@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flames</title>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<script src="jquery-3.0.0.js"></script>
+<script>
+	var stock_info = [ {
+		"name" : "平安银行",
+		"code" : "000001",
+		"cur_price" : 8.88,
+		"amount" : 4000,
+		"estimated_debt" : 56.23
+	}, {
+		"name" : "中国平安",
+		"code" : "601318",
+		"cur_price" : 32.00,
+		"amount" : 1200,
+		"estimated_debt" : 55.97
+	}, {
+		"name" : "现金",
+		"code" : "",
+		"cur_price" : 1.00,
+		"amount" : 12000,
+		"estimated_debt" : 0
+	} ];
+	$(document).ready(function() {
+		$("#detail tbody tr").remove();
+
+		$.each(stock_info, function(key, row_data) {
+			var row = $("<tr/>").appendTo($("#detail tbody"));
+			$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row);
+			$("<td/>").html(row_data["cur_price"]).appendTo(row);
+			$("<td/>").html(row_data["amount"]).appendTo(row);
+			$("<td/>").html(row_data["cur_price"] * row_data["amount"]).appendTo(row);
+			$("<td/>").html(row_data["estimated_debt"]).appendTo(row);
+			$("<td/>").html(row_data["cur_price"] * row_data["amount"] - row_data["estimated_debt"]).appendTo(row);
+		});
+
+	});
+</script>
+</head>
+
+<body>
+	<div style="height: 50px"></div>
+	<div id="global">
+		<div>
+			<table class="gmt">
+				<tr>
+					<td class="gmt-title">累计净值</td>
+					<td class="gmt-title gmt-sp">年度收益率</td>
+				</tr>
+				<tr>
+					<td class="gmt-value">1.2678</td>
+					<td class="gmt-value gmt-sp">36.8%</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<hr style="width:600px"/>
+	<div id="detail">
+		<table class="zebra">
+			<caption>持仓清单</caption>
+			<thead>
+				<tr>
+					<th>证券名称/代码</th>
+					<th>现价</th>
+					<th>数量</th>
+					<th>市值</th>
+					<th>预计税费</th>
+					<th>净值</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<div id="log"></div>
+</body>
+</html>
