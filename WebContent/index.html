@@ -6,36 +6,64 @@
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 <script src="jquery-3.0.0.js"></script>
 <script>
-	var stock_info = [ {
-		"name" : "平安银行",
-		"code" : "000001",
-		"cur_price" : 8.88,
-		"amount" : 4000,
-		"estimated_debt" : 56.23
-	}, {
-		"name" : "中国平安",
-		"code" : "601318",
-		"cur_price" : 32.00,
-		"amount" : 1200,
-		"estimated_debt" : 55.97
-	}, {
-		"name" : "现金",
-		"code" : "",
-		"cur_price" : 1.00,
-		"amount" : 12000,
-		"estimated_debt" : 0
-	} ];
+	var portfolio_info = {
+		"global_info" : {
+			"net_worth_per_unit" : 1.0235,
+			"rate_of_return_year" : 0.3556,
+			"total_worth" : 96986,
+			"projected_liabilities" : 132.7,
+			"net_worth" : 96853.3,
+			"stock_net_worth" : 73787.3,
+			"cash" : 23066,
+			"proportion_of_stock" : 0.76
+		},
+		"stock_info" : [ {
+			"name" : "平安银行",
+			"code" : "000001",
+			"amount" : 4000,
+			"cur_price" : 8.88,
+			"market_worth" : 35520,
+			"estimated_commission" : 56.23,
+			"estimated_tax" : 10,
+			"net_worth" : 35453.77,
+			"proportion" : 0.366
+		}, {
+			"name" : "中国平安",
+			"code" : "601318",
+			"amount" : 1200,
+			"cur_price" : 32.00,
+			"market_worth" : 38400,
+			"estimated_commission" : 55.97,
+			"estimated_tax" : 10.5,
+			"net_worth" : 38333.53,
+			"proportion" : 0.396
+		} ]
+	};
+	
+	Number.prototype.toPercent = function(n){n = n || 0;return ( Math.round( this * Math.pow( 10, n + 2 ) ) / Math.pow( 10, n ) ).toFixed( n ) + '%';}
+	
 	$(document).ready(function() {
 		$("#detail tbody tr").remove();
 
-		$.each(stock_info, function(key, row_data) {
+		$("#net_worth_per_unit").html(portfolio_info["global_info"]["net_worth_per_unit"]);
+		$("#rate_of_return_year").html(portfolio_info["global_info"]["rate_of_return_year"].toPercent(2));
+		$("#total_worth").html(portfolio_info["global_info"]["total_worth"]);
+		$("#projected_liabilities").html(portfolio_info["global_info"]["projected_liabilities"]);
+		$("#net_worth").html(portfolio_info["global_info"]["net_worth"]);
+		$("#stock_net_worth").html(portfolio_info["global_info"]["stock_net_worth"]);
+		$("#cash").html(portfolio_info["global_info"]["cash"]);
+		$("#proportion_of_stock").html(portfolio_info["global_info"]["proportion_of_stock"].toPercent());
+		
+		$.each(portfolio_info["stock_info"], function(key, row_data) {
 			var row = $("<tr/>").appendTo($("#detail tbody"));
-			$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row);
-			$("<td/>").html(row_data["cur_price"]).appendTo(row);
-			$("<td/>").html(row_data["amount"]).appendTo(row);
-			$("<td/>").html(row_data["cur_price"] * row_data["amount"]).appendTo(row);
-			$("<td/>").html(row_data["estimated_debt"]).appendTo(row);
-			$("<td/>").html(row_data["cur_price"] * row_data["amount"] - row_data["estimated_debt"]).appendTo(row);
+			$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
+			$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
+			$("<td/>").html(row_data["cur_price"]).appendTo(row); // 价格
+			$("<td/>").html(row_data["market_worth"]).appendTo(row); // 市值
+			$("<td/>").html(row_data["estimated_commission"]).appendTo(row); //预计手续费
+			$("<td/>").html(row_data["estimated_tax"]).appendTo(row); //预计税费
+			$("<td/>").html(row_data["net_worth"]).appendTo(row); //净值
+			$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
 		});
 
 	});
@@ -52,24 +80,47 @@
 					<td class="gmt-title gmt-sp">年度收益率</td>
 				</tr>
 				<tr>
-					<td class="gmt-value">1.2678</td>
-					<td class="gmt-value gmt-sp">36.8%</td>
+					<td id="net_worth_per_unit" class="gmt-value"></td>
+					<td id= "rate_of_return_year" class="gmt-value gmt-sp"></td>
 				</tr>
 			</table>
 		</div>
 	</div>
-	<hr style="width:600px"/>
+	<div style="height: 5px"></div>
+	<div id="global-more">
+		<table class="gmt">
+			<tr>
+				<td class="gmt-detail-title">总资产</td>
+				<td id="total_worth" class="gmt-detail-value"></td>
+				<td class="gmt-detail-title">预计负债</td>
+				<td id="projected_liabilities" class="gmt-detail-value"></td>
+				<td class="gmt-detail-title">净资产</td>
+				<td id="net_worth" class="gmt-detail-value"></td>
+			</tr>
+			<tr>
+				<td class="gmt-detail-title">市值</td>
+				<td id="stock_net_worth" class="gmt-detail-value"></td>
+				<td class="gmt-detail-title">现金</td>
+				<td id="cash" class="gmt-detail-value"></td>
+				<td class="gmt-detail-title">仓位</td>
+				<td id="proportion_of_stock" class="gmt-detail-value"></td>
+			</tr>
+		</table>
+	</div>
+	<hr style="width: 800px" />
 	<div id="detail">
 		<table class="zebra">
 			<caption>持仓清单</caption>
 			<thead>
 				<tr>
 					<th>证券名称/代码</th>
-					<th>现价</th>
 					<th>数量</th>
+					<th>现价</th>
 					<th>市值</th>
+					<th>预计手续费</th>
 					<th>预计税费</th>
 					<th>净值</th>
+					<th>占比</th>
 				</tr>
 			</thead>
 			<tbody>
