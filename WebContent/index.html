@@ -7,16 +7,6 @@
 <script src="jquery-3.0.0.js"></script>
 <script>
 	var portfolio_info = {
-		"global_info" : {
-			"net_worth_per_unit" : 1.0235,
-			"rate_of_return_year" : 0.3556,
-			"total_worth" : 96986,
-			"projected_liabilities" : 132.7,
-			"net_worth" : 96853.3,
-			"stock_net_worth" : 73787.3,
-			"cash" : 23066,
-			"proportion_of_stock" : 0.76
-		},
 		"stock_info" : [ {
 			"name" : "平安银行",
 			"code" : "000001",
@@ -39,21 +29,34 @@
 			"proportion" : 0.396
 		} ]
 	};
-	
-	Number.prototype.toPercent = function(n){n = n || 0;return ( Math.round( this * Math.pow( 10, n + 2 ) ) / Math.pow( 10, n ) ).toFixed( n ) + '%';}
-	
+
+	Number.prototype.toPercent = function(n) {
+		n = n || 0;
+		return (Math.round(this * Math.pow(10, n + 2)) / Math.pow(10, n)).toFixed(n) + '%';
+	}
+
 	$(document).ready(function() {
+		$.get({
+			url : "rest/portfolios/P00000001",
+			dataType : 'json',
+			async : false,
+			success : function(result) { //回调函数，result，返回值
+				alert(JSON.stringify(result));
+				portfolio_info["global_info"] = result;
+			}
+		});
+
 		$("#detail tbody tr").remove();
 
-		$("#net_worth_per_unit").html(portfolio_info["global_info"]["net_worth_per_unit"]);
-		$("#rate_of_return_year").html(portfolio_info["global_info"]["rate_of_return_year"].toPercent(2));
-		$("#total_worth").html(portfolio_info["global_info"]["total_worth"]);
-		$("#projected_liabilities").html(portfolio_info["global_info"]["projected_liabilities"]);
-		$("#net_worth").html(portfolio_info["global_info"]["net_worth"]);
-		$("#stock_net_worth").html(portfolio_info["global_info"]["stock_net_worth"]);
+		$("#netWorthPerUnit").html(portfolio_info["global_info"]["netWorthPerUnit"]);
+		$("#rateOfReturnYear").html(portfolio_info["global_info"]["rateOfReturnYear"].toPercent(2));
+		$("#totalWorth").html(portfolio_info["global_info"]["totalWorth"]);
+		$("#projectedLiabilities").html(portfolio_info["global_info"]["projectedLiabilities"]);
+		$("#netWorth").html(portfolio_info["global_info"]["netWorth"]);
+		$("#stockNetWorth").html(portfolio_info["global_info"]["stockNetWorth"]);
 		$("#cash").html(portfolio_info["global_info"]["cash"]);
-		$("#proportion_of_stock").html(portfolio_info["global_info"]["proportion_of_stock"].toPercent());
-		
+		$("#proportionOfStock").html(portfolio_info["global_info"]["proportionOfStock"].toPercent());
+
 		$.each(portfolio_info["stock_info"], function(key, row_data) {
 			var row = $("<tr/>").appendTo($("#detail tbody"));
 			$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
@@ -62,7 +65,7 @@
 			$("<td/>").html(row_data["market_worth"]).appendTo(row); // 市值
 			$("<td/>").html(row_data["estimated_commission"]).appendTo(row); //预计手续费
 			$("<td/>").html(row_data["estimated_tax"]).appendTo(row); //预计税费
-			$("<td/>").html(row_data["net_worth"]).appendTo(row); //净值
+			$("<td/>").html(row_data["netWorth"]).appendTo(row); //净值
 			$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
 		});
 
@@ -80,8 +83,8 @@
 					<td class="gmt-title gmt-sp">年度收益率</td>
 				</tr>
 				<tr>
-					<td id="net_worth_per_unit" class="gmt-value"></td>
-					<td id= "rate_of_return_year" class="gmt-value gmt-sp"></td>
+					<td id="netWorthPerUnit" class="gmt-value"></td>
+					<td id="rateOfReturnYear" class="gmt-value gmt-sp"></td>
 				</tr>
 			</table>
 		</div>
@@ -91,19 +94,19 @@
 		<table class="gmt">
 			<tr>
 				<td class="gmt-detail-title">总资产</td>
-				<td id="total_worth" class="gmt-detail-value"></td>
+				<td id="totalWorth" class="gmt-detail-value"></td>
 				<td class="gmt-detail-title">预计负债</td>
-				<td id="projected_liabilities" class="gmt-detail-value"></td>
+				<td id="projectedLiabilities" class="gmt-detail-value"></td>
 				<td class="gmt-detail-title">净资产</td>
-				<td id="net_worth" class="gmt-detail-value"></td>
+				<td id="netWorth" class="gmt-detail-value"></td>
 			</tr>
 			<tr>
 				<td class="gmt-detail-title">市值</td>
-				<td id="stock_net_worth" class="gmt-detail-value"></td>
+				<td id="stockNetWorth" class="gmt-detail-value"></td>
 				<td class="gmt-detail-title">现金</td>
 				<td id="cash" class="gmt-detail-value"></td>
 				<td class="gmt-detail-title">仓位</td>
-				<td id="proportion_of_stock" class="gmt-detail-value"></td>
+				<td id="proportionOfStock" class="gmt-detail-value"></td>
 			</tr>
 		</table>
 	</div>
