@@ -35,27 +35,23 @@
 		return (Math.round(this * Math.pow(10, n + 2)) / Math.pow(10, n)).toFixed(n) + '%';
 	}
 
+	$("#detail tbody tr").remove();
+	
 	$(document).ready(function() {
 		$.get({
 			url : "rest/portfolios/P00000001",
 			dataType : 'json',
-			async : false,
 			success : function(result) { //回调函数，result，返回值
-				alert(JSON.stringify(result));
-				portfolio_info["global_info"] = result;
+				$("#netWorthPerUnit").html(result["netWorthPerUnit"]);
+				$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
+				$("#totalWorth").html(result["totalWorth"]);
+				$("#projectedLiabilities").html(result["projectedLiabilities"]);
+				$("#netWorth").html(result["netWorth"]);
+				$("#stockNetWorth").html(result["stockNetWorth"]);
+				$("#cash").html(result["cash"]);
+				$("#proportionOfStock").html(result["proportionOfStock"].toPercent());
 			}
 		});
-
-		$("#detail tbody tr").remove();
-
-		$("#netWorthPerUnit").html(portfolio_info["global_info"]["netWorthPerUnit"]);
-		$("#rateOfReturnYear").html(portfolio_info["global_info"]["rateOfReturnYear"].toPercent(2));
-		$("#totalWorth").html(portfolio_info["global_info"]["totalWorth"]);
-		$("#projectedLiabilities").html(portfolio_info["global_info"]["projectedLiabilities"]);
-		$("#netWorth").html(portfolio_info["global_info"]["netWorth"]);
-		$("#stockNetWorth").html(portfolio_info["global_info"]["stockNetWorth"]);
-		$("#cash").html(portfolio_info["global_info"]["cash"]);
-		$("#proportionOfStock").html(portfolio_info["global_info"]["proportionOfStock"].toPercent());
 
 		$.each(portfolio_info["stock_info"], function(key, row_data) {
 			var row = $("<tr/>").appendTo($("#detail tbody"));
