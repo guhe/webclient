@@ -39,9 +39,9 @@
 	
 	$(document).ready(function() {
 		$.get({
-			url : "rest/portfolios/P00000001",
+			url : "rest/Portfolios/P00000001",
 			dataType : 'json',
-			success : function(result) { //回调函数，result，返回值
+			success : function(result) {
 				$("#netWorthPerUnit").html(result["netWorthPerUnit"]);
 				$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
 				$("#totalWorth").html(result["totalWorth"]);
@@ -52,17 +52,23 @@
 				$("#proportionOfStock").html(result["proportionOfStock"].toPercent());
 			}
 		});
-
-		$.each(portfolio_info["stock_info"], function(key, row_data) {
-			var row = $("<tr/>").appendTo($("#detail tbody"));
-			$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
-			$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
-			$("<td/>").html(row_data["cur_price"]).appendTo(row); // 价格
-			$("<td/>").html(row_data["market_worth"]).appendTo(row); // 市值
-			$("<td/>").html(row_data["estimated_commission"]).appendTo(row); //预计手续费
-			$("<td/>").html(row_data["estimated_tax"]).appendTo(row); //预计税费
-			$("<td/>").html(row_data["netWorth"]).appendTo(row); //净值
-			$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
+		
+		$.get({
+			url : "rest/Portfolios/P00000001/HoldingStocks",
+			dataType : 'json',
+			success : function(result) {
+				$.each(result, function(key, row_data) {
+					var row = $("<tr/>").appendTo($("#detail tbody"));
+					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
+					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
+					$("<td/>").html(row_data["curPrice"]).appendTo(row); // 价格
+					$("<td/>").html(row_data["marketWorth"]).appendTo(row); // 市值
+					$("<td/>").html(row_data["estimatedCommission"]).appendTo(row); //预计手续费
+					$("<td/>").html(row_data["estimatedTax"]).appendTo(row); //预计税费
+					$("<td/>").html(row_data["netWorth"]).appendTo(row); //净值
+					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
+				});
+			}
 		});
 
 	});
