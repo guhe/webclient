@@ -13,7 +13,7 @@ public enum Dao {
 	private Map<String, List<HoldingStock>> holdingstocks = new LinkedHashMap<>();
 
 	private Dao() {
-		Portfolio portfolio = new Portfolio("P00000001", "·¶²ı»¢²âÊÔ×éºÏ1");
+		Portfolio portfolio = new Portfolio("P00000001", "èŒƒæ˜Œè™æµ‹è¯•ç»„åˆ1");
 		portfolio.setNetWorthPerUnit(1.0235);
 		portfolio.setRateOfReturnYear(0.3556);
 		portfolio.setTotalWorth(96986);
@@ -25,8 +25,20 @@ public enum Dao {
 		portfolios.put("P00000001", portfolio);
 		holdingstocks.put("P00000001", new ArrayList<>());
 
+		Portfolio portfolio2 = new Portfolio("P00000002", "èŒƒæ˜Œè™æµ‹è¯•ç»„åˆ2");
+		portfolio2.setNetWorthPerUnit(1.0235);
+		portfolio2.setRateOfReturnYear(0.3556);
+		portfolio2.setTotalWorth(96986);
+		portfolio2.setProjectedLiabilities(132.7);
+		portfolio2.setNetWorth(96853.3);
+		portfolio2.setStockNetWorth(73787.3);
+		portfolio2.setCash(23066);
+		portfolio2.setProportionOfStock(0.76);
+		portfolios.put("P00000002", portfolio2);
+		holdingstocks.put("P00000002", new ArrayList<>());
+		
 		HoldingStock stock1 = new HoldingStock();
-		stock1.setName("Æ½°²ÒøĞĞ");
+		stock1.setName("å¹³å®‰é“¶è¡Œ");
 		stock1.setCode("000001");
 		stock1.setAmount(4000);
 		stock1.setCurPrice(8.88);
@@ -38,7 +50,7 @@ public enum Dao {
 		holdingstocks.get("P00000001").add(stock1);
 
 		HoldingStock stock2 = new HoldingStock();
-		stock2.setName("ÖĞ¹úÆ½°²");
+		stock2.setName("ä¸­å›½å¹³å®‰");
 		stock2.setCode("601318");
 		stock2.setAmount(1200);
 		stock2.setCurPrice(32.00);
