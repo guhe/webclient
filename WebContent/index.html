@@ -6,30 +6,6 @@
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 <script src="jquery-3.0.0.js"></script>
 <script>
-	var portfolio_info = {
-		"stock_info" : [ {
-			"name" : "平安银行",
-			"code" : "000001",
-			"amount" : 4000,
-			"cur_price" : 8.88,
-			"market_worth" : 35520,
-			"estimated_commission" : 56.23,
-			"estimated_tax" : 10,
-			"net_worth" : 35453.77,
-			"proportion" : 0.366
-		}, {
-			"name" : "中国平安",
-			"code" : "601318",
-			"amount" : 1200,
-			"cur_price" : 32.00,
-			"market_worth" : 38400,
-			"estimated_commission" : 55.97,
-			"estimated_tax" : 10.5,
-			"net_worth" : 38333.53,
-			"proportion" : 0.396
-		} ]
-	};
-
 	Number.prototype.toPercent = function(n) {
 		n = n || 0;
 		return (Math.round(this * Math.pow(10, n + 2)) / Math.pow(10, n)).toFixed(n) + '%';
