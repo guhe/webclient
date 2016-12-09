@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Path("/Portfolios")
 public class PortfoliosResource {
 
-	private StockMarket market = new SinaStockMarket();
+	private StockMarket market = new TencentStockMarket();
 
 	@GET
 	@Path("{portfolio}")
