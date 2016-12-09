@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Portfolio {
-	public static final double RATE_TAX = 0.001;
-	public static final double RATE_COMMISSION = 0.00025;
-
 	private String id;
 	private String name;
 

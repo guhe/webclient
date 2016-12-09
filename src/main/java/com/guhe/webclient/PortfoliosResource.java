@@ -1,7 +1,7 @@
 package com.guhe.webclient;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,54 +22,40 @@ public class PortfoliosResource {
 	@GET
 	@Path("{portfolio}/HoldingStocks")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
-		ArrayList<HoldingStockViewData> holdingStockVDs = new ArrayList<>();
 		Portfolio portfolio = Dao.instance.getPortfolio(portfolioId);
-		double portfolioNetWorth = getPortfolioStockTotalWorth(portfolio)
-				* (1 - Portfolio.RATE_COMMISSION - Portfolio.RATE_TAX) + portfolio.getCash();
-		for (Holding holding : portfolio.getHoldings()) {
-			holdingStockVDs.add(createViewData(portfolio, holding, portfolioNetWorth));
-		}
-		return holdingStockVDs;
-	}
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market);
 
-	private double getPortfolioStockTotalWorth(Portfolio portfolio) {
-		double stockTotalWorth = 0;
-		for (Holding holding : portfolio.getHoldings()) {
-			stockTotalWorth += holding.getAmount() * market.getPrice(holding.getStock().getCode());
-		}
-		return stockTotalWorth;
+		return calculator.getHoldingCalculators().stream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
 	private PortfolioViewData createViewData(Portfolio portfolio) {
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market);
+
 		PortfolioViewData viewData = new PortfolioViewData();
 		viewData.setId(portfolio.getId());
 		viewData.setName(portfolio.getName());
 		viewData.setCash(portfolio.getCash());
-
-		double stockTotalWorth = getPortfolioStockTotalWorth(portfolio);
-		viewData.setTotalWorth(stockTotalWorth + portfolio.getCash());
-		viewData.setProjectedLiabilities(stockTotalWorth * (Portfolio.RATE_COMMISSION + Portfolio.RATE_TAX));
-		viewData.setStockNetWorth(stockTotalWorth - viewData.getProjectedLiabilities());
-		viewData.setNetWorth(viewData.getTotalWorth() - viewData.getProjectedLiabilities());
-		viewData.setNetWorthPerUnit(viewData.getNetWorth() / portfolio.getNumberOfShares());
-		viewData.setProportionOfStock(viewData.getStockNetWorth() / viewData.getNetWorth());
-		viewData.setRateOfReturnYear(viewData.getNetWorthPerUnit() / portfolio.getNetWorthPerUnitLastYear() - 1);
-
+		viewData.setTotalWorth(calculator.getTotalWorth());
+		viewData.setProjectedLiabilities(calculator.getProjectedLiabilities());
+		viewData.setStockNetWorth(calculator.getStockNetWorth());
+		viewData.setNetWorth(calculator.getNetWorth());
+		viewData.setNetWorthPerUnit(calculator.getNetWorthPerUnit());
+		viewData.setProportionOfStock(calculator.getProportionOfStock());
+		viewData.setRateOfReturnYear(calculator.getRateOfReturnYear());
 		return viewData;
 	}
 
-	private HoldingStockViewData createViewData(Portfolio portfolio, Holding holding, double portfolioNetWorth) {
+	private HoldingStockViewData createViewData(PortfolioCalculator.HoldingCalculator calculator) {
 		HoldingStockViewData viewData = new HoldingStockViewData();
-		viewData.setCode(holding.getStock().getCode());
-		viewData.setName(holding.getStock().getName());
-		viewData.setAmount(holding.getAmount());
-		viewData.setCurPrice(market.getPrice(holding.getStock().getCode()));
-		viewData.setMarketWorth(viewData.getAmount() * viewData.getCurPrice());
-		viewData.setEstimatedCommission(viewData.getMarketWorth() * Portfolio.RATE_COMMISSION);
-		viewData.setEstimatedTax(viewData.getMarketWorth() * Portfolio.RATE_TAX);
-		viewData.setNetWorth(
-				viewData.getMarketWorth() - viewData.getEstimatedCommission() - viewData.getEstimatedTax());
-		viewData.setProportion(viewData.getNetWorth() / portfolioNetWorth);
+		viewData.setCode(calculator.getHolding().getStock().getCode());
+		viewData.setName(calculator.getHolding().getStock().getName());
+		viewData.setAmount(calculator.getHolding().getAmount());
+		viewData.setCurPrice(calculator.getCurPrice());
+		viewData.setMarketWorth(calculator.getMarketWorth());
+		viewData.setEstimatedCommission(calculator.getEstimatedCommission());
+		viewData.setEstimatedTax(calculator.getEstimatedTax());
+		viewData.setNetWorth(calculator.getNetWorth());
+		viewData.setProportion(calculator.getProportion());
 		return viewData;
 	}
 

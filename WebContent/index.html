@@ -18,7 +18,7 @@
 			url : "rest/Portfolios/P00000001",
 			dataType : 'json',
 			success : function(result) {
-				$("#netWorthPerUnit").html(result["netWorthPerUnit"]);
+				$("#netWorthPerUnit").html(result["netWorthPerUnit"].toFixed(4));
 				$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
 				$("#totalWorth").html(result["totalWorth"]);
 				$("#projectedLiabilities").html(result["projectedLiabilities"]);
