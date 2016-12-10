@@ -20,11 +20,11 @@
 			success : function(result) {
 				$("#netWorthPerUnit").html(result["netWorthPerUnit"].toFixed(4));
 				$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
-				$("#totalWorth").html(result["totalWorth"]);
-				$("#projectedLiabilities").html(result["projectedLiabilities"]);
-				$("#netWorth").html(result["netWorth"]);
-				$("#stockNetWorth").html(result["stockNetWorth"]);
-				$("#cash").html(result["cash"]);
+				$("#totalWorth").html(result["totalWorth"].toFixed(2));
+				$("#projectedLiabilities").html(result["projectedLiabilities"].toFixed(2));
+				$("#netWorth").html(result["netWorth"].toFixed(2));
+				$("#stockNetWorth").html(result["stockNetWorth"].toFixed(2));
+				$("#cash").html(result["cash"].toFixed(2));
 				$("#proportionOfStock").html(result["proportionOfStock"].toPercent());
 			}
 		});
@@ -37,11 +37,11 @@
 					var row = $("<tr/>").appendTo($("#detail tbody"));
 					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
 					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
-					$("<td/>").html(row_data["curPrice"]).appendTo(row); // 价格
-					$("<td/>").html(row_data["marketWorth"]).appendTo(row); // 市值
-					$("<td/>").html(row_data["estimatedCommission"]).appendTo(row); //预计手续费
-					$("<td/>").html(row_data["estimatedTax"]).appendTo(row); //预计税费
-					$("<td/>").html(row_data["netWorth"]).appendTo(row); //净值
+					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
+					$("<td/>").html(row_data["marketWorth"].toFixed(2)).appendTo(row); // 市值
+					$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
+					$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
+					$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row); //净值
 					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
 				});
 			}
