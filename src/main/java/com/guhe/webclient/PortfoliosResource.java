@@ -3,6 +3,7 @@ package com.guhe.webclient;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -11,7 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Path("/Portfolios")
 public class PortfoliosResource {
 
-	private StockMarket market = new TencentStockMarket();
+	@Inject
+	private StockMarket stockMarket;
 
 	@GET
 	@Path("{portfolio}")
@@ -23,13 +25,13 @@ public class PortfoliosResource {
 	@Path("{portfolio}/HoldingStocks")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
 		Portfolio portfolio = Dao.instance.getPortfolio(portfolioId);
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
 
 		return calculator.getHoldingCalculators().stream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
 	private PortfolioViewData createViewData(Portfolio portfolio) {
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
 
 		PortfolioViewData viewData = new PortfolioViewData();
 		viewData.setId(portfolio.getId());
@@ -57,14 +59,6 @@ public class PortfoliosResource {
 		viewData.setNetWorth(calculator.getNetWorth());
 		viewData.setProportion(calculator.getProportion());
 		return viewData;
-	}
-
-	public StockMarket getMarket() {
-		return market;
-	}
-
-	public void setMarket(StockMarket market) {
-		this.market = market;
 	}
 }
 

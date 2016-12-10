@@ -1,10 +1,13 @@
 package com.guhe.webclient.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
@@ -14,14 +17,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.guhe.webclient.PortfoliosResource;
+import com.guhe.webclient.StockMarket;
 
 public class PortfoliosResourceTest extends JerseyTest {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
+	private StockMarket market;
+
 	@Override
 	protected Application configure() {
-		return new ResourceConfig(PortfoliosResource.class);
+		market = mock(StockMarket.class);
+		when(market.getPrice("000001")).thenReturn(8.88);
+		when(market.getPrice("601318")).thenReturn(32.0);
+
+		ResourceConfig config = new ResourceConfig(PortfoliosResource.class);
+		config.register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				bind(market).to(StockMarket.class);
+			}
+		});
+		return config;
 	}
 
 	@Test

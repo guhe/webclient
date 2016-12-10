@@ -17,6 +17,10 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<!-- Register resources and providers under com.vogella.jersey.first package. -->
 		<init-param>
+			<param-name>javax.ws.rs.Application</param-name>
+			<param-value>com.guhe.webclient.JerseyConfig</param-value>
+		</init-param>
+		<init-param>
 			<param-name>jersey.config.server.provider.packages</param-name>
 			<param-value>com.guhe.webclient</param-value>
 		</init-param>

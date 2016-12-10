@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.ws.rs.client.ClientBuilder;
 
+import org.jvnet.hk2.annotations.Service;
+
+@Service
 public class TencentStockMarket implements StockMarket {
 
 	private Map<String, Double> cache = new HashMap<>();
