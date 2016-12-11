@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PortfolioCalculator {
-	private static final double RATE_TAX = 0.001;
-	private static final double RATE_COMMISSION = 0.00025;
-
 	private Portfolio portfolio;
 	private StockMarket market;
 
@@ -16,11 +13,7 @@ public class PortfolioCalculator {
 	}
 
 	private double getStockTotalWorth() {
-		double stockTotalWorth = 0;
-		for (Holding holding : portfolio.getHoldings()) {
-			stockTotalWorth += holding.getAmount() * market.getPrice(holding.getStock().getCode());
-		}
-		return stockTotalWorth;
+		return getHoldingCalculators().stream().map(e -> e.getMarketWorth()).reduce(0.0, Double::sum);
 	}
 
 	public double getTotalWorth() {
@@ -28,7 +21,8 @@ public class PortfolioCalculator {
 	}
 
 	public double getProjectedLiabilities() {
-		return getStockTotalWorth() * (RATE_COMMISSION + RATE_TAX);
+		return getHoldingCalculators().stream().map(e -> e.getEstimatedTax() + e.getEstimatedCommission()).reduce(0.0,
+				Double::sum);
 	}
 
 	public double getNetWorth() {
@@ -56,6 +50,9 @@ public class PortfolioCalculator {
 	}
 
 	public class HoldingCalculator {
+		private static final double RATE_TAX = 0.001;
+		private static final double RATE_COMMISSION = 0.00025;
+
 		private Holding holding;
 
 		HoldingCalculator(Holding holding) {
@@ -75,7 +72,7 @@ public class PortfolioCalculator {
 		}
 
 		public double getEstimatedCommission() {
-			return getMarketWorth() * RATE_COMMISSION;
+			return Math.max(5, getMarketWorth() * RATE_COMMISSION);
 		}
 
 		public double getEstimatedTax() {
@@ -83,7 +80,7 @@ public class PortfolioCalculator {
 		}
 
 		public double getNetWorth() {
-			return getMarketWorth() * (1 - RATE_COMMISSION - RATE_TAX);
+			return getMarketWorth() - getEstimatedCommission() - getEstimatedTax();
 		}
 
 		public double getProportion() {
