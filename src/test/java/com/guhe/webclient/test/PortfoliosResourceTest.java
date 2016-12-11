@@ -16,7 +16,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.guhe.webclient.Dao;
+import com.guhe.webclient.Holding;
+import com.guhe.webclient.Portfolio;
 import com.guhe.webclient.PortfoliosResource;
+import com.guhe.webclient.Stock;
 import com.guhe.webclient.StockMarket;
 
 public class PortfoliosResourceTest extends JerseyTest {
@@ -25,17 +29,39 @@ public class PortfoliosResourceTest extends JerseyTest {
 
 	private StockMarket market;
 
+	private Dao dao;
+
+	private Portfolio createPortfolio() {
+		Portfolio portfolio = new Portfolio();
+		portfolio.setId("P00000001");
+		portfolio.setName("范昌虎测试组合1");
+		portfolio.setCash(23066);
+		portfolio.setNumberOfShares(150000);
+		portfolio.setNetWorthPerUnitLastYear(1.0822);
+
+		Stock ping_an_yin_hang = new Stock("000001", "平安银行");
+		portfolio.add(ping_an_yin_hang, new Holding(ping_an_yin_hang, 5800));
+		Stock zhong_guo_ping_an = new Stock("601318", "中国平安");
+		portfolio.add(zhong_guo_ping_an, new Holding(zhong_guo_ping_an, 3600));
+
+		return portfolio;
+	}
+
 	@Override
 	protected Application configure() {
 		market = mock(StockMarket.class);
 		when(market.getPrice("000001")).thenReturn(8.88);
 		when(market.getPrice("601318")).thenReturn(32.0);
 
+		dao = mock(Dao.class);
+		when(dao.getPortfolio("P00000001")).thenReturn(createPortfolio());
+
 		ResourceConfig config = new ResourceConfig(PortfoliosResource.class);
 		config.register(new AbstractBinder() {
 			@Override
 			protected void configure() {
 				bind(market).to(StockMarket.class);
+				bind(dao).to(Dao.class);
 			}
 		});
 		return config;

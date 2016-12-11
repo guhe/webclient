@@ -10,6 +10,7 @@ public class JerseyConfig extends ResourceConfig {
 			@Override
 			protected void configure() {
 				bind(TencentStockMarket.class).to(StockMarket.class);
+				bind(StaticDao.class).to(Dao.class);
 			}
 		});
 	}

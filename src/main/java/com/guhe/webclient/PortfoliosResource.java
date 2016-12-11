@@ -14,17 +14,20 @@ public class PortfoliosResource {
 
 	@Inject
 	private StockMarket stockMarket;
+	
+	@Inject
+	private Dao dao;
 
 	@GET
 	@Path("{portfolio}")
 	public PortfolioViewData getPortfolio(@PathParam("portfolio") String id) {
-		return createViewData(Dao.instance.getPortfolio(id));
+		return createViewData(dao.getPortfolio(id));
 	}
 
 	@GET
 	@Path("{portfolio}/HoldingStocks")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
-		Portfolio portfolio = Dao.instance.getPortfolio(portfolioId);
+		Portfolio portfolio = dao.getPortfolio(portfolioId);
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
 
 		return calculator.getHoldingCalculators().stream().map(e -> createViewData(e)).collect(Collectors.toList());
