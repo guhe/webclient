@@ -3,6 +3,8 @@ package com.guhe.webclient;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.guhe.webclient.Stock.Exchange;
+
 public class PortfolioCalculator {
 	private Portfolio portfolio;
 	private StockMarket market;
@@ -52,6 +54,7 @@ public class PortfolioCalculator {
 	public class HoldingCalculator {
 		private static final double RATE_TAX = 0.001;
 		private static final double RATE_COMMISSION = 0.00025;
+		private static final double RATE_SH_GUOHU = 0.00002;
 
 		private Holding holding;
 
@@ -76,7 +79,8 @@ public class PortfolioCalculator {
 		}
 
 		public double getEstimatedTax() {
-			return getMarketWorth() * RATE_TAX;
+			return getMarketWorth()
+					* (RATE_TAX + (holding.getStock().getExchange() == Exchange.ShangHai ? RATE_SH_GUOHU : 0));
 		}
 
 		public double getNetWorth() {

@@ -12,6 +12,10 @@ public class Stock {
 		this.name = name;
 	}
 
+	public Exchange getExchange() {
+		return Exchange.get(code);
+	}
+
 	public String getCode() {
 		return code;
 	}
@@ -28,5 +32,27 @@ public class Stock {
 	@Override
 	public boolean equals(Object obj) {
 		return Reflector.isAllFieldsEquals(obj, this);
+	}
+
+	public enum Exchange {
+		ShangHai('6'), ShenZheng('0');
+
+		private char first;
+
+		private Exchange(char first) {
+			this.first = first;
+		}
+
+		public static Exchange get(String code) {
+			if (code == null || code.length() == 0) {
+				throw new RuntimeException();
+			}
+			for (Exchange ex : values()) {
+				if (code.charAt(0) == ex.first) {
+					return ex;
+				}
+			}
+			throw new RuntimeException();
+		}
 	}
 }

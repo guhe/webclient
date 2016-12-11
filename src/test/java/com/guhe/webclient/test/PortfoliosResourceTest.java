@@ -75,14 +75,14 @@ public class PortfoliosResourceTest extends JerseyTest {
 		ObjectNode expect = mapper.createObjectNode();
 		expect.set("id", mapper.getNodeFactory().textNode("P00000001"));
 		expect.set("name", mapper.getNodeFactory().textNode("范昌虎测试组合1"));
-		expect.set("netWorthPerUnit", mapper.getNodeFactory().numberNode(1.263744));
-		expect.set("rateOfReturnYear", mapper.getNodeFactory().numberNode(0.167755));
+		expect.set("netWorthPerUnit", mapper.getNodeFactory().numberNode(1.263729));
+		expect.set("rateOfReturnYear", mapper.getNodeFactory().numberNode(0.167741));
 		expect.set("totalWorth", mapper.getNodeFactory().numberNode(189770.0));
-		expect.set("projectedLiabilities", mapper.getNodeFactory().numberNode(208.38));
-		expect.set("netWorth", mapper.getNodeFactory().numberNode(189561.62));
-		expect.set("stockNetWorth", mapper.getNodeFactory().numberNode(166495.62));
+		expect.set("projectedLiabilities", mapper.getNodeFactory().numberNode(210.684));
+		expect.set("netWorth", mapper.getNodeFactory().numberNode(189559.316));
+		expect.set("stockNetWorth", mapper.getNodeFactory().numberNode(166493.316));
 		expect.set("cash", mapper.getNodeFactory().numberNode(23066.0));
-		expect.set("proportionOfStock", mapper.getNodeFactory().numberNode(0.878319));
+		expect.set("proportionOfStock", mapper.getNodeFactory().numberNode(0.878318));
 
 		assertEquals(expect, actual);
 	}
@@ -102,7 +102,7 @@ public class PortfoliosResourceTest extends JerseyTest {
 		obj1.set("estimatedCommission", mapper.getNodeFactory().numberNode(12.876));
 		obj1.set("estimatedTax", mapper.getNodeFactory().numberNode(51.504));
 		obj1.set("netWorth", mapper.getNodeFactory().numberNode(51439.62));
-		obj1.set("proportion", mapper.getNodeFactory().numberNode(0.271361));
+		obj1.set("proportion", mapper.getNodeFactory().numberNode(0.271364));
 		expect.add(obj1);
 
 		ObjectNode obj2 = mapper.createObjectNode();
@@ -112,9 +112,9 @@ public class PortfoliosResourceTest extends JerseyTest {
 		obj2.set("curPrice", mapper.getNodeFactory().numberNode(32.0));
 		obj2.set("marketWorth", mapper.getNodeFactory().numberNode(115200.0));
 		obj2.set("estimatedCommission", mapper.getNodeFactory().numberNode(28.8));
-		obj2.set("estimatedTax", mapper.getNodeFactory().numberNode(115.2));
-		obj2.set("netWorth", mapper.getNodeFactory().numberNode(115056.0));
-		obj2.set("proportion", mapper.getNodeFactory().numberNode(0.606958));
+		obj2.set("estimatedTax", mapper.getNodeFactory().numberNode(117.504));
+		obj2.set("netWorth", mapper.getNodeFactory().numberNode(115053.696));
+		obj2.set("proportion", mapper.getNodeFactory().numberNode(0.606954));
 		expect.add(obj2);
 
 		assertEquals(expect, actual);
