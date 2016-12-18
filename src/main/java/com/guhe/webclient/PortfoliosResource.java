@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.guhe.dao.Dao;
+import com.guhe.dao.DaoManager;
 import com.guhe.dao.Portfolio;
 
 @Path("/Portfolios")
@@ -18,27 +20,30 @@ public class PortfoliosResource {
 	@Inject
 	private StockMarket stockMarket;
 
+	@Context
+	private HttpServletRequest httpRequest;
+
 	@Inject
-	private Dao dao;
+	private DaoManager daoFactory;
 
 	@GET
 	@Path("{portfolio}")
 	public PortfolioViewData getPortfolio(@PathParam("portfolio") String id) {
-		Portfolio portfolio = dao.getPortfolio(id);
+		Portfolio portfolio = daoFactory.getDao(httpRequest).getPortfolio(id);
 		if (portfolio == null) {
 			return null;
 		}
-		return createViewData(dao.getPortfolio(id));
+		return createViewData(portfolio);
 	}
 
 	@GET
 	@Path("{portfolio}/HoldingStocks")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
-		Portfolio portfolio = dao.getPortfolio(portfolioId);
+		Portfolio portfolio = daoFactory.getDao(httpRequest).getPortfolio(portfolioId);
 		if (portfolio == null) {
 			return null;
 		}
-		
+
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
 		return calculator.getHoldingCalculators().stream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}

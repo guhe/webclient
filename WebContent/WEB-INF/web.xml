@@ -34,7 +34,4 @@
 		<servlet-name>Jersey REST Service</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-	<listener>
-		<listener-class>com.guhe.dao.impl.EmfCloser</listener-class>
-	</listener>
 </web-app>
