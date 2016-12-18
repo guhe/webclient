@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.guhe.dao.Dao;
+import com.guhe.dao.DaoManager;
 import com.guhe.dao.Holding;
 import com.guhe.dao.Portfolio;
 import com.guhe.dao.Stock;
@@ -28,6 +30,8 @@ public class PortfoliosResourceTest extends JerseyTest {
 	private ObjectMapper mapper = new ObjectMapper();
 
 	private StockMarket market;
+
+	private DaoManager daoManager;
 
 	private Dao dao;
 
@@ -56,12 +60,18 @@ public class PortfoliosResourceTest extends JerseyTest {
 		dao = mock(Dao.class);
 		when(dao.getPortfolio("P00000001")).thenReturn(createPortfolio());
 
+		HttpServletRequest httpReq = mock(HttpServletRequest.class);
+		
+		daoManager = mock(DaoManager.class);
+		when(daoManager.getDao(httpReq)).thenReturn(dao);
+
 		ResourceConfig config = new ResourceConfig(PortfoliosResource.class);
 		config.register(new AbstractBinder() {
 			@Override
 			protected void configure() {
 				bind(market).to(StockMarket.class);
-				bind(dao).to(Dao.class);
+				bind(daoManager).to(DaoManager.class);
+				bind(httpReq).to(HttpServletRequest.class);
 			}
 		});
 		return config;

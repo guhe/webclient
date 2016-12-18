@@ -10,7 +10,7 @@ import com.guhe.dao.Dao;
 import com.guhe.dao.DaoManager;
 import com.guhe.dao.Portfolio;
 
-public class JpaDaoFactory implements DaoManager {
+public class JpaDaoManager implements DaoManager {
 
 	@Override
 	public synchronized Dao getDao(HttpServletRequest req) {
