@@ -9,18 +9,25 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.guhe.dao.Dao;
+import com.guhe.dao.Portfolio;
+
 @Path("/Portfolios")
 public class PortfoliosResource {
 
 	@Inject
 	private StockMarket stockMarket;
-	
+
 	@Inject
 	private Dao dao;
 
 	@GET
 	@Path("{portfolio}")
 	public PortfolioViewData getPortfolio(@PathParam("portfolio") String id) {
+		Portfolio portfolio = dao.getPortfolio(id);
+		if (portfolio == null) {
+			return null;
+		}
 		return createViewData(dao.getPortfolio(id));
 	}
 
@@ -28,8 +35,11 @@ public class PortfoliosResource {
 	@Path("{portfolio}/HoldingStocks")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
 		Portfolio portfolio = dao.getPortfolio(portfolioId);
+		if (portfolio == null) {
+			return null;
+		}
+		
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-
 		return calculator.getHoldingCalculators().stream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 

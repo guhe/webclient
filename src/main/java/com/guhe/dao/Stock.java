@@ -1,10 +1,25 @@
-package com.guhe.webclient;
+package com.guhe.dao;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import com.guhe.util.Reflector;
 
+@Entity
 public class Stock {
+
+	@Id
+	@GeneratedValue
+	private int id;
+
 	private String code;
+
 	private String name;
+
+	public Stock() {
+
+	}
 
 	public Stock(String code, String name) {
 		super();

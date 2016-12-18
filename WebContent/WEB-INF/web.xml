@@ -18,7 +18,7 @@
 		<!-- Register resources and providers under com.vogella.jersey.first package. -->
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>com.guhe.webclient.JerseyConfig</param-value>
+			<param-value>com.guhe.config.JerseyConfig</param-value>
 		</init-param>
 		<init-param>
 			<param-name>jersey.config.server.provider.packages</param-name>
@@ -34,4 +34,7 @@
 		<servlet-name>Jersey REST Service</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
+	<listener>
+		<listener-class>com.guhe.dao.impl.EmfCloser</listener-class>
+	</listener>
 </web-app>

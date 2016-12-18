@@ -16,11 +16,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.guhe.webclient.Dao;
-import com.guhe.webclient.Holding;
-import com.guhe.webclient.Portfolio;
+import com.guhe.dao.Dao;
+import com.guhe.dao.Holding;
+import com.guhe.dao.Portfolio;
+import com.guhe.dao.Stock;
 import com.guhe.webclient.PortfoliosResource;
-import com.guhe.webclient.Stock;
 import com.guhe.webclient.StockMarket;
 
 public class PortfoliosResourceTest extends JerseyTest {
@@ -40,9 +40,9 @@ public class PortfoliosResourceTest extends JerseyTest {
 		portfolio.setNetWorthPerUnitLastYear(1.0822);
 
 		Stock ping_an_yin_hang = new Stock("000001", "平安银行");
-		portfolio.add(ping_an_yin_hang, new Holding(ping_an_yin_hang, 5800));
+		portfolio.add(new Holding(ping_an_yin_hang, 5800));
 		Stock zhong_guo_ping_an = new Stock("601318", "中国平安");
-		portfolio.add(zhong_guo_ping_an, new Holding(zhong_guo_ping_an, 3600));
+		portfolio.add(new Holding(zhong_guo_ping_an, 3600));
 
 		return portfolio;
 	}

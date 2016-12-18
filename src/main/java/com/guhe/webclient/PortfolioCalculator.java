@@ -3,7 +3,9 @@ package com.guhe.webclient;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.guhe.webclient.Stock.Exchange;
+import com.guhe.dao.Holding;
+import com.guhe.dao.Portfolio;
+import com.guhe.dao.Stock.Exchange;
 
 public class PortfolioCalculator {
 	private Portfolio portfolio;

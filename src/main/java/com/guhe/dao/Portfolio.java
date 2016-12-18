@@ -1,10 +1,17 @@
-package com.guhe.webclient;
+package com.guhe.dao;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Portfolio {
+
+	@Id
 	private String id;
 	private String name;
 
@@ -12,7 +19,9 @@ public class Portfolio {
 	private double netWorthPerUnitLastYear;
 
 	private double cash;
-	private LinkedHashMap<Stock, Holding> holdings = new LinkedHashMap<>();
+
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Holding> holdings = new ArrayList<>();
 
 	public String getId() {
 		return id;
@@ -54,11 +63,11 @@ public class Portfolio {
 		this.cash = cash;
 	}
 
-	public void add(Stock stock, Holding holding) {
-		holdings.put(stock, holding);
+	public void add(Holding holding) {
+		holdings.add(holding);
 	}
 
 	public List<Holding> getHoldings() {
-		return holdings.values().stream().collect(Collectors.toList());
+		return holdings;
 	}
 }
