@@ -24,12 +24,12 @@ public class PortfoliosResource {
 	private HttpServletRequest httpRequest;
 
 	@Inject
-	private DaoManager daoFactory;
+	private DaoManager daoManager;
 
 	@GET
 	@Path("{portfolio}")
 	public PortfolioViewData getPortfolio(@PathParam("portfolio") String id) {
-		Portfolio portfolio = daoFactory.getDao(httpRequest).getPortfolio(id);
+		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(id);
 		if (portfolio == null) {
 			return null;
 		}
@@ -39,7 +39,7 @@ public class PortfoliosResource {
 	@GET
 	@Path("{portfolio}/HoldingStocks")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
-		Portfolio portfolio = daoFactory.getDao(httpRequest).getPortfolio(portfolioId);
+		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(portfolioId);
 		if (portfolio == null) {
 			return null;
 		}
@@ -62,6 +62,8 @@ public class PortfoliosResource {
 		viewData.setNetWorthPerUnit(calculator.getNetWorthPerUnit());
 		viewData.setProportionOfStock(calculator.getProportionOfStock());
 		viewData.setRateOfReturnYear(calculator.getRateOfReturnYear());
+		viewData.setPe(calculator.getPE());
+		viewData.setPb(calculator.getPB());
 		return viewData;
 	}
 
@@ -92,6 +94,8 @@ class PortfolioViewData {
 	private double netWorthPerUnit;
 	private double proportionOfStock;
 	private double rateOfReturnYear;
+	private double pe;
+	private double pb;
 
 	public String getId() {
 		return id;
@@ -172,6 +176,23 @@ class PortfolioViewData {
 	public void setProportionOfStock(Double proportionOfStock) {
 		this.proportionOfStock = proportionOfStock;
 	}
+
+	public Double getPe() {
+		return pe;
+	}
+
+	public void setPe(Double pe) {
+		this.pe = pe;
+	}
+
+	public Double getPb() {
+		return pb;
+	}
+
+	public void setPb(Double pb) {
+		this.pb = pb;
+	}
+
 }
 
 @XmlRootElement(name = "holdingStock")

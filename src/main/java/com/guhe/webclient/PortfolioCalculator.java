@@ -2,6 +2,7 @@ package com.guhe.webclient;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.guhe.dao.Holding;
 import com.guhe.dao.Portfolio;
@@ -17,7 +18,7 @@ public class PortfolioCalculator {
 	}
 
 	private double getStockTotalWorth() {
-		return getHoldingCalculators().stream().map(e -> e.getMarketWorth()).reduce(0.0, Double::sum);
+		return getHoldingCalculatorStream().map(e -> e.getMarketWorth()).reduce(0.0, Double::sum);
 	}
 
 	public double getTotalWorth() {
@@ -25,7 +26,7 @@ public class PortfolioCalculator {
 	}
 
 	public double getProjectedLiabilities() {
-		return getHoldingCalculators().stream().map(e -> e.getEstimatedTax() + e.getEstimatedCommission()).reduce(0.0,
+		return getHoldingCalculatorStream().map(e -> e.getEstimatedTax() + e.getEstimatedCommission()).reduce(0.0,
 				Double::sum);
 	}
 
@@ -49,8 +50,22 @@ public class PortfolioCalculator {
 		return getNetWorthPerUnit() / portfolio.getNetWorthPerUnitLastYear() - 1;
 	}
 
+	public double getPE() {
+		return getStockTotalWorth()
+				/ getHoldingCalculatorStream().map(e -> e.getMarketWorth() / e.getPE()).reduce(0.0, Double::sum);
+	}
+
+	public double getPB() {
+		return getStockTotalWorth()
+				/ getHoldingCalculatorStream().map(e -> e.getMarketWorth() / e.getPB()).reduce(0.0, Double::sum);
+	}
+
 	public List<HoldingCalculator> getHoldingCalculators() {
-		return portfolio.getHoldings().stream().map(e -> new HoldingCalculator(e)).collect(Collectors.toList());
+		return getHoldingCalculatorStream().collect(Collectors.toList());
+	}
+
+	private Stream<HoldingCalculator> getHoldingCalculatorStream() {
+		return portfolio.getHoldings().stream().map(e -> new HoldingCalculator(e));
 	}
 
 	public class HoldingCalculator {
@@ -59,9 +74,19 @@ public class PortfolioCalculator {
 		private static final double RATE_SH_GUOHU = 0.00002;
 
 		private Holding holding;
+		private StockData data;
 
 		HoldingCalculator(Holding holding) {
 			this.holding = holding;
+			this.data = market.getStockData(holding.getStock().getCode());
+		}
+
+		public double getPE() {
+			return data.getPe();
+		}
+
+		public double getPB() {
+			return data.getPb();
 		}
 
 		public Holding getHolding() {
@@ -69,7 +94,7 @@ public class PortfolioCalculator {
 		}
 
 		public double getCurPrice() {
-			return market.getPrice(holding.getStock().getCode());
+			return data.getPrice();
 		}
 
 		public double getMarketWorth() {

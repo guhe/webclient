@@ -23,6 +23,7 @@ import com.guhe.dao.Holding;
 import com.guhe.dao.Portfolio;
 import com.guhe.dao.Stock;
 import com.guhe.webclient.PortfoliosResource;
+import com.guhe.webclient.StockData;
 import com.guhe.webclient.StockMarket;
 
 public class PortfoliosResourceTest extends JerseyTest {
@@ -54,14 +55,23 @@ public class PortfoliosResourceTest extends JerseyTest {
 	@Override
 	protected Application configure() {
 		market = mock(StockMarket.class);
-		when(market.getPrice("000001")).thenReturn(8.88);
-		when(market.getPrice("601318")).thenReturn(32.0);
+		StockData data1 = new StockData();
+		data1.setPrice(8.88);
+		data1.setPe(8);
+		data1.setPb(1.11);
+		when(market.getStockData("000001")).thenReturn(data1);
+
+		StockData data2 = new StockData();
+		data2.setPrice(32.0);
+		data2.setPe(10);
+		data2.setPb(2);
+		when(market.getStockData("601318")).thenReturn(data2);
 
 		dao = mock(Dao.class);
 		when(dao.getPortfolio("P00000001")).thenReturn(createPortfolio());
 
 		HttpServletRequest httpReq = mock(HttpServletRequest.class);
-		
+
 		daoManager = mock(DaoManager.class);
 		when(daoManager.getDao(httpReq)).thenReturn(dao);
 
@@ -93,6 +103,8 @@ public class PortfoliosResourceTest extends JerseyTest {
 		expect.set("stockNetWorth", mapper.getNodeFactory().numberNode(166493.316));
 		expect.set("cash", mapper.getNodeFactory().numberNode(23066.0));
 		expect.set("proportionOfStock", mapper.getNodeFactory().numberNode(0.878318));
+		expect.set("pe", mapper.getNodeFactory().numberNode(9.282994));
+		expect.set("pb", mapper.getNodeFactory().numberNode(1.602923));
 
 		assertEquals(expect, actual);
 	}
