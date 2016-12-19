@@ -12,7 +12,7 @@
 	}
 
 	$("#detail tbody tr").remove();
-	
+
 	$(document).ready(function() {
 		$.get({
 			url : "rest/Portfolios/P00000001",
@@ -23,16 +23,19 @@
 				$("#totalWorth").html(result["totalWorth"].toFixed(0));
 				$("#projectedLiabilities").html(result["projectedLiabilities"].toFixed(0));
 				$("#netWorth").html(result["netWorth"].toFixed(0));
-				$("#stockNetWorth").html(result["stockNetWorth"].toFixed(0));
-				$("#cash").html(result["cash"].toFixed(0));
+				$("#pb").html(result["pb"].toFixed(2));
+				$("#pe").html(result["pe"].toFixed(1));
 				$("#proportionOfStock").html(result["proportionOfStock"].toPercent(1));
 			}
 		});
-		
+
 		$.get({
 			url : "rest/Portfolios/P00000001/HoldingStocks",
 			dataType : 'json',
 			success : function(result) {
+				result.sort(function(a, b) {
+					return b["proportion"] - a["proportion"];
+				});
 				$.each(result, function(key, row_data) {
 					var row = $("<tr/>").appendTo($("#detail tbody"));
 					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
@@ -79,10 +82,10 @@
 				<td id="netWorth" class="gmt-detail-value"></td>
 			</tr>
 			<tr>
-				<td class="gmt-detail-title">市值</td>
-				<td id="stockNetWorth" class="gmt-detail-value"></td>
-				<td class="gmt-detail-title">现金</td>
-				<td id="cash" class="gmt-detail-value"></td>
+				<td class="gmt-detail-title">PB</td>
+				<td id="pb" class="gmt-detail-value"></td>
+				<td class="gmt-detail-title">PE</td>
+				<td id="pe" class="gmt-detail-value"></td>
 				<td class="gmt-detail-title">仓位</td>
 				<td id="proportionOfStock" class="gmt-detail-value"></td>
 			</tr>
