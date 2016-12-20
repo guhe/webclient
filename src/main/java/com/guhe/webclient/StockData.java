@@ -1,5 +1,7 @@
 package com.guhe.webclient;
 
+import com.guhe.util.Reflector;
+
 public class StockData {
 	double price;
 	double pe;
@@ -27,6 +29,11 @@ public class StockData {
 
 	public void setPb(double pb) {
 		this.pb = pb;
+	}
+
+	@Override
+	public String toString() {
+		return Reflector.toStringByAllFields(this);
 	}
 
 }
