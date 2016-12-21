@@ -1,7 +1,5 @@
 package com.guhe.dao.impl;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
 
 import com.guhe.dao.Dao;
@@ -20,13 +18,20 @@ public class JpaDao implements Dao {
 	}
 
 	@Override
-	public List<Portfolio> getPortfolios() {
-		return em.createQuery("from Portfolio", Portfolio.class).getResultList();
-	}
-
-	@Override
 	public Portfolio getPortfolio(String id) {
 		return em.find(Portfolio.class, id);
+	}
+	
+	public void createPortfolio(Portfolio portfolio){
+		em.getTransaction().begin();
+		em.persist(portfolio);
+		em.getTransaction().commit();
+	}
+	
+	public void deletePortfolio(String id){
+		em.getTransaction().begin();
+		em.remove(getPortfolio(id));
+		em.getTransaction().commit();
 	}
 
 }
