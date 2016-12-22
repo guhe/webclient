@@ -6,7 +6,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.guhe.dao.DaoManager;
-import com.guhe.dao.impl.JpaDaoManager;
+import com.guhe.dao.JpaDaoManager;
 import com.guhe.webclient.StockMarket;
 import com.guhe.webclient.TencentStockMarket;
 

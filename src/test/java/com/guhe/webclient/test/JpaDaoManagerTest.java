@@ -23,9 +23,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.guhe.dao.JpaDao;
+import com.guhe.dao.JpaDaoManager;
 import com.guhe.dao.Portfolio;
-import com.guhe.dao.impl.JpaDao;
-import com.guhe.dao.impl.JpaDaoManager;
 
 public class JpaDaoManagerTest {
 

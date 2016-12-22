@@ -6,16 +6,13 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.client.ClientBuilder;
 
-import org.jvnet.hk2.annotations.Service;
-
-@Service
 public class TencentStockMarket implements StockMarket {
 	private static final Logger LOGGER = Logger.getLogger(TencentStockMarket.class.getName());
 
 	private Map<String, StockData> cache = new HashMap<>();
 
 	@Override
-	public StockData getStockData(String stockCode) {
+	public synchronized StockData getStockData(String stockCode) {
 		if (!cache.containsKey(stockCode)) {
 			String url = "http://qt.gtimg.cn/q=";
 			if (stockCode.charAt(0) == '6') {
@@ -30,7 +27,7 @@ public class TencentStockMarket implements StockMarket {
 			StockData sd = buildStockData(data);
 			cache.put(stockCode, sd);
 
-			LOGGER.info("Already loaded stock data : " + sd);
+			LOGGER.info("Loaded a stock data, stock : " + stockCode + ", data : " + sd);
 		}
 
 		return cache.get(stockCode);

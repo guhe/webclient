@@ -1,4 +1,4 @@
-package com.guhe.dao.impl;
+package com.guhe.dao;
 
 import java.util.Collections;
 import java.util.logging.Logger;

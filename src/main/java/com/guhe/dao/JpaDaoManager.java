@@ -1,10 +1,7 @@
-package com.guhe.dao.impl;
+package com.guhe.dao;
 
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
-
-import com.guhe.dao.Dao;
-import com.guhe.dao.DaoManager;
 
 public class JpaDaoManager implements DaoManager {
 
