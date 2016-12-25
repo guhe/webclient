@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>股盒-买入</title>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<script src="jquery-3.0.0.js"></script>
+</head>
+<body>
+	<div style="height: 50px"></div>
+	<div align="center">
+		<div id="detail">
+			<table class="zebra">
+				<caption>
+					<span>交易记录</span>
+				</caption>
+				<thead>
+					<tr>
+						<th>交易方向</th>
+						<th>股票代码</th>
+						<th>成交数量</th>
+						<th>成交价格</th>
+						<th>成交日期</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div style="height: 20px"></div>
+		<div class="trade" align="center">
+			<form method="post">
+				<table>
+					<tr>
+						<td><span>交易方向：</span></td>
+						<td align="center"><input type="radio" name="type"
+							checked="checked">买<input type="radio" name="type">卖</td>
+					</tr>
+					<tr>
+						<td><span>股票代码：</span></td>
+						<td><input type="text" name="code"></td>
+					</tr>
+					<tr>
+						<td><span>成交数量：</span></td>
+						<td><input type="text" name="count"></td>
+					</tr>
+					<tr>
+						<td><span>成交价格：</span></td>
+						<td><input type="text" name="price"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center"><input type="button"
+							name="commit" value="确定"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</body>
+</html>
