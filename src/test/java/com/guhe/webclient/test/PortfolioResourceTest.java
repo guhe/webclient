@@ -22,11 +22,11 @@ import com.guhe.dao.DaoManager;
 import com.guhe.dao.Holding;
 import com.guhe.dao.Portfolio;
 import com.guhe.dao.Stock;
-import com.guhe.webclient.PortfoliosResource;
+import com.guhe.webclient.PortfolioResource;
 import com.guhe.webclient.StockData;
 import com.guhe.webclient.StockMarket;
 
-public class PortfoliosResourceTest extends JerseyTest {
+public class PortfolioResourceTest extends JerseyTest {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
@@ -75,7 +75,7 @@ public class PortfoliosResourceTest extends JerseyTest {
 		daoManager = mock(DaoManager.class);
 		when(daoManager.getDao(httpReq)).thenReturn(dao);
 
-		ResourceConfig config = new ResourceConfig(PortfoliosResource.class);
+		ResourceConfig config = new ResourceConfig(PortfolioResource.class);
 		config.register(new AbstractBinder() {
 			@Override
 			protected void configure() {
@@ -89,7 +89,7 @@ public class PortfoliosResourceTest extends JerseyTest {
 
 	@Test
 	public void test_get_portfolio_id() {
-		JsonNode actual = target("/Portfolios/P00000001").request().accept(MediaType.APPLICATION_JSON)
+		JsonNode actual = target("/Portfolio/P00000001").request().accept(MediaType.APPLICATION_JSON)
 				.get(JsonNode.class);
 
 		ObjectNode expect = mapper.createObjectNode();
@@ -111,7 +111,7 @@ public class PortfoliosResourceTest extends JerseyTest {
 
 	@Test
 	public void test_get_portfolio_id_holdingstocks() {
-		JsonNode actual = target("/Portfolios/P00000001/HoldingStocks").request().accept(MediaType.APPLICATION_JSON)
+		JsonNode actual = target("/Portfolio/P00000001/HoldingStock").request().accept(MediaType.APPLICATION_JSON)
 				.get(JsonNode.class);
 
 		ArrayNode expect = mapper.createArrayNode();

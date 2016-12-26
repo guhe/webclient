@@ -14,8 +14,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.guhe.dao.DaoManager;
 import com.guhe.dao.Portfolio;
 
-@Path("/Portfolios")
-public class PortfoliosResource {
+@Path("/Portfolio")
+public class PortfolioResource {
 
 	@Inject
 	private StockMarket stockMarket;
@@ -37,7 +37,7 @@ public class PortfoliosResource {
 	}
 
 	@GET
-	@Path("{portfolio}/HoldingStocks")
+	@Path("{portfolio}/HoldingStock")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
 		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(portfolioId);
 		if (portfolio == null) {

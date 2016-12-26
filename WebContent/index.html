@@ -15,7 +15,7 @@
 
 	$(document).ready(function() {
 		$.get({
-			url : "rest/Portfolios/P00000001",
+			url : "rest/Portfolio/P00000001",
 			dataType : 'json',
 			success : function(result) {
 				$("#netWorthPerUnit").html(result["netWorthPerUnit"].toFixed(4));
@@ -30,7 +30,7 @@
 		});
 
 		$.get({
-			url : "rest/Portfolios/P00000001/HoldingStocks",
+			url : "rest/Portfolio/P00000001/HoldingStock",
 			dataType : 'json',
 			success : function(result) {
 				result.sort(function(a, b) {
