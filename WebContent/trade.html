@@ -5,6 +5,26 @@
 <title>股盒-买入</title>
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 <script src="jquery-3.0.0.js"></script>
+<script>
+	$(document).ready(function() {
+		$(".trade form").submit(function(event) {
+			event.preventDefault();
+
+			$.post({
+				url : "rest/Portfolio/P00000001/Trade",
+				dataType : 'json',
+				data : "{}",
+				async : false,
+				success : function() {
+
+				},
+				error : function() {
+					$("#tradeTip span").text("操作失败。");
+				}
+			});
+		});
+	});
+</script>
 </head>
 <body>
 	<div style="height: 50px"></div>
@@ -29,7 +49,7 @@
 		</div>
 		<div style="height: 20px"></div>
 		<div class="trade" align="center">
-			<form method="post">
+			<form>
 				<table>
 					<tr>
 						<td><span>交易方向：</span></td>
@@ -49,12 +69,13 @@
 						<td><input type="text" name="price"></td>
 					</tr>
 					<tr>
-						<td colspan="2" align="center"><input type="button"
-							name="commit" value="确定"></td>
+						<td colspan="2" align="center"><input type="submit"
+							value="确定"></td>
 					</tr>
 				</table>
 			</form>
 		</div>
+		<p id="tradeTip"><span></span></p>
 	</div>
 </body>
 </html>
