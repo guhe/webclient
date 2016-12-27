@@ -38,7 +38,7 @@
 				});
 				$.each(result, function(key, row_data) {
 					var row = $("<tr/>").appendTo($("#detail tbody"));
-					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 代码
+					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
 					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
 					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
 					$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值

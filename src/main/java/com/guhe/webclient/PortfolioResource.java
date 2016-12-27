@@ -1,5 +1,6 @@
 package com.guhe.webclient;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.guhe.dao.DaoManager;
 import com.guhe.dao.Portfolio;
+import com.guhe.dao.TradeRecord;
 
 @Path("/Portfolio")
 public class PortfolioResource {
@@ -48,6 +50,18 @@ public class PortfolioResource {
 		return calculator.getHoldingCalculators().stream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
+	@GET
+	@Path("{portfolio}/Trade")
+	public List<TradeRecordViewData> getTradeRecords(@PathParam("portfolio") String portfolioId) {
+		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(portfolioId);
+		if (portfolio == null) {
+			return null;
+		}
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		return portfolio.getTradeRecords().stream().map(e -> createViewData(e, sdf)).collect(Collectors.toList());
+	}
+
 	private PortfolioViewData createViewData(Portfolio portfolio) {
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
 
@@ -80,6 +94,18 @@ public class PortfolioResource {
 		viewData.setProportion(calculator.getProportion());
 		return viewData;
 	}
+
+	private TradeRecordViewData createViewData(TradeRecord tradeRecord, SimpleDateFormat sdf) {
+		TradeRecordViewData viewDate = new TradeRecordViewData();
+		viewDate.setBuyOrSell(tradeRecord.getBuyOrSell().toString());
+		viewDate.setStockCode(tradeRecord.getStock().getCode());
+		viewDate.setStockName(tradeRecord.getStock().getName());
+		viewDate.setAmount(tradeRecord.getAmount());
+		viewDate.setPrice(tradeRecord.getPrice());
+		viewDate.setDate(sdf.format(tradeRecord.getDate()));
+		return viewDate;
+	}
+
 }
 
 @XmlRootElement(name = "portfolio")
@@ -277,5 +303,63 @@ class HoldingStockViewData {
 
 	public void setProportion(Double proportion) {
 		this.proportion = proportion;
+	}
+}
+
+@XmlRootElement(name = "tradeRecord")
+class TradeRecordViewData {
+	private String buyOrSell;
+	private String stockName;
+	private String stockCode;
+	private long amount;
+	private double price;
+	private String date;
+
+	public String getBuyOrSell() {
+		return buyOrSell;
+	}
+
+	public void setBuyOrSell(String buyOrSell) {
+		this.buyOrSell = buyOrSell;
+	}
+
+	public String getStockName() {
+		return stockName;
+	}
+
+	public void setStockName(String stockName) {
+		this.stockName = stockName;
+	}
+
+	public String getStockCode() {
+		return stockCode;
+	}
+
+	public void setStockCode(String stockCode) {
+		this.stockCode = stockCode;
+	}
+
+	public long getAmount() {
+		return amount;
+	}
+
+	public void setAmount(long amount) {
+		this.amount = amount;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 }

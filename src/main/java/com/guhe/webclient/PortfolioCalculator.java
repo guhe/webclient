@@ -68,6 +68,10 @@ public class PortfolioCalculator {
 		return portfolio.getHoldings().stream().map(e -> new HoldingCalculator(e));
 	}
 
+	public List<TradeCalculator> getTradeRecords() {
+		return null;
+	}
+	
 	public class HoldingCalculator {
 		private static final double RATE_TAX = 0.001;
 		private static final double RATE_COMMISSION = 0.00025;
@@ -118,4 +122,9 @@ public class PortfolioCalculator {
 			return getNetWorth() / PortfolioCalculator.this.getNetWorth();
 		}
 	}
+	
+	public class TradeCalculator {
+
+	}
+
 }
