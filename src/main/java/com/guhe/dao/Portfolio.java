@@ -73,6 +73,10 @@ public class Portfolio {
 	public List<Holding> getHoldings() {
 		return holdings;
 	}
+	
+	public void add(TradeRecord tradeRecord){
+		tradeRecords.add(tradeRecord);
+	}
 
 	public List<TradeRecord> getTradeRecords() {
 		return tradeRecords;

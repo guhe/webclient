@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -22,6 +25,7 @@ import com.guhe.dao.DaoManager;
 import com.guhe.dao.Holding;
 import com.guhe.dao.Portfolio;
 import com.guhe.dao.Stock;
+import com.guhe.dao.TradeRecord;
 import com.guhe.webclient.PortfolioResource;
 import com.guhe.webclient.StockData;
 import com.guhe.webclient.StockMarket;
@@ -48,6 +52,26 @@ public class PortfolioResourceTest extends JerseyTest {
 		portfolio.add(new Holding(ping_an_yin_hang, 5800));
 		Stock zhong_guo_ping_an = new Stock("601318", "中国平安");
 		portfolio.add(new Holding(zhong_guo_ping_an, 3600));
+
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			TradeRecord record1 = new TradeRecord();
+			record1.setBuyOrSell(TradeRecord.BuyOrSell.BUY);
+			record1.setAmount(500);
+			record1.setDate(sdf.parse("2016-08-10 10:20:33"));
+			record1.setPrice(8.65);
+			record1.setStock(ping_an_yin_hang);
+			portfolio.add(record1);
+			TradeRecord record2 = new TradeRecord();
+			record2.setBuyOrSell(TradeRecord.BuyOrSell.SELL);
+			record2.setAmount(300);
+			record2.setDate(sdf.parse("2016-12-22 09:50:55"));
+			record2.setPrice(38.88);
+			record2.setStock(zhong_guo_ping_an);
+			portfolio.add(record2);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 
 		return portfolio;
 	}
@@ -110,7 +134,7 @@ public class PortfolioResourceTest extends JerseyTest {
 	}
 
 	@Test
-	public void test_get_portfolio_id_holdingstocks() {
+	public void test_get_holdingstocks_by_portfolio_id() {
 		JsonNode actual = target("/Portfolio/P00000001/HoldingStock").request().accept(MediaType.APPLICATION_JSON)
 				.get(JsonNode.class);
 
@@ -137,6 +161,32 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj2.set("estimatedTax", mapper.getNodeFactory().numberNode(117.504));
 		obj2.set("netWorth", mapper.getNodeFactory().numberNode(115053.696));
 		obj2.set("proportion", mapper.getNodeFactory().numberNode(0.606954));
+		expect.add(obj2);
+
+		assertEquals(expect, actual);
+	}
+
+	@Test
+	public void test_get_trade_record_by_portfolio_id() {
+		JsonNode actual = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
+				.get(JsonNode.class);
+
+		ArrayNode expect = mapper.createArrayNode();
+		ObjectNode obj1 = mapper.createObjectNode();
+		obj1.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
+		obj1.set("stockCode", mapper.getNodeFactory().textNode("000001"));
+		obj1.set("stockName", mapper.getNodeFactory().textNode("平安银行"));
+		obj1.set("amount", mapper.getNodeFactory().numberNode(500));
+		obj1.set("price", mapper.getNodeFactory().numberNode(8.65));
+		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		expect.add(obj1);
+		ObjectNode obj2 = mapper.createObjectNode();
+		obj2.set("buyOrSell", mapper.getNodeFactory().textNode("SELL"));
+		obj2.set("stockCode", mapper.getNodeFactory().textNode("601318"));
+		obj2.set("stockName", mapper.getNodeFactory().textNode("中国平安"));
+		obj2.set("amount", mapper.getNodeFactory().numberNode(300));
+		obj2.set("price", mapper.getNodeFactory().numberNode(38.88));
+		obj2.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
 		expect.add(obj2);
 
 		assertEquals(expect, actual);
