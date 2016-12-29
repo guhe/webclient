@@ -48,7 +48,7 @@ public class JpaDaoManagerTest {
 	public static void afterAll() throws IOException {
 		testEmf.close();
 
-		DerbyUtil.closeEmbeddedDatebase("test_temp/derby");
+		DerbyUtil.closeEmbeddedDatebase("test_temp/guhe");
 
 		FileUtils.deleteDirectory(new File("test_temp"));
 	}

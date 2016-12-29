@@ -8,8 +8,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -190,5 +192,20 @@ public class PortfolioResourceTest extends JerseyTest {
 		expect.add(obj2);
 
 		assertEquals(expect, actual);
+	}
+
+	@Test
+	public void test_post_trade_of_buy() {
+		ObjectNode tradeObj = mapper.createObjectNode();
+		tradeObj.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
+		tradeObj.set("stockCode", mapper.getNodeFactory().textNode("000001"));
+		tradeObj.set("stockName", mapper.getNodeFactory().textNode("平安银行"));
+		tradeObj.set("amount", mapper.getNodeFactory().numberNode(500));
+		tradeObj.set("price", mapper.getNodeFactory().numberNode(8.65));
+		tradeObj.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		Entity<String> entity = Entity.json(tradeObj.toString());
+		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
+				.post(entity);
+		assertEquals(200, response.getStatus());
 	}
 }

@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.guhe.dao.DaoManager;
@@ -60,6 +62,12 @@ public class PortfolioResource {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return portfolio.getTradeRecords().stream().map(e -> createViewData(e, sdf)).collect(Collectors.toList());
+	}
+	
+	@POST
+	@Path("{portfolio}/Trade")
+	public Response addTradeRecord(@PathParam("portfolio") String portfolioId, TradeRecordViewData viewData){
+		return Response.ok().build();
 	}
 
 	private PortfolioViewData createViewData(Portfolio portfolio) {
