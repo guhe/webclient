@@ -9,6 +9,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import com.guhe.util.DerbyUtil;
+
 @WebListener
 public class EmfProvider implements ServletContextListener {
 
@@ -30,6 +32,8 @@ public class EmfProvider implements ServletContextListener {
 			emf.close();
 			LOGGER.info("EMF is closed.");
 		}
+		
+		DerbyUtil.closeEmbeddedDatebase(System.getenv("DERBY_SPACE") + "/guhe");
 	}
 
 }

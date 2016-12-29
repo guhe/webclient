@@ -7,8 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Collections;
 
 import javax.persistence.EntityManagerFactory;
@@ -26,6 +24,7 @@ import org.junit.Test;
 import com.guhe.dao.JpaDao;
 import com.guhe.dao.JpaDaoManager;
 import com.guhe.dao.Portfolio;
+import com.guhe.util.DerbyUtil;
 
 public class JpaDaoManagerTest {
 
@@ -49,12 +48,7 @@ public class JpaDaoManagerTest {
 	public static void afterAll() throws IOException {
 		testEmf.close();
 
-		try {
-			DriverManager.getConnection("jdbc:derby:test_temp/guhe;shutdown=true");
-		} catch (SQLException e) {
-			assertEquals(45000, e.getErrorCode());
-			assertEquals("08006", e.getSQLState());
-		}
+		DerbyUtil.closeEmbeddedDatebase("test_temp/derby");
 
 		FileUtils.deleteDirectory(new File("test_temp"));
 	}

@@ -59,7 +59,7 @@ html, body {
 }
 
 .zebra tbody tr:nth-child(even) {
-	background: #3c3c3c !important;
+	background: #3c3c3c;
 	color: #fff;
 }
 

@@ -12,21 +12,30 @@
 			dataType : 'json',
 			success : function(result) {
 				result.sort(function(a, b) {
-					return a["tradeDate"] - b["tradeDate"];
+					return a["date"] > b["date"];
 				});
 				$.each(result, function(key, row_data) {
+					var isBuy = row_data["buyOrSell"] == "BUY";
 					var row = $("<tr/>").appendTo($("#detail tbody"));
-					$("<td/>").html(row_data["buyOrSell"]).appendTo(row); // 交易方向
+					$("<td/>").html(isBuy ? "买入" : "卖出").appendTo(row); // 交易方向
 					$("<td/>").html(row_data["stockName"] + row_data["stockCode"]).appendTo(row); // 股票代码
 					$("<td/>").html(row_data["amount"]).appendTo(row); // 成交数量
 					$("<td/>").html(row_data["price"]).appendTo(row); // 成交价格
 					$("<td/>").html(row_data["date"]).appendTo(row); // 成交日期
+
+					console.log(row_data, isBuy);
+					
+					if (isBuy) {
+						row.css("background", "#800");
+					} else {
+						row.css("background", "#080");
+					}
 				});
 			},
 		});
 	}
-	
-	function addTradeRecord(){
+
+	function addTradeRecord() {
 		$.post({
 			url : "rest/Portfolio/P00000001/Trade",
 			dataType : 'json',
