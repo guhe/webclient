@@ -18,7 +18,7 @@ public class Holding {
 	@ManyToOne
 	private Portfolio portfolio;
 
-	private int amount;
+	private long amount;
 
 	public Holding() {
 
@@ -34,7 +34,24 @@ public class Holding {
 		return stock;
 	}
 
-	public int getAmount() {
+	public void setStock(Stock stock) {
+		this.stock = stock;
+	}
+
+	public Portfolio getPortfolio() {
+		return portfolio;
+	}
+
+	public void setPortfolio(Portfolio portfolio) {
+		this.portfolio = portfolio;
+	}
+
+	public long getAmount() {
 		return amount;
 	}
+
+	public void setAmount(long amount) {
+		this.amount = amount;
+	}
+
 }

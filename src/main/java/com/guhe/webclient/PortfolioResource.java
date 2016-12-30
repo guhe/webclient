@@ -1,7 +1,9 @@
 package com.guhe.webclient;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -14,12 +16,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.guhe.dao.DaoManager;
 import com.guhe.dao.Portfolio;
+import com.guhe.dao.PortfolioException;
 import com.guhe.dao.TradeRecord;
+import com.guhe.dao.TradeRecord.BuyOrSell;
+import com.guhe.util.CommonUtil;
+import com.guhe.util.Reflector;
 
 @Path("/Portfolio")
 public class PortfolioResource {
+
+	private static final Logger LOGGER = Logger.getLogger(PortfolioResource.class.getName());
 
 	@Inject
 	private StockMarket stockMarket;
@@ -63,11 +73,27 @@ public class PortfolioResource {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return portfolio.getTradeRecords().stream().map(e -> createViewData(e, sdf)).collect(Collectors.toList());
 	}
-	
+
 	@POST
 	@Path("{portfolio}/Trade")
-	public Response addTradeRecord(@PathParam("portfolio") String portfolioId, TradeRecordViewData viewData){
-		return Response.ok().build();
+	public Response addTradeRecord(@PathParam("portfolio") String portfolioId, TradeRecordViewData viewData) {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode rltJsonObj = mapper.createObjectNode();
+
+		try {
+			BuyOrSell buyOrSell = BuyOrSell.valueOf(viewData.getBuyOrSell());
+			Date date = CommonUtil.formatDate("yyyy-MM-dd", viewData.getDate());
+			daoManager.getDao(httpRequest).trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(),
+					viewData.getAmount(), 0, date);
+			rltJsonObj.set("rltCode", mapper.getNodeFactory().numberNode(0));
+			rltJsonObj.set("message", mapper.getNodeFactory().textNode("OK"));
+		} catch (PortfolioException e) {
+			LOGGER.warning("Failed to trade, PortfolioId: " + portfolioId + ", Trade: " + viewData + ", reason: "
+					+ e.getMessage());
+			rltJsonObj.set("rltCode", mapper.getNodeFactory().numberNode(-1));
+			rltJsonObj.set("message", mapper.getNodeFactory().textNode(e.getMessage()));
+		}
+		return Response.ok(rltJsonObj).build();
 	}
 
 	private PortfolioViewData createViewData(Portfolio portfolio) {
@@ -369,5 +395,10 @@ class TradeRecordViewData {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	@Override
+	public String toString() {
+		return Reflector.toStringByAllFields(this);
 	}
 }

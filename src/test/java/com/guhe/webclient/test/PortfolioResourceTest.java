@@ -2,10 +2,9 @@ package com.guhe.webclient.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import static org.mockito.Mockito.doThrow;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Entity;
@@ -26,8 +25,11 @@ import com.guhe.dao.Dao;
 import com.guhe.dao.DaoManager;
 import com.guhe.dao.Holding;
 import com.guhe.dao.Portfolio;
+import com.guhe.dao.PortfolioException;
 import com.guhe.dao.Stock;
 import com.guhe.dao.TradeRecord;
+import com.guhe.dao.TradeRecord.BuyOrSell;
+import com.guhe.util.CommonUtil;
 import com.guhe.webclient.PortfolioResource;
 import com.guhe.webclient.StockData;
 import com.guhe.webclient.StockMarket;
@@ -55,25 +57,20 @@ public class PortfolioResourceTest extends JerseyTest {
 		Stock zhong_guo_ping_an = new Stock("601318", "中国平安");
 		portfolio.add(new Holding(zhong_guo_ping_an, 3600));
 
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			TradeRecord record1 = new TradeRecord();
-			record1.setBuyOrSell(TradeRecord.BuyOrSell.BUY);
-			record1.setAmount(500);
-			record1.setDate(sdf.parse("2016-08-10 10:20:33"));
-			record1.setPrice(8.65);
-			record1.setStock(ping_an_yin_hang);
-			portfolio.add(record1);
-			TradeRecord record2 = new TradeRecord();
-			record2.setBuyOrSell(TradeRecord.BuyOrSell.SELL);
-			record2.setAmount(300);
-			record2.setDate(sdf.parse("2016-12-22 09:50:55"));
-			record2.setPrice(38.88);
-			record2.setStock(zhong_guo_ping_an);
-			portfolio.add(record2);
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
+		TradeRecord record1 = new TradeRecord();
+		record1.setBuyOrSell(TradeRecord.BuyOrSell.BUY);
+		record1.setAmount(500);
+		record1.setDate(CommonUtil.formatDate("yyy-MM-dd", "2016-08-10 10:20:33"));
+		record1.setPrice(8.65);
+		record1.setStock(ping_an_yin_hang);
+		portfolio.add(record1);
+		TradeRecord record2 = new TradeRecord();
+		record2.setBuyOrSell(TradeRecord.BuyOrSell.SELL);
+		record2.setAmount(300);
+		record2.setDate(CommonUtil.formatDate("yyy-MM-dd", "2016-12-22 09:50:55"));
+		record2.setPrice(38.88);
+		record2.setStock(zhong_guo_ping_an);
+		portfolio.add(record2);
 
 		return portfolio;
 	}
@@ -195,7 +192,7 @@ public class PortfolioResourceTest extends JerseyTest {
 	}
 
 	@Test
-	public void test_post_trade_of_buy() {
+	public void test_post_trade_and_succ() {
 		ObjectNode tradeObj = mapper.createObjectNode();
 		tradeObj.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
 		tradeObj.set("stockCode", mapper.getNodeFactory().textNode("000001"));
@@ -206,6 +203,39 @@ public class PortfolioResourceTest extends JerseyTest {
 		Entity<String> entity = Entity.json(tradeObj.toString());
 		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
 				.post(entity);
+
+		verify(dao).trade("P00000001", "000001", BuyOrSell.BUY, 8.65, 500, 0,
+				CommonUtil.formatDate("yyy-MM-dd", "2016-08-10"));
+
 		assertEquals(200, response.getStatus());
+
+		ObjectNode expectObj = mapper.createObjectNode();
+		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(0));
+		expectObj.set("message", mapper.getNodeFactory().textNode("OK"));
+		assertEquals(expectObj, response.readEntity(ObjectNode.class));
+	}
+
+	@Test
+	public void test_post_trade_and_fail() {
+		doThrow(new PortfolioException("mock expection")).when(dao).trade("P00000001", "000001", BuyOrSell.BUY, 8.65,
+				500, 0, CommonUtil.formatDate("yyy-MM-dd", "2016-08-10"));
+
+		ObjectNode tradeObj = mapper.createObjectNode();
+		tradeObj.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
+		tradeObj.set("stockCode", mapper.getNodeFactory().textNode("000001"));
+		tradeObj.set("stockName", mapper.getNodeFactory().textNode("平安银行"));
+		tradeObj.set("amount", mapper.getNodeFactory().numberNode(500));
+		tradeObj.set("price", mapper.getNodeFactory().numberNode(8.65));
+		tradeObj.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		Entity<String> entity = Entity.json(tradeObj.toString());
+		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
+				.post(entity);
+
+		assertEquals(200, response.getStatus());
+
+		ObjectNode expectObj = mapper.createObjectNode();
+		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(-1));
+		expectObj.set("message", mapper.getNodeFactory().textNode("mock expection"));
+		assertEquals(expectObj, response.readEntity(ObjectNode.class));
 	}
 }
