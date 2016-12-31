@@ -1,12 +1,11 @@
 package com.guhe.webclient.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -21,14 +20,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.guhe.dao.Dao;
-import com.guhe.dao.DaoManager;
-import com.guhe.dao.Holding;
-import com.guhe.dao.Portfolio;
-import com.guhe.dao.PortfolioException;
-import com.guhe.dao.Stock;
-import com.guhe.dao.TradeRecord;
-import com.guhe.dao.TradeRecord.BuyOrSell;
+import com.guhe.portfolio.Holding;
+import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.PortfolioException;
+import com.guhe.portfolio.PortfolioManager;
+import com.guhe.portfolio.Stock;
+import com.guhe.portfolio.TradeRecord;
+import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 import com.guhe.webclient.PortfolioResource;
 import com.guhe.webclient.StockData;
@@ -40,9 +38,7 @@ public class PortfolioResourceTest extends JerseyTest {
 
 	private StockMarket market;
 
-	private DaoManager daoManager;
-
-	private Dao dao;
+	private PortfolioManager pm;
 
 	private Portfolio createPortfolio() {
 		Portfolio portfolio = new Portfolio();
@@ -90,21 +86,15 @@ public class PortfolioResourceTest extends JerseyTest {
 		data2.setPb(2);
 		when(market.getStockData("601318")).thenReturn(data2);
 
-		dao = mock(Dao.class);
-		when(dao.getPortfolio("P00000001")).thenReturn(createPortfolio());
-
-		HttpServletRequest httpReq = mock(HttpServletRequest.class);
-
-		daoManager = mock(DaoManager.class);
-		when(daoManager.getDao(httpReq)).thenReturn(dao);
+		pm = mock(PortfolioManager.class);
+		when(pm.getPortfolio("P00000001")).thenReturn(createPortfolio());
 
 		ResourceConfig config = new ResourceConfig(PortfolioResource.class);
 		config.register(new AbstractBinder() {
 			@Override
 			protected void configure() {
 				bind(market).to(StockMarket.class);
-				bind(daoManager).to(DaoManager.class);
-				bind(httpReq).to(HttpServletRequest.class);
+				bind(pm).to(PortfolioManager.class);
 			}
 		});
 		return config;
@@ -204,7 +194,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
 				.post(entity);
 
-		verify(dao).trade("P00000001", "000001", BuyOrSell.BUY, 8.65, 500, 0,
+		verify(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65, 500, 0,
 				CommonUtil.formatDate("yyy-MM-dd", "2016-08-10"));
 
 		assertEquals(200, response.getStatus());
@@ -217,7 +207,7 @@ public class PortfolioResourceTest extends JerseyTest {
 
 	@Test
 	public void test_post_trade_and_fail() {
-		doThrow(new PortfolioException("mock expection")).when(dao).trade("P00000001", "000001", BuyOrSell.BUY, 8.65,
+		doThrow(new PortfolioException("mock expection")).when(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65,
 				500, 0, CommonUtil.formatDate("yyy-MM-dd", "2016-08-10"));
 
 		ObjectNode tradeObj = mapper.createObjectNode();

@@ -1,4 +1,4 @@
-package com.guhe.dao;
+package com.guhe.portfolio;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -16,11 +16,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.guhe.dao.DaoManager;
-import com.guhe.dao.Portfolio;
-import com.guhe.dao.PortfolioException;
-import com.guhe.dao.TradeRecord;
-import com.guhe.dao.TradeRecord.BuyOrSell;
+import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.PortfolioException;
+import com.guhe.portfolio.PortfolioManager;
+import com.guhe.portfolio.TradeRecord;
+import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 import com.guhe.util.Reflector;
 
@@ -36,12 +36,12 @@ public class PortfolioResource {
 	private HttpServletRequest httpRequest;
 
 	@Inject
-	private DaoManager daoManager;
+	private PortfolioManager pm;
 
 	@GET
 	@Path("{portfolio}")
 	public PortfolioViewData getPortfolio(@PathParam("portfolio") String id) {
-		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(id);
+		Portfolio portfolio = pm.getPortfolio(id);
 		if (portfolio == null) {
 			return null;
 		}
@@ -51,7 +51,7 @@ public class PortfolioResource {
 	@GET
 	@Path("{portfolio}/HoldingStock")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
-		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(portfolioId);
+		Portfolio portfolio = pm.getPortfolio(portfolioId);
 		if (portfolio == null) {
 			return null;
 		}
@@ -63,7 +63,7 @@ public class PortfolioResource {
 	@GET
 	@Path("{portfolio}/Trade")
 	public List<TradeRecordViewData> getTradeRecords(@PathParam("portfolio") String portfolioId) {
-		Portfolio portfolio = daoManager.getDao(httpRequest).getPortfolio(portfolioId);
+		Portfolio portfolio = pm.getPortfolio(portfolioId);
 		if (portfolio == null) {
 			return null;
 		}
@@ -76,12 +76,11 @@ public class PortfolioResource {
 	@Path("{portfolio}/Trade")
 	public Response addTradeRecord(@PathParam("portfolio") String portfolioId, TradeRecordViewData viewData) {
 		TradeResultViewData result;
-
 		try {
 			BuyOrSell buyOrSell = BuyOrSell.valueOf(viewData.getBuyOrSell());
 			Date date = CommonUtil.formatDate("yyyy-MM-dd", viewData.getDate());
-			daoManager.getDao(httpRequest).trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(),
-					viewData.getAmount(), 0, date);
+			pm.trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(), viewData.getAmount(), 0,
+					date);
 			result = new TradeResultViewData(0, "OK");
 		} catch (PortfolioException e) {
 			LOGGER.warning("Failed to trade, PortfolioId: " + portfolioId + ", Trade: " + viewData + ", reason: "

@@ -1,4 +1,4 @@
-package com.guhe.dao;
+package com.guhe.portfolio;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
