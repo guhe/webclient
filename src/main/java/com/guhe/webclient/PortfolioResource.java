@@ -16,8 +16,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.guhe.dao.DaoManager;
 import com.guhe.dao.Portfolio;
 import com.guhe.dao.PortfolioException;
@@ -77,23 +75,20 @@ public class PortfolioResource {
 	@POST
 	@Path("{portfolio}/Trade")
 	public Response addTradeRecord(@PathParam("portfolio") String portfolioId, TradeRecordViewData viewData) {
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode rltJsonObj = mapper.createObjectNode();
+		TradeResultViewData result;
 
 		try {
 			BuyOrSell buyOrSell = BuyOrSell.valueOf(viewData.getBuyOrSell());
 			Date date = CommonUtil.formatDate("yyyy-MM-dd", viewData.getDate());
 			daoManager.getDao(httpRequest).trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(),
 					viewData.getAmount(), 0, date);
-			rltJsonObj.set("rltCode", mapper.getNodeFactory().numberNode(0));
-			rltJsonObj.set("message", mapper.getNodeFactory().textNode("OK"));
+			result = new TradeResultViewData(0, "OK");
 		} catch (PortfolioException e) {
 			LOGGER.warning("Failed to trade, PortfolioId: " + portfolioId + ", Trade: " + viewData + ", reason: "
 					+ e.getMessage());
-			rltJsonObj.set("rltCode", mapper.getNodeFactory().numberNode(-1));
-			rltJsonObj.set("message", mapper.getNodeFactory().textNode(e.getMessage()));
+			result = new TradeResultViewData(-1, e.getMessage());
 		}
-		return Response.ok(rltJsonObj).build();
+		return Response.ok(result).build();
 	}
 
 	private PortfolioViewData createViewData(Portfolio portfolio) {
@@ -140,6 +135,33 @@ public class PortfolioResource {
 		return viewDate;
 	}
 
+}
+
+@XmlRootElement
+class TradeResultViewData {
+	private int rltCode;
+	private String message;
+
+	public TradeResultViewData(int rltCode, String message) {
+		this.rltCode = rltCode;
+		this.message = message;
+	}
+
+	public int getRltCode() {
+		return rltCode;
+	}
+
+	public void setRltCode(int rltCode) {
+		this.rltCode = rltCode;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }
 
 @XmlRootElement(name = "portfolio")
