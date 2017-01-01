@@ -108,18 +108,11 @@ public class PortfolioManagerTest {
 
 		List<Holding> holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
-		assertEquals("ID001", holdings.get(0).getPortfolio().getId());
-		assertEquals("000001", holdings.get(0).getStock().getCode());
-		assertEquals(400, holdings.get(0).getAmount());
+		assertThat(holdings.get(0), "ID001", "000001", 400);
 
 		List<TradeRecord> tradeRecords = portfolio.getTradeRecords();
 		assertEquals(1, tradeRecords.size());
-		assertEquals("ID001", tradeRecords.get(0).getPortfolio().getId());
-		assertEquals("000001", tradeRecords.get(0).getStock().getCode());
-		assertEquals(BuyOrSell.BUY, tradeRecords.get(0).getBuyOrSell());
-		assertEquals(400, tradeRecords.get(0).getAmount());
-		assertEquals(8.5, tradeRecords.get(0).getPrice(), 0.000001);
-		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"), tradeRecords.get(0).getDate());
+		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, "2016-12-14");
 
 		// sell
 		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-15"));
@@ -129,26 +122,29 @@ public class PortfolioManagerTest {
 
 		holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
-		assertEquals("ID001", holdings.get(0).getPortfolio().getId());
-		assertEquals("000001", holdings.get(0).getStock().getCode());
-		assertEquals(100, holdings.get(0).getAmount());
+		assertThat(holdings.get(0), "ID001", "000001", 100);
 
 		tradeRecords = portfolio.getTradeRecords();
 		assertEquals(2, tradeRecords.size());
-		assertEquals("ID001", tradeRecords.get(0).getPortfolio().getId());
-		assertEquals("000001", tradeRecords.get(0).getStock().getCode());
-		assertEquals(BuyOrSell.BUY, tradeRecords.get(0).getBuyOrSell());
-		assertEquals(400, tradeRecords.get(0).getAmount());
-		assertEquals(8.5, tradeRecords.get(0).getPrice(), 0.000001);
-		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"), tradeRecords.get(0).getDate());
-
-		assertEquals("ID001", tradeRecords.get(1).getPortfolio().getId());
-		assertEquals("000001", tradeRecords.get(1).getStock().getCode());
-		assertEquals(BuyOrSell.SELL, tradeRecords.get(1).getBuyOrSell());
-		assertEquals(300, tradeRecords.get(1).getAmount());
-		assertEquals(10, tradeRecords.get(1).getPrice(), 0.000001);
-		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", "2016-12-15"), tradeRecords.get(1).getDate());
+		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, "2016-12-14");
+		assertThat(tradeRecords.get(1), "ID001", "000001", BuyOrSell.SELL, 300, 10.0, "2016-12-15");
 
 		pm.deletePortfolio("ID001");
+	}
+
+	private void assertThat(Holding holding, String protfolioId, String stockCode, int amount) {
+		assertEquals(protfolioId, holding.getPortfolio().getId());
+		assertEquals(stockCode, holding.getStock().getCode());
+		assertEquals(amount, holding.getAmount());
+	}
+
+	private void assertThat(TradeRecord tradeRecord, String protfolioId, String stockCode, BuyOrSell buyOrSell,
+			long amount, double price, String date) {
+		assertEquals(protfolioId, tradeRecord.getPortfolio().getId());
+		assertEquals(stockCode, tradeRecord.getStock().getCode());
+		assertEquals(buyOrSell, tradeRecord.getBuyOrSell());
+		assertEquals(amount, tradeRecord.getAmount());
+		assertEquals(price, tradeRecord.getPrice(), 0.000001);
+		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", date), tradeRecord.getDate());
 	}
 }
