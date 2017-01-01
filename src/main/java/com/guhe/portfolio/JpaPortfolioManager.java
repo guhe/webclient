@@ -31,25 +31,19 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	@Override
 	public void savePortfolio(Portfolio portfolio) {
-		em.getTransaction().begin();
-		em.persist(portfolio);
-		em.getTransaction().commit();
+		doInTransaction(() -> {
+			em.persist(portfolio);
+		});
 	}
 
 	@Override
 	public void deletePortfolio(String id) {
-		em.getTransaction().begin();
-		em.remove(em.find(Portfolio.class, id));
-		em.getTransaction().commit();
+		doInTransaction(() -> {
+			em.remove(em.find(Portfolio.class, id));
+		});
 	}
 
-	public void saveStock(Stock stock) {
-		em.getTransaction().begin();
-		em.persist(stock);
-		em.getTransaction().commit();
-	}
-
-	private Stock getStockByCode(String stockCode) {
+	public Stock getStockByCode(String stockCode) {
 		TypedQuery<Stock> query = em.createQuery("FROM Stock WHERE code=:code", Stock.class);
 		query.setParameter("code", stockCode);
 		List<Stock> stocks = query.getResultList();
@@ -59,59 +53,63 @@ public class JpaPortfolioManager implements PortfolioManager {
 	@Override
 	public void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double cost,
 			Date date) {
-		em.getTransaction().begin();
-
-		Portfolio portfolio = getPortfolio(portfolioId);
-		if (portfolio == null) {
-			em.getTransaction().rollback();
-			throw new PortfolioException("no such portfolio.");
-		}
-		if (buyOrSell == BuyOrSell.BUY && portfolio.getCash() - cost - amount * price < 0) {
-			em.getTransaction().rollback();
-			throw new PortfolioException("no enough money to buy.");
-		}
-		portfolio.setCash(portfolio.getCash() - (buyOrSell == BuyOrSell.SELL ? -amount : amount) * price - cost);
-
-		Stock stock = getStockByCode(stockCode);
-		if (stock == null) {
-			em.getTransaction().rollback();
-			throw new PortfolioException("no such stock code.");
-		}
-
-		TypedQuery<Holding> query = em.createQuery("FROM Holding WHERE portfolio.id=:pId AND stock.code=:code",
-				Holding.class);
-		query.setParameter("pId", portfolioId);
-		query.setParameter("code", stockCode);
-		List<Holding> holdings = query.getResultList();
-		if (holdings.isEmpty()) {
-			if (buyOrSell == BuyOrSell.SELL) {
-				em.getTransaction().rollback();
-				throw new PortfolioException("no such holding to sell.");
+		doInTransaction(() -> {
+			Portfolio portfolio = getPortfolio(portfolioId);
+			if (portfolio == null) {
+				throw new PortfolioException("no such portfolio.");
 			}
-			Holding holding = new Holding();
-			holding.setStock(stock);
-			holding.setPortfolio(portfolio);
-			holding.setAmount(amount);
-			em.persist(holding);
-		} else {
-			Holding holding = holdings.get(0);
-			if (buyOrSell == BuyOrSell.SELL && holding.getAmount() < amount) {
-				em.getTransaction().rollback();
-				throw new PortfolioException("No enough holdings to sell.");
+
+			Stock stock = getStockByCode(stockCode);
+			if (stock == null) {
+				throw new PortfolioException("no such stock code.");
 			}
-			holding.setAmount(holding.getAmount() + (buyOrSell == BuyOrSell.SELL ? -amount : amount));
-		}
 
-		TradeRecord tradeRecord = new TradeRecord();
-		tradeRecord.setAmount(amount);
-		tradeRecord.setBuyOrSell(buyOrSell);
-		tradeRecord.setDate(date);
-		tradeRecord.setPortfolio(portfolio);
-		tradeRecord.setPrice(price);
-		tradeRecord.setStock(getStockByCode(stockCode));
-		em.persist(tradeRecord);
+			if (buyOrSell == BuyOrSell.BUY && portfolio.getCash() - cost - amount * price < 0) {
+				throw new PortfolioException("no enough money to buy.");
+			}
+			portfolio.setCash(portfolio.getCash() - (buyOrSell == BuyOrSell.SELL ? -amount : amount) * price - cost);
 
-		em.getTransaction().commit();
+			TypedQuery<Holding> query = em.createQuery("FROM Holding WHERE portfolio.id=:pId AND stock.code=:code",
+					Holding.class);
+			query.setParameter("pId", portfolioId);
+			query.setParameter("code", stockCode);
+			List<Holding> holdings = query.getResultList();
+			if (holdings.isEmpty()) {
+				if (buyOrSell == BuyOrSell.SELL) {
+					throw new PortfolioException("no such holding to sell.");
+				}
+				Holding holding = new Holding();
+				holding.setStock(stock);
+				holding.setPortfolio(portfolio);
+				holding.setAmount(amount);
+				em.persist(holding);
+			} else {
+				Holding holding = holdings.get(0);
+				if (buyOrSell == BuyOrSell.SELL && holding.getAmount() < amount) {
+					throw new PortfolioException("No enough holdings to sell.");
+				}
+				holding.setAmount(holding.getAmount() + (buyOrSell == BuyOrSell.SELL ? -amount : amount));
+			}
+
+			TradeRecord tradeRecord = new TradeRecord();
+			tradeRecord.setAmount(amount);
+			tradeRecord.setBuyOrSell(buyOrSell);
+			tradeRecord.setDate(date);
+			tradeRecord.setPortfolio(portfolio);
+			tradeRecord.setPrice(price);
+			tradeRecord.setStock(getStockByCode(stockCode));
+			em.persist(tradeRecord);
+		});
 	}
 
+	private void doInTransaction(Runnable r) {
+		em.getTransaction().begin();
+		try {
+			r.run();
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			throw e;
+		}
+	}
 }
