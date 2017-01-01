@@ -22,7 +22,11 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	@Override
 	public Portfolio getPortfolio(String id) {
-		return em.find(Portfolio.class, id);
+		Portfolio p = em.find(Portfolio.class, id);
+		if (p != null) {
+			em.refresh(p);
+		}
+		return p;
 	}
 
 	@Override
@@ -35,7 +39,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 	@Override
 	public void deletePortfolio(String id) {
 		em.getTransaction().begin();
-		em.remove(getPortfolio(id));
+		em.remove(em.find(Portfolio.class, id));
 		em.getTransaction().commit();
 	}
 
@@ -101,6 +105,12 @@ public class JpaPortfolioManager implements PortfolioManager {
 		tradeRecord.setStock(getStockByCode(stockCode));
 		em.persist(tradeRecord);
 
+		em.getTransaction().commit();
+	}
+
+	public void saveStock(Stock stock) {
+		em.getTransaction().begin();
+		em.persist(stock);
 		em.getTransaction().commit();
 	}
 

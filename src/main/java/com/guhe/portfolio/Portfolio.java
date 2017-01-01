@@ -25,7 +25,14 @@ public class Portfolio {
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
 	private List<TradeRecord> tradeRecords = new ArrayList<>();
-	
+
+	public Portfolio() {
+	}
+
+	public Portfolio(String id) {
+		this.id = id;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -73,8 +80,8 @@ public class Portfolio {
 	public List<Holding> getHoldings() {
 		return holdings;
 	}
-	
-	public void add(TradeRecord tradeRecord){
+
+	public void add(TradeRecord tradeRecord) {
 		tradeRecords.add(tradeRecord);
 	}
 

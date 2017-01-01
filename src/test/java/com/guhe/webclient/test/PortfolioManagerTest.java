@@ -16,12 +16,12 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.JpaPortfolioManager;
 import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.Stock;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 import com.guhe.util.DerbyUtil;
@@ -87,7 +87,6 @@ public class PortfolioManagerTest {
 		assertNull(pm.getPortfolio("ID001"));
 	}
 
-	@Ignore
 	@Test
 	public void test_trade() {
 		Portfolio portfolio = new Portfolio();
@@ -98,10 +97,12 @@ public class PortfolioManagerTest {
 		portfolio.setNetWorthPerUnitLastYear(1.1);
 		pm.savePortfolio(portfolio);
 
+		pm.saveStock(new Stock("000001", "平安银行"));
+		
 		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 0, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
 
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(5632.3, portfolio.getCash(), 0.000001);
+		assertEquals(8900.4, portfolio.getCash(), 0.000001);
 
 		List<Holding> holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
