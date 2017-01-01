@@ -43,6 +43,12 @@ public class JpaPortfolioManager implements PortfolioManager {
 		em.getTransaction().commit();
 	}
 
+	public void saveStock(Stock stock) {
+		em.getTransaction().begin();
+		em.persist(stock);
+		em.getTransaction().commit();
+	}
+
 	private Stock getStockByCode(String stockCode) {
 		TypedQuery<Stock> query = em.createQuery("FROM Stock WHERE code=:code", Stock.class);
 		query.setParameter("code", stockCode);
@@ -64,7 +70,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 			em.getTransaction().rollback();
 			throw new PortfolioException("no enough money to buy.");
 		}
-		portfolio.setCash(portfolio.getCash() - amount * price - cost);
+		portfolio.setCash(portfolio.getCash() - (buyOrSell == BuyOrSell.SELL ? -amount : amount) * price - cost);
 
 		Stock stock = getStockByCode(stockCode);
 		if (stock == null) {
@@ -105,12 +111,6 @@ public class JpaPortfolioManager implements PortfolioManager {
 		tradeRecord.setStock(getStockByCode(stockCode));
 		em.persist(tradeRecord);
 
-		em.getTransaction().commit();
-	}
-
-	public void saveStock(Stock stock) {
-		em.getTransaction().begin();
-		em.persist(stock);
 		em.getTransaction().commit();
 	}
 

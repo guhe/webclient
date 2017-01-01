@@ -23,7 +23,7 @@ public class Portfolio {
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Holding> holdings = new ArrayList<>();
 
-	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<TradeRecord> tradeRecords = new ArrayList<>();
 
 	public Portfolio() {

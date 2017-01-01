@@ -22,6 +22,7 @@ import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.JpaPortfolioManager;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.Stock;
+import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 import com.guhe.util.DerbyUtil;
@@ -88,7 +89,7 @@ public class PortfolioManagerTest {
 	}
 
 	@Test
-	public void test_trade() {
+	public void test_trade_buy_sell() {
 		Portfolio portfolio = new Portfolio();
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
@@ -98,16 +99,56 @@ public class PortfolioManagerTest {
 		pm.savePortfolio(portfolio);
 
 		pm.saveStock(new Stock("000001", "平安银行"));
-		
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 0, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+
+		// buy
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
 
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(8900.4, portfolio.getCash(), 0.000001);
+		assertEquals(8895.4, portfolio.getCash(), 0.000001);
 
 		List<Holding> holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
 		assertEquals("ID001", holdings.get(0).getPortfolio().getId());
 		assertEquals("000001", holdings.get(0).getStock().getCode());
 		assertEquals(400, holdings.get(0).getAmount());
+
+		List<TradeRecord> tradeRecords = portfolio.getTradeRecords();
+		assertEquals(1, tradeRecords.size());
+		assertEquals("ID001", tradeRecords.get(0).getPortfolio().getId());
+		assertEquals("000001", tradeRecords.get(0).getStock().getCode());
+		assertEquals(BuyOrSell.BUY, tradeRecords.get(0).getBuyOrSell());
+		assertEquals(400, tradeRecords.get(0).getAmount());
+		assertEquals(8.5, tradeRecords.get(0).getPrice(), 0.000001);
+		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"), tradeRecords.get(0).getDate());
+
+		// sell
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-15"));
+
+		portfolio = pm.getPortfolio("ID001");
+		assertEquals(11887.1, portfolio.getCash(), 0.000001);
+
+		holdings = portfolio.getHoldings();
+		assertEquals(1, holdings.size());
+		assertEquals("ID001", holdings.get(0).getPortfolio().getId());
+		assertEquals("000001", holdings.get(0).getStock().getCode());
+		assertEquals(100, holdings.get(0).getAmount());
+
+		tradeRecords = portfolio.getTradeRecords();
+		assertEquals(2, tradeRecords.size());
+		assertEquals("ID001", tradeRecords.get(0).getPortfolio().getId());
+		assertEquals("000001", tradeRecords.get(0).getStock().getCode());
+		assertEquals(BuyOrSell.BUY, tradeRecords.get(0).getBuyOrSell());
+		assertEquals(400, tradeRecords.get(0).getAmount());
+		assertEquals(8.5, tradeRecords.get(0).getPrice(), 0.000001);
+		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"), tradeRecords.get(0).getDate());
+
+		assertEquals("ID001", tradeRecords.get(1).getPortfolio().getId());
+		assertEquals("000001", tradeRecords.get(1).getStock().getCode());
+		assertEquals(BuyOrSell.SELL, tradeRecords.get(1).getBuyOrSell());
+		assertEquals(300, tradeRecords.get(1).getAmount());
+		assertEquals(10, tradeRecords.get(1).getPrice(), 0.000001);
+		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", "2016-12-15"), tradeRecords.get(1).getDate());
+
+		pm.deletePortfolio("ID001");
 	}
 }
