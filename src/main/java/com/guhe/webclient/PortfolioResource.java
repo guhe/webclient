@@ -39,6 +39,12 @@ public class PortfolioResource {
 	private PortfolioManager pm;
 
 	@GET
+	public List<PortfolioViewData> getPortfolios() {
+		List<Portfolio> portfolios = pm.getPortfolios();
+		return portfolios.stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	@GET
 	@Path("{portfolio}")
 	public PortfolioViewData getPortfolio(@PathParam("portfolio") String id) {
 		Portfolio portfolio = pm.getPortfolio(id);

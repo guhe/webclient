@@ -6,114 +6,42 @@
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 <script src="jquery-3.0.0.js"></script>
 <script>
-	Number.prototype.toPercent = function(n) {
-		n = n || 0;
-		return (Math.round(this * Math.pow(10, n + 2)) / Math.pow(10, n)).toFixed(n) + '%';
-	}
-
-	$("#detail tbody tr").remove();
-
 	$(document).ready(function() {
-		$.get({
-			url : "rest/Portfolio/P00000001",
-			dataType : 'json',
-			success : function(result) {
-				$("#netWorthPerUnit").html(result["netWorthPerUnit"].toFixed(4));
-				$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
-				$("#totalWorth").html(result["totalWorth"].toFixed(0));
-				$("#projectedLiabilities").html(result["projectedLiabilities"].toFixed(0));
-				$("#netWorth").html(result["netWorth"].toFixed(0));
-				$("#pb").html(result["pb"].toFixed(2));
-				$("#pe").html(result["pe"].toFixed(1));
-				$("#proportionOfStock").html(result["proportionOfStock"].toPercent(1));
-			}
-		});
+		$("#detail tbody tr").remove();
 
 		$.get({
-			url : "rest/Portfolio/P00000001/HoldingStock",
+			url : "rest/Portfolio",
 			dataType : 'json',
 			success : function(result) {
-				result.sort(function(a, b) {
-					return b["proportion"] - a["proportion"];
-				});
 				$.each(result, function(key, row_data) {
+					var href = "portfolio.html?id=" + row_data["id"];
 					var row = $("<tr/>").appendTo($("#detail tbody"));
-					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
-					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
-					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
-					$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
-					$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
-					$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
-					$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
-					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
+					$("<td/>").html("<a href=\""+href+"\">" + row_data["id"] + "</a>").appendTo(row);
+					$("<td/>").html("<a href=\""+href+"\">" + row_data["name"] + "</a>").appendTo(row);
 				});
 			}
 		});
-
 	});
 </script>
 </head>
-
 <body>
 	<div style="height: 50px"></div>
-	<div id="global">
-		<div>
-			<table class="gmt">
-				<tr>
-					<td class="gmt-title">累计净值</td>
-					<td class="gmt-title gmt-sp">年度收益率</td>
-				</tr>
-				<tr>
-					<td id="netWorthPerUnit" class="gmt-value"></td>
-					<td id="rateOfReturnYear" class="gmt-value gmt-sp"></td>
-				</tr>
+	<div align="center">
+		<div id="detail">
+			<table class="zebra">
+				<caption>
+					<span>组合列表</span>
+				</caption>
+				<thead>
+					<tr>
+						<th>编号</th>
+						<th>名称</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
 			</table>
 		</div>
 	</div>
-	<div style="height: 5px"></div>
-	<div id="global-more">
-		<table class="gmt">
-			<tr>
-				<td class="gmt-detail-title">总资产</td>
-				<td id="totalWorth" class="gmt-detail-value"></td>
-				<td class="gmt-detail-title">预计负债</td>
-				<td id="projectedLiabilities" class="gmt-detail-value"></td>
-				<td class="gmt-detail-title">净资产</td>
-				<td id="netWorth" class="gmt-detail-value"></td>
-			</tr>
-			<tr>
-				<td class="gmt-detail-title">PB</td>
-				<td id="pb" class="gmt-detail-value"></td>
-				<td class="gmt-detail-title">PE</td>
-				<td id="pe" class="gmt-detail-value"></td>
-				<td class="gmt-detail-title">仓位</td>
-				<td id="proportionOfStock" class="gmt-detail-value"></td>
-			</tr>
-		</table>
-	</div>
-	<hr style="width: 800px" />
-	<div id="detail">
-		<table class="zebra">
-			<caption>
-				<span>持仓清单</span>
-				<a href="trade.html">交易</a>
-			</caption>
-			<thead>
-				<tr>
-					<th>证券名称/代码</th>
-					<th>数量</th>
-					<th>现价</th>
-					<th>市值</th>
-					<th>预计手续费</th>
-					<th>预计税费</th>
-					<th>净值</th>
-					<th>占比</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-	</div>
-	<div id="log"></div>
 </body>
 </html>

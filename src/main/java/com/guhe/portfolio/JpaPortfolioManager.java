@@ -21,6 +21,11 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	@Override
+	public List<Portfolio> getPortfolios() {
+		return em.createQuery("FROM Portfolio", Portfolio.class).getResultList();
+	}
+
+	@Override
 	public Portfolio getPortfolio(String id) {
 		Portfolio p = em.find(Portfolio.class, id);
 		if (p != null) {
