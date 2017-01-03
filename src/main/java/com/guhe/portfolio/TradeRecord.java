@@ -28,6 +28,8 @@ public class TradeRecord {
 	private long amount;
 
 	private double price;
+	
+	private double fee;
 
 	private Date date;
 
@@ -77,6 +79,14 @@ public class TradeRecord {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public double getFee() {
+		return fee;
+	}
+
+	public void setFee(double fee) {
+		this.fee = fee;
 	}
 
 	public Date getDate() {

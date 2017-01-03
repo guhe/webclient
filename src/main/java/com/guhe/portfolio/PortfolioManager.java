@@ -18,7 +18,7 @@ public interface PortfolioManager {
 
 	void deletePortfolio(String id);
 
-	void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double cost,
+	void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee,
 			Date date);
 
 }

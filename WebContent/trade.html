@@ -24,6 +24,7 @@
 					$("<td/>").html(row_data["stockName"] + row_data["stockCode"]).appendTo(row); // 股票代码
 					$("<td/>").html(row_data["amount"]).appendTo(row); // 成交数量
 					$("<td/>").html(row_data["price"]).appendTo(row); // 成交价格
+					$("<td/>").html(row_data["fee"]).appendTo(row); // 成交价格
 					$("<td/>").html(row_data["date"]).appendTo(row); // 成交日期
 
 					console.log(row_data, isBuy);
@@ -39,13 +40,28 @@
 	}
 
 	function addTradeRecord() {
+		var data = {};
+		data["buyOrSell"] = $(".trade input[name='buyOrSell']:checked").val();
+		data["stockCode"] = $(".trade input[name='stockCode']").val();
+		data["amount"] = $(".trade input[name='amount']").val() * 1;
+		data["price"] = $(".trade input[name='price']").val() * 1;
+		data["fee"] = $(".trade input[name='fee']").val() * 1;
+		data["date"] = $(".trade input[name='date']").val();
+
+		alert(JSON.stringify(data));
+		
 		$.post({
 			url : "rest/Portfolio/" + portfolioId + "/Trade",
+			contentType : "application/json; charset=utf-8",
 			dataType : 'json',
-			data : "{}",
+			data : JSON.stringify(data),
 			async : false,
 			success : function(result) {
-
+				if (result["rltCode"] == 0) {
+					$("#tradeTip span").text("操作成功。");
+				} else {
+					$("#tradeTip span").text(result["message"]);
+				}
 			},
 			error : function() {
 				$("#tradeTip span").text("操作失败。");
@@ -87,6 +103,7 @@
 						<th>股票代码</th>
 						<th>成交数量</th>
 						<th>成交价格</th>
+						<th>交易费用</th>
 						<th>成交日期</th>
 					</tr>
 				</thead>
@@ -100,20 +117,29 @@
 				<table>
 					<tr>
 						<td><span>交易方向：</span></td>
-						<td align="center"><input type="radio" name="type"
-							checked="checked">买<input type="radio" name="type">卖</td>
+						<td align="center"><input type="radio" name="buyOrSell"
+							value="BUY" checked="checked">买<input type="radio"
+							name="buyOrSell" value="SELL">卖</td>
 					</tr>
 					<tr>
 						<td><span>股票代码：</span></td>
-						<td><input type="text" name="code"></td>
+						<td><input type="text" name="stockCode"></td>
 					</tr>
 					<tr>
 						<td><span>成交数量：</span></td>
-						<td><input type="text" name="count"></td>
+						<td><input type="text" name="amount"></td>
 					</tr>
 					<tr>
 						<td><span>成交价格：</span></td>
 						<td><input type="text" name="price"></td>
+					</tr>
+					<tr>
+						<td><span>交易费用：</span></td>
+						<td><input type="text" name="fee"></td>
+					</tr>
+					<tr>
+						<td><span>交易日期：</span></td>
+						<td><input type="text" name="date"></td>
 					</tr>
 					<tr>
 						<td colspan="2" align="center"><input type="submit"

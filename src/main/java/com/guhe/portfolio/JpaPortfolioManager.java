@@ -56,7 +56,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	@Override
-	public void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double cost,
+	public void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee,
 			Date date) {
 		doInTransaction(() -> {
 			Portfolio portfolio = getPortfolio(portfolioId);
@@ -69,10 +69,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 				throw new PortfolioException("no such stock code.");
 			}
 
-			if (buyOrSell == BuyOrSell.BUY && portfolio.getCash() - cost - amount * price < 0) {
+			if (buyOrSell == BuyOrSell.BUY && portfolio.getCash() - fee - amount * price < 0) {
 				throw new PortfolioException("no enough money to buy.");
 			}
-			portfolio.setCash(portfolio.getCash() - (buyOrSell == BuyOrSell.SELL ? -amount : amount) * price - cost);
+			portfolio.setCash(portfolio.getCash() - (buyOrSell == BuyOrSell.SELL ? -amount : amount) * price - fee);
 
 			TypedQuery<Holding> query = em.createQuery("FROM Holding WHERE portfolio.id=:pId AND stock.code=:code",
 					Holding.class);
@@ -102,6 +102,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 			tradeRecord.setDate(date);
 			tradeRecord.setPortfolio(portfolio);
 			tradeRecord.setPrice(price);
+			tradeRecord.setFee(fee);
 			tradeRecord.setStock(getStockByCode(stockCode));
 			em.persist(tradeRecord);
 		});

@@ -58,7 +58,7 @@ public class PortfolioTradeTest extends PortfolioTestBase {
 	@Test
 	public void test_trade_buy_sell() {
 		// buy
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 
 		portfolio = pm.getPortfolio("ID001");
 		assertEquals(8895.4, portfolio.getCash(), 0.000001);
@@ -69,10 +69,10 @@ public class PortfolioTradeTest extends PortfolioTestBase {
 
 		List<TradeRecord> tradeRecords = portfolio.getTradeRecords();
 		assertEquals(1, tradeRecords.size());
-		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, "2016-12-14");
+		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, 5.0, "2016-12-14");
 
 		// sell
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-15"));
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-15"));
 
 		portfolio = pm.getPortfolio("ID001");
 		assertEquals(11887.1, portfolio.getCash(), 0.000001);
@@ -83,28 +83,28 @@ public class PortfolioTradeTest extends PortfolioTestBase {
 
 		tradeRecords = portfolio.getTradeRecords();
 		assertEquals(2, tradeRecords.size());
-		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, "2016-12-14");
-		assertThat(tradeRecords.get(1), "ID001", "000001", BuyOrSell.SELL, 300, 10.0, "2016-12-15");
+		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, 5.0, "2016-12-14");
+		assertThat(tradeRecords.get(1), "ID001", "000001", BuyOrSell.SELL, 300, 10.0, 8.3, "2016-12-15");
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_nonexistent_portfolio() {
-		pm.trade("ID002", "000001", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+		pm.trade("ID002", "000001", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_nonexistent_stock() {
-		pm.trade("ID001", "000002", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+		pm.trade("ID001", "000002", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_no_enough_money_to_buy() {
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 4000, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 4000, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_no_such_holding_to_sell() {
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 	}
 
 	@Test(expected = PortfolioException.class)
@@ -117,7 +117,7 @@ public class PortfolioTradeTest extends PortfolioTestBase {
 		pm.getEm().persist(holding);
 		pm.getEm().getTransaction().commit();
 
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, CommonUtil.formatDate("yyyy-MM-dd", "2016-12-14"));
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 	}
 
 	private void assertThat(Holding holding, String protfolioId, String stockCode, int amount) {
@@ -127,12 +127,13 @@ public class PortfolioTradeTest extends PortfolioTestBase {
 	}
 
 	private void assertThat(TradeRecord tradeRecord, String protfolioId, String stockCode, BuyOrSell buyOrSell,
-			long amount, double price, String date) {
+			long amount, double price, double fee, String date) {
 		assertEquals(protfolioId, tradeRecord.getPortfolio().getId());
 		assertEquals(stockCode, tradeRecord.getStock().getCode());
 		assertEquals(buyOrSell, tradeRecord.getBuyOrSell());
 		assertEquals(amount, tradeRecord.getAmount());
 		assertEquals(price, tradeRecord.getPrice(), 0.000001);
-		assertEquals(CommonUtil.formatDate("yyyy-MM-dd", date), tradeRecord.getDate());
+		assertEquals(fee, tradeRecord.getFee(), 0.000001);
+		assertEquals(CommonUtil.parseDate("yyyy-MM-dd", date), tradeRecord.getDate());
 	}
 }

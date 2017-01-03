@@ -1,6 +1,5 @@
 package com.guhe.webclient;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -74,8 +73,7 @@ public class PortfolioResource {
 			return null;
 		}
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		return portfolio.getTradeRecords().stream().map(e -> createViewData(e, sdf)).collect(Collectors.toList());
+		return portfolio.getTradeRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
 	@POST
@@ -84,9 +82,9 @@ public class PortfolioResource {
 		TradeResultViewData result;
 		try {
 			BuyOrSell buyOrSell = BuyOrSell.valueOf(viewData.getBuyOrSell());
-			Date date = CommonUtil.formatDate("yyyy-MM-dd", viewData.getDate());
-			pm.trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(), viewData.getAmount(), 0,
-					date);
+			Date date = CommonUtil.parseDate("yyyy-MM-dd", viewData.getDate());
+			pm.trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(), viewData.getAmount(),
+					viewData.getFee(), date);
 			result = new TradeResultViewData(0, "OK");
 		} catch (PortfolioException e) {
 			LOGGER.warning("Failed to trade, PortfolioId: " + portfolioId + ", Trade: " + viewData + ", reason: "
@@ -129,14 +127,15 @@ public class PortfolioResource {
 		return viewData;
 	}
 
-	private TradeRecordViewData createViewData(TradeRecord tradeRecord, SimpleDateFormat sdf) {
+	private TradeRecordViewData createViewData(TradeRecord tradeRecord) {
 		TradeRecordViewData viewDate = new TradeRecordViewData();
 		viewDate.setBuyOrSell(tradeRecord.getBuyOrSell().toString());
 		viewDate.setStockCode(tradeRecord.getStock().getCode());
 		viewDate.setStockName(tradeRecord.getStock().getName());
 		viewDate.setAmount(tradeRecord.getAmount());
 		viewDate.setPrice(tradeRecord.getPrice());
-		viewDate.setDate(sdf.format(tradeRecord.getDate()));
+		viewDate.setFee(tradeRecord.getFee());
+		viewDate.setDate(CommonUtil.formatDate("yyyy-MM-dd", tradeRecord.getDate()));
 		return viewDate;
 	}
 
@@ -374,6 +373,7 @@ class TradeRecordViewData {
 	private String stockCode;
 	private long amount;
 	private double price;
+	private double fee;
 	private String date;
 
 	public String getBuyOrSell() {
@@ -414,6 +414,14 @@ class TradeRecordViewData {
 
 	public void setPrice(Double price) {
 		this.price = price;
+	}
+
+	public Double getFee() {
+		return fee;
+	}
+
+	public void setFee(Double fee) {
+		this.fee = fee;
 	}
 
 	public String getDate() {
