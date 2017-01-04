@@ -11,7 +11,7 @@
 
 	$(document).ready(function() {
 		$("#detail tbody tr").remove();
-		
+
 		$("#detail caption a").attr("href", "trade.html?id=" + portfolioId);
 
 		$.get({
@@ -28,6 +28,12 @@
 				$("#pb").html(result["pb"].toFixed(2));
 				$("#pe").html(result["pe"].toFixed(1));
 				$("#proportionOfStock").html(result["proportionOfStock"].toPercent(1));
+
+				if (result["rateOfReturnYear"] < 0) {
+					$("#rateOfReturnYear").css("color", "green");
+				} else {
+					$("#rateOfReturnYear").css("color", "red");
+				}
 			}
 		});
 
