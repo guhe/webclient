@@ -72,6 +72,8 @@
 	}
 
 	$(document).ready(function() {
+		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
+		
 		$.get({
 			url : "rest/Portfolio/" + portfolioId,
 			dataType : 'json',
@@ -97,7 +99,7 @@
 		<div id="detail">
 			<table class="zebra">
 				<caption>
-					<span>交易记录</span>
+					<span>交易记录</span> <a href="#">返回</a>
 				</caption>
 				<thead>
 					<tr>
