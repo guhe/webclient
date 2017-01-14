@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioManager;
+import com.guhe.portfolio.PurchaseRedeemRecord;
 import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
@@ -66,6 +67,18 @@ public class PortfolioResource {
 	}
 
 	@GET
+	@Path("{portfolio}/Holder")
+	public List<PortfolioHolderViewData> getHolders(@PathParam("portfolio") String portfolioId) {
+		Portfolio portfolio = pm.getPortfolio(portfolioId);
+		if (portfolio == null) {
+			return null;
+		}
+
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
+		return calculator.getHolderCalculators().stream().map(e -> e.getViewData()).collect(Collectors.toList());
+	}
+
+	@GET
 	@Path("{portfolio}/Trade")
 	public List<TradeRecordViewData> getTradeRecords(@PathParam("portfolio") String portfolioId) {
 		Portfolio portfolio = pm.getPortfolio(portfolioId);
@@ -92,6 +105,21 @@ public class PortfolioResource {
 			result = new TradeResultViewData(-1, e.getMessage());
 		}
 		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("{portfolio}/PurchaseRedeem")
+	public List<PurchaseRedeemViewData> getPurchaseRedeemRecords(@PathParam("portfolio") String portfolioId) {
+		Portfolio portfolio = pm.getPortfolio(portfolioId);
+		if (portfolio == null) {
+			return null;
+		}
+
+		return portfolio.getPurchaseRedeemRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	private PurchaseRedeemViewData createViewData(PurchaseRedeemRecord record) {
+		return null;
 	}
 
 	private PortfolioViewData createViewData(Portfolio portfolio) {
@@ -138,6 +166,68 @@ public class PortfolioResource {
 		viewDate.setDate(CommonUtil.formatDate("yyyy-MM-dd", tradeRecord.getDate()));
 		return viewDate;
 	}
+
+}
+
+@XmlRootElement
+class PortfolioHolderViewData {
+	private String name;
+	private double share;
+	private double netWorth;
+	private double totalInvestment;
+	private double rateOfReturn;
+	private double proportion;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Double getShare() {
+		return share;
+	}
+
+	public void setShare(Double share) {
+		this.share = share;
+	}
+
+	public Double getNetWorth() {
+		return netWorth;
+	}
+
+	public void setNetWorth(Double netWorth) {
+		this.netWorth = netWorth;
+	}
+
+	public Double getTotalInvestment() {
+		return totalInvestment;
+	}
+
+	public void setTotalInvestment(Double totalInvestment) {
+		this.totalInvestment = totalInvestment;
+	}
+
+	public Double getRateOfReturn() {
+		return rateOfReturn;
+	}
+
+	public void setRateOfReturn(Double rateOfReturn) {
+		this.rateOfReturn = rateOfReturn;
+	}
+
+	public Double getProportion() {
+		return proportion;
+	}
+
+	public void setProportion(Double proportion) {
+		this.proportion = proportion;
+	}
+}
+
+class PurchaseRedeemViewData {
 
 }
 

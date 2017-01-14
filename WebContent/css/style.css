@@ -117,7 +117,7 @@ html, body {
 	border: 1px solid #555;
 }
 
-#detail {
+.detail {
 	padding-top: 0px;
 	width: 800px;
 	margin: 0 auto;

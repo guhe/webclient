@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.Stock.Exchange;
 
 public class PortfolioCalculator {
@@ -68,10 +69,14 @@ public class PortfolioCalculator {
 		return portfolio.getHoldings().stream().map(e -> new HoldingCalculator(e));
 	}
 
-	public List<TradeCalculator> getTradeRecords() {
-		return null;
+	public List<HolderCalculator> getHolderCalculators() {
+		return getHolderCalculatorStream().collect(Collectors.toList());
 	}
-	
+
+	private Stream<HolderCalculator> getHolderCalculatorStream() {
+		return portfolio.getHolders().stream().map(e -> new HolderCalculator(e));
+	}
+
 	public class HoldingCalculator {
 		private static final double RATE_TAX = 0.001;
 		private static final double RATE_COMMISSION = 0.00025;
@@ -122,9 +127,23 @@ public class PortfolioCalculator {
 			return getNetWorth() / PortfolioCalculator.this.getNetWorth();
 		}
 	}
-	
-	public class TradeCalculator {
 
+	public class HolderCalculator {
+		private PortfolioHolder holder;
+
+		public HolderCalculator(PortfolioHolder holder) {
+			this.holder = holder;
+		}
+
+		public PortfolioHolderViewData getViewData() {
+			PortfolioHolderViewData vd = new PortfolioHolderViewData();
+			vd.setName(holder.getHolder().getName());
+			vd.setShare(holder.getShare());
+			vd.setNetWorth(holder.getShare() * getNetWorthPerUnit());
+			vd.setProportion(holder.getShare()/portfolio.getNumberOfShares());
+			vd.setRateOfReturn(vd.getNetWorth() / holder.getTotalInvestment() - 1);
+			vd.setTotalInvestment(holder.getTotalInvestment());
+			return vd;
+		}
 	}
-
 }

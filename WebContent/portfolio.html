@@ -10,9 +10,9 @@
 	var portfolioId = $.getUrlVar("id");
 
 	$(document).ready(function() {
-		$("#detail tbody tr").remove();
+		$("#stock_detail tbody tr").remove();
 
-		$("#detail caption a").attr("href", "trade.html?id=" + portfolioId);
+		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
 
 		$.get({
 			url : "rest/Portfolio/" + portfolioId,
@@ -45,7 +45,7 @@
 					return b["proportion"] - a["proportion"];
 				});
 				$.each(result, function(key, row_data) {
-					var row = $("<tr/>").appendTo($("#detail tbody"));
+					var row = $("<tr/>").appendTo($("#stock_detail tbody"));
 					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
 					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
 					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
@@ -54,6 +54,25 @@
 					$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
 					$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
 					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
+				});
+			}
+		});
+		
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/Holder",
+			dataType : 'json',
+			success : function(result) {
+				result.sort(function(a, b) {
+					return b["name"] - a["name"];
+				});
+				$.each(result, function(key, row_data) {
+					var row = $("<tr/>").appendTo($("#holder_detail tbody"));
+					$("<td/>").html(row_data["name"]).appendTo(row); 
+					$("<td/>").html(row_data["share"].toFixed(0)).appendTo(row); 
+					$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row); 
+					$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row); 
+					$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row); 
+					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
 				});
 			}
 		});
@@ -100,7 +119,7 @@
 		</table>
 	</div>
 	<hr style="width: 800px" />
-	<div id="detail">
+	<div id="stock_detail" class="detail">
 		<table class="zebra">
 			<caption>
 				<span>持仓清单</span> <a href="#">交易</a>
@@ -114,6 +133,26 @@
 					<th>预计手续费</th>
 					<th>预计税费</th>
 					<th>净值</th>
+					<th>占比</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<hr style="width: 800px" />
+	<div id="holder_detail" class="detail">
+		<table class="zebra">
+			<caption>
+				<span>持有人清单</span> <a href="#">申赎</a>
+			</caption>
+			<thead>
+				<tr>
+					<th>名称</th>
+					<th>份额</th>
+					<th>净资产</th>
+					<th>总投入</th>
+					<th>收益率</th>
 					<th>占比</th>
 				</tr>
 			</thead>

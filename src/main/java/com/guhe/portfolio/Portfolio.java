@@ -24,7 +24,13 @@ public class Portfolio {
 	private List<Holding> holdings = new ArrayList<>();
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PortfolioHolder> holders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<TradeRecord> tradeRecords = new ArrayList<>();
+
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PurchaseRedeemRecord> purchaseRedeemRecords = new ArrayList<>();
 
 	public Portfolio() {
 	}
@@ -81,11 +87,19 @@ public class Portfolio {
 		return holdings;
 	}
 
+	public List<PortfolioHolder> getHolders() {
+		return holders;
+	}
+
 	public void add(TradeRecord tradeRecord) {
 		tradeRecords.add(tradeRecord);
 	}
 
 	public List<TradeRecord> getTradeRecords() {
 		return tradeRecords;
+	}
+
+	public List<PurchaseRedeemRecord> getPurchaseRedeemRecords() {
+		return purchaseRedeemRecords;
 	}
 }
