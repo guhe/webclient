@@ -17,8 +17,6 @@ import javax.ws.rs.core.Response;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioManager;
-import com.guhe.portfolio.PurchaseRedeemRecord;
-import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 
@@ -87,7 +85,8 @@ public class PortfolioResource {
 			return null;
 		}
 
-		return portfolio.getTradeRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
+		return calculator.getTradeRecordVDs();
 	}
 
 	@POST
@@ -116,27 +115,7 @@ public class PortfolioResource {
 			return null;
 		}
 
-		return portfolio.getPurchaseRedeemRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
+		return calculator.getPurchaseRedeemVDs();
 	}
-
-	private PurchaseRedeemViewData createViewData(PurchaseRedeemRecord record) {
-		return null;
-	}
-
-	private TradeRecordViewData createViewData(TradeRecord tradeRecord) {
-		TradeRecordViewData viewDate = new TradeRecordViewData();
-		viewDate.setBuyOrSell(tradeRecord.getBuyOrSell().toString());
-		viewDate.setStockCode(tradeRecord.getStock().getCode());
-		viewDate.setStockName(tradeRecord.getStock().getName());
-		viewDate.setAmount(tradeRecord.getAmount());
-		viewDate.setPrice(tradeRecord.getPrice());
-		viewDate.setFee(tradeRecord.getFee());
-		viewDate.setDate(CommonUtil.formatDate("yyyy-MM-dd", tradeRecord.getDate()));
-		return viewDate;
-	}
-
-}
-
-class PurchaseRedeemViewData {
-
 }

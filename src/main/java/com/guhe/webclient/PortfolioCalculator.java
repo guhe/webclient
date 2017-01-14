@@ -7,7 +7,10 @@ import java.util.stream.Stream;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioHolder;
+import com.guhe.portfolio.PurchaseRedeemRecord;
+import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.Stock.Exchange;
+import com.guhe.util.CommonUtil;
 
 public class PortfolioCalculator {
 	private Portfolio portfolio;
@@ -17,7 +20,7 @@ public class PortfolioCalculator {
 		this.portfolio = portfolio;
 		this.market = market;
 	}
-	
+
 	public PortfolioViewData getViewData() {
 		PortfolioViewData viewData = new PortfolioViewData();
 		viewData.setId(portfolio.getId());
@@ -79,7 +82,7 @@ public class PortfolioCalculator {
 	}
 
 	public List<HoldingStockViewData> getHoldingStockVDs() {
-		return getHoldingCalculatorStream().map(e->e.getViewData()).collect(Collectors.toList());
+		return getHoldingCalculatorStream().map(e -> e.getViewData()).collect(Collectors.toList());
 	}
 
 	private Stream<HoldingCalculator> getHoldingCalculatorStream() {
@@ -87,11 +90,35 @@ public class PortfolioCalculator {
 	}
 
 	public List<PortfolioHolderViewData> getHolderVDs() {
-		return getHolderCalculatorStream().map(e->e.getViewData()).collect(Collectors.toList());
+		return getHolderCalculatorStream().map(e -> e.getViewData()).collect(Collectors.toList());
 	}
 
 	private Stream<HolderCalculator> getHolderCalculatorStream() {
 		return portfolio.getHolders().stream().map(e -> new HolderCalculator(e));
+	}
+
+	public List<TradeRecordViewData> getTradeRecordVDs() {
+		return portfolio.getTradeRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	private TradeRecordViewData createViewData(TradeRecord record) {
+		TradeRecordViewData vd = new TradeRecordViewData();
+		vd.setBuyOrSell(record.getBuyOrSell().toString());
+		vd.setStockCode(record.getStock().getCode());
+		vd.setStockName(record.getStock().getName());
+		vd.setAmount(record.getAmount());
+		vd.setPrice(record.getPrice());
+		vd.setFee(record.getFee());
+		vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", record.getDate()));
+		return vd;
+	}
+
+	public List<PurchaseRedeemViewData> getPurchaseRedeemVDs() {
+		return portfolio.getPurchaseRedeemRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	private PurchaseRedeemViewData createViewData(PurchaseRedeemRecord record) {
+		return null;
 	}
 
 	private class HoldingCalculator {
@@ -106,19 +133,19 @@ public class PortfolioCalculator {
 			this.holding = holding;
 			this.data = market.getStockData(holding.getStock().getCode());
 		}
-		
+
 		public HoldingStockViewData getViewData() {
-			HoldingStockViewData viewData = new HoldingStockViewData();
-			viewData.setCode(holding.getStock().getCode());
-			viewData.setName(holding.getStock().getName());
-			viewData.setAmount(holding.getAmount());
-			viewData.setCurPrice(data.getPrice());
-			viewData.setMarketWorth(getMarketWorth());
-			viewData.setEstimatedCommission(getEstimatedCommission());
-			viewData.setEstimatedTax(getEstimatedTax());
-			viewData.setNetWorth(getNetWorth());
-			viewData.setProportion(getProportion());
-			return viewData;
+			HoldingStockViewData vd = new HoldingStockViewData();
+			vd.setCode(holding.getStock().getCode());
+			vd.setName(holding.getStock().getName());
+			vd.setAmount(holding.getAmount());
+			vd.setCurPrice(data.getPrice());
+			vd.setMarketWorth(getMarketWorth());
+			vd.setEstimatedCommission(getEstimatedCommission());
+			vd.setEstimatedTax(getEstimatedTax());
+			vd.setNetWorth(getNetWorth());
+			vd.setProportion(getProportion());
+			return vd;
 		}
 
 		public double getPE() {
@@ -163,7 +190,7 @@ public class PortfolioCalculator {
 			vd.setName(holder.getHolder().getName());
 			vd.setShare(holder.getShare());
 			vd.setNetWorth(holder.getShare() * getNetWorthPerUnit());
-			vd.setProportion(holder.getShare()/portfolio.getNumberOfShares());
+			vd.setProportion(holder.getShare() / portfolio.getNumberOfShares());
 			vd.setRateOfReturn(vd.getNetWorth() / holder.getTotalInvestment() - 1);
 			vd.setTotalInvestment(holder.getTotalInvestment());
 			return vd;
