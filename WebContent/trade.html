@@ -29,8 +29,6 @@
 					$("<td/>").html(row_data["fee"]).appendTo(row); // 成交价格
 					$("<td/>").html(row_data["date"]).appendTo(row); // 成交日期
 
-					console.log(row_data, isBuy);
-
 					if (isBuy) {
 						row.css("background", "#800");
 					} else {
@@ -122,8 +120,8 @@
 					<tr>
 						<td><span>交易方向：</span></td>
 						<td align="center"><input type="radio" name="buyOrSell"
-							value="BUY" checked="checked">买<input type="radio"
-							name="buyOrSell" value="SELL">卖</td>
+							value="BUY" checked="checked">买入<input type="radio"
+							name="buyOrSell" value="SELL">卖出</td>
 					</tr>
 					<tr>
 						<td><span>股票代码：</span></td>

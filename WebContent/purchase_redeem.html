@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>申赎</title>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<script src="jquery-3.0.0.js"></script>
+<script src="extends.js"></script>
+<script>
+	var portfolioId = $.getUrlVar("id");
+
+	function loadPurchaseRedeemRecord(){
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/PurchaseRedeem",
+			dataType : 'json',
+			success : function(result) {
+				$("#detail tbody tr").remove();
+				
+				result.sort(function(a, b) {
+					return a["date"] > b["date"];
+				});
+				$.each(result, function(key, row_data) {
+					var isPurchase = row_data["purchaseOrRedeem"] == "PURCHASE";
+					var row = $("<tr/>").appendTo($("#detail tbody"));
+					$("<td/>").html(isPurchase ? "申购" : "赎回").appendTo(row); // 类型
+					$("<td/>").html(row_data["holder"]).appendTo(row); // 持有人
+					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
+					$("<td/>").html(row_data["netWorth"]).appendTo(row); // 净值
+					$("<td/>").html(row_data["fee"]).appendTo(row); // 费用
+					$("<td/>").html(row_data["date"]).appendTo(row); // 日期
+				});
+			},
+		});
+	}
+	
+	$(document).ready(function() {
+		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
+		
+		$.get({
+			url : "rest/Portfolio/" + portfolioId,
+			dataType : 'json',
+			async : false,
+			success : function(result) {
+				$('title').text("申赎-" + result["name"]);
+			},
+		});
+		
+		loadPurchaseRedeemRecord();
+	});
+</script>
+</head>
+<body>
+	<div style="height: 50px"></div>
+	<div align="center">
+		<div id="detail">
+			<table class="zebra">
+				<caption>
+					<span>申赎记录</span> <a href="#">返回</a>
+				</caption>
+				<thead>
+					<tr>
+						<th>类型</th>
+						<th>持有人</th>
+						<th>数量</th>
+						<th>净值</th>
+						<th>费用</th>
+						<th>日期</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div style="height: 20px"></div>
+		<div class="trade" align="center">
+			<form>
+				<table>
+					<tr>
+						<td><span>类型：</span></td>
+						<td align="center"><input type="radio" name="purchaseOrRedeem"
+							value="PURCHASE" checked="checked">申购<input type="radio"
+							name="purchaseOrRedeem" value="REDEEM">赎回</td>
+					</tr>
+					<tr>
+						<td><span>持有人：</span></td>
+						<td><input type="text" name="holder"></td>
+					</tr>
+					<tr>
+						<td><span>数量：</span></td>
+						<td><input type="text" name="amount"></td>
+					</tr>
+					<tr>
+						<td><span>净值：</span></td>
+						<td><input type="text" name="netWorth"></td>
+					</tr>
+					<tr>
+						<td><span>费用：</span></td>
+						<td><input type="text" name="fee"></td>
+					</tr>
+					<tr>
+						<td><span>日期：</span></td>
+						<td><input type="text" name="date"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center"><input type="submit"
+							value="确定"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<p id="tradeTip">
+			<span></span>
+		</p>
+	</div>
+</body>
+</html>
