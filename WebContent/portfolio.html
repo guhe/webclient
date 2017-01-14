@@ -57,7 +57,17 @@
 				});
 			}
 		});
-		
+
+		function appendRowToHolderTable(row_data) {
+			var row = $("<tr/>").appendTo($("#holder_detail tbody"));
+			$("<td/>").html(row_data["name"]).appendTo(row);
+			$("<td/>").html(row_data["share"].toFixed(0)).appendTo(row);
+			$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row);
+			$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row);
+			$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row);
+			$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
+		}
+
 		$.get({
 			url : "rest/Portfolio/" + portfolioId + "/Holder",
 			dataType : 'json',
@@ -65,15 +75,25 @@
 				result.sort(function(a, b) {
 					return b["name"] - a["name"];
 				});
+				var total = {
+					"name" : "总计",
+					"share" : 0,
+					"netWorth" : 0,
+					"totalInvestment" : 0,
+					"rateOfReturn" : 0,
+					"proportion" : 0
+				};
 				$.each(result, function(key, row_data) {
-					var row = $("<tr/>").appendTo($("#holder_detail tbody"));
-					$("<td/>").html(row_data["name"]).appendTo(row); 
-					$("<td/>").html(row_data["share"].toFixed(0)).appendTo(row); 
-					$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row); 
-					$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row); 
-					$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row); 
-					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
+					appendRowToHolderTable(row_data);
+
+					total["share"] += row_data["share"];
+					total["netWorth"] += row_data["netWorth"];
+					total["totalInvestment"] += row_data["totalInvestment"];
+					total["proportion"] += row_data["proportion"];
+
 				});
+				total["rateOfReturn"] += total["netWorth"] / total["totalInvestment"] - 1;
+				appendRowToHolderTable(total);
 			}
 		});
 
