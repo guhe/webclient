@@ -13,6 +13,7 @@
 		$("#stock_detail tbody tr").remove();
 
 		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
+		$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
 
 		$.get({
 			url : "rest/Portfolio/" + portfolioId,

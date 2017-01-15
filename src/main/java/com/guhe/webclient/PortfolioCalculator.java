@@ -8,8 +8,8 @@ import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.PurchaseRedeemRecord;
-import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.Stock.Exchange;
+import com.guhe.portfolio.TradeRecord;
 import com.guhe.util.CommonUtil;
 
 public class PortfolioCalculator {
@@ -37,9 +37,9 @@ public class PortfolioCalculator {
 		viewData.setPb(getPB());
 		return viewData;
 	}
-	
-	private double getNumberOfShares(){
-		return portfolio.getHolders().stream().map(e->e.getShare()).reduce(0.0, Double::sum);
+
+	private double getNumberOfShares() {
+		return portfolio.getHolders().stream().map(e -> e.getShare()).reduce(0.0, Double::sum);
 	}
 
 	private double getStockTotalWorth() {
@@ -122,7 +122,14 @@ public class PortfolioCalculator {
 	}
 
 	private PurchaseRedeemViewData createViewData(PurchaseRedeemRecord record) {
-		return null;
+		PurchaseRedeemViewData vd = new PurchaseRedeemViewData();
+		vd.setPurchaseOrRedeem(record.getPurchaseOrRedeem().toString());
+		vd.setHolder(record.getHolder().getName());
+		vd.setShare(record.getShare());
+		vd.setNetWorth(record.getNetWorth());
+		vd.setFee(record.getFee());
+		vd.setDate(CommonUtil.formatDate("yyy-MM-dd", record.getDate()));
+		return vd;
 	}
 
 	private class HoldingCalculator {

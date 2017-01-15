@@ -15,18 +15,19 @@
 			dataType : 'json',
 			success : function(result) {
 				$("#detail tbody tr").remove();
-				
+
 				result.sort(function(a, b) {
 					return a["date"] > b["date"];
 				});
+				
 				$.each(result, function(key, row_data) {
 					var isPurchase = row_data["purchaseOrRedeem"] == "PURCHASE";
 					var row = $("<tr/>").appendTo($("#detail tbody"));
 					$("<td/>").html(isPurchase ? "申购" : "赎回").appendTo(row); // 类型
 					$("<td/>").html(row_data["holder"]).appendTo(row); // 持有人
-					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
-					$("<td/>").html(row_data["netWorth"]).appendTo(row); // 净值
-					$("<td/>").html(row_data["fee"]).appendTo(row); // 费用
+					$("<td/>").html(row_data["share"].toFixed(0)).appendTo(row); // 份额
+					$("<td/>").html(row_data["netWorth"].toFixed(4)).appendTo(row); // 净值
+					$("<td/>").html(row_data["fee"].toFixed(2)).appendTo(row); // 费用
 					$("<td/>").html(row_data["date"]).appendTo(row); // 日期
 				});
 			},
@@ -86,8 +87,8 @@
 						<td><input type="text" name="holder"></td>
 					</tr>
 					<tr>
-						<td><span>数量：</span></td>
-						<td><input type="text" name="amount"></td>
+						<td><span>份额：</span></td>
+						<td><input type="text" name="share"></td>
 					</tr>
 					<tr>
 						<td><span>净值：</span></td>

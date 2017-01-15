@@ -25,7 +25,7 @@ public class PurchaseRedeemRecord {
 	@ManyToOne
 	private Holder holder;
 	
-	private long amount;
+	private double share;
 
 	private double netWorth;
 
@@ -65,12 +65,12 @@ public class PurchaseRedeemRecord {
 		this.holder = holder;
 	}
 
-	public long getAmount() {
-		return amount;
+	public double getShare() {
+		return share;
 	}
 
-	public void setAmount(long amount) {
-		this.amount = amount;
+	public void setShare(double share) {
+		this.share = share;
 	}
 
 	public double getNetWorth() {
@@ -97,7 +97,7 @@ public class PurchaseRedeemRecord {
 		this.date = date;
 	}
 
-	enum PurchaseOrRedeem {
+	public enum PurchaseOrRedeem {
 		PURCHASE, REDEEM
 	}
 }
