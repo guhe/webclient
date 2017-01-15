@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
+import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.Stock;
 import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
@@ -43,8 +44,13 @@ public class PortfolioTradeTest extends PortfolioTestBase {
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
 		portfolio.setCash(12300.4);
-		portfolio.setNumberOfShares(100.0);
 		portfolio.setNetWorthPerUnitLastYear(1.1);
+
+		PortfolioHolder holder = new PortfolioHolder();
+		holder.setShare(100.0);
+		holder.setTotalInvestment(110);
+		portfolio.add(holder);
+
 		pm.savePortfolio(portfolio);
 	}
 

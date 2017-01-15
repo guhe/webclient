@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
+import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.PortfolioManager;
 import com.guhe.portfolio.Stock;
 import com.guhe.portfolio.TradeRecord;
@@ -45,7 +46,6 @@ public class PortfolioResourceTest extends JerseyTest {
 		portfolio.setId("P00000001");
 		portfolio.setName("范昌虎测试组合1");
 		portfolio.setCash(23066);
-		portfolio.setNumberOfShares(150000);
 		portfolio.setNetWorthPerUnitLastYear(1.0822);
 
 		Stock ping_an_yin_hang = new Stock("000001", "平安银行");
@@ -69,6 +69,15 @@ public class PortfolioResourceTest extends JerseyTest {
 		record2.setFee(10.5);
 		record2.setStock(zhong_guo_ping_an);
 		portfolio.add(record2);
+
+		PortfolioHolder holder1 = new PortfolioHolder();
+		holder1.setShare(70000.0);
+		holder1.setTotalInvestment(50000);
+		portfolio.add(holder1);
+		PortfolioHolder holder2 = new PortfolioHolder();
+		holder2.setShare(80000.0);
+		holder2.setTotalInvestment(50000);
+		portfolio.add(holder2);
 
 		return portfolio;
 	}
@@ -194,9 +203,9 @@ public class PortfolioResourceTest extends JerseyTest {
 		tradeObj.set("price", mapper.getNodeFactory().numberNode(8.65));
 		tradeObj.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		tradeObj.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
-		
+
 		Entity<String> entity = Entity.json(tradeObj.toString());
-		
+
 		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
 				.post(entity);
 

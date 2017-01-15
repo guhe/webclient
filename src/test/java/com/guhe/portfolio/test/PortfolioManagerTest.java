@@ -15,7 +15,6 @@ public class PortfolioManagerTest extends PortfolioTestBase {
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
 		portfolio.setCash(123.4);
-		portfolio.setNumberOfShares(100.0);
 		portfolio.setNetWorthPerUnitLastYear(1.1);
 		pm.savePortfolio(portfolio);
 
@@ -23,7 +22,6 @@ public class PortfolioManagerTest extends PortfolioTestBase {
 		assertEquals("ID001", saved.getId());
 		assertEquals("Test Portfolio Name", saved.getName());
 		assertEquals(123.4, saved.getCash(), 0.000001);
-		assertEquals(100.0, saved.getNumberOfShares(), 0.000001);
 		assertEquals(1.1, saved.getNetWorthPerUnitLastYear(), 0.000001);
 
 		pm.deletePortfolio("ID001");

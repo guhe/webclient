@@ -15,7 +15,6 @@ public class Portfolio {
 	private String id;
 	private String name;
 
-	private double numberOfShares;
 	private double netWorthPerUnitLastYear;
 
 	private double cash;
@@ -55,14 +54,6 @@ public class Portfolio {
 		this.name = name;
 	}
 
-	public double getNumberOfShares() {
-		return numberOfShares;
-	}
-
-	public void setNumberOfShares(double numberOfShares) {
-		this.numberOfShares = numberOfShares;
-	}
-
 	public double getNetWorthPerUnitLastYear() {
 		return netWorthPerUnitLastYear;
 	}
@@ -85,6 +76,10 @@ public class Portfolio {
 
 	public List<Holding> getHoldings() {
 		return holdings;
+	}
+	
+	public void add(PortfolioHolder holder){
+		holders.add(holder);
 	}
 
 	public List<PortfolioHolder> getHolders() {

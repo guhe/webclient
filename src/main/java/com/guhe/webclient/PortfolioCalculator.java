@@ -37,6 +37,10 @@ public class PortfolioCalculator {
 		viewData.setPb(getPB());
 		return viewData;
 	}
+	
+	private double getNumberOfShares(){
+		return portfolio.getHolders().stream().map(e->e.getShare()).reduce(0.0, Double::sum);
+	}
 
 	private double getStockTotalWorth() {
 		return getHoldingCalculatorStream().map(e -> e.getMarketWorth()).reduce(0.0, Double::sum);
@@ -60,7 +64,7 @@ public class PortfolioCalculator {
 	}
 
 	private double getNetWorthPerUnit() {
-		return getNetWorth() / portfolio.getNumberOfShares();
+		return getNetWorth() / getNumberOfShares();
 	}
 
 	private double getProportionOfStock() {
@@ -190,7 +194,7 @@ public class PortfolioCalculator {
 			vd.setName(holder.getHolder().getName());
 			vd.setShare(holder.getShare());
 			vd.setNetWorth(holder.getShare() * getNetWorthPerUnit());
-			vd.setProportion(holder.getShare() / portfolio.getNumberOfShares());
+			vd.setProportion(holder.getShare() / getNumberOfShares());
 			vd.setRateOfReturn(vd.getNetWorth() / holder.getTotalInvestment() - 1);
 			vd.setTotalInvestment(holder.getTotalInvestment());
 			return vd;
