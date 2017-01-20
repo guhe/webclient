@@ -30,7 +30,7 @@ public class PurchaseRedeemRecord {
 	private double netWorth;
 
 	private double fee;
-
+	
 	private Date date;
 
 	public int getId() {

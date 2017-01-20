@@ -123,8 +123,7 @@ html, body {
 	margin: 0 auto;
 }
 
-/* ---------- trade.html ---------- */
-.trade {
+.inputArea {
 	width: 300px;
 	border-style: solid;
 	border-width: 1px;

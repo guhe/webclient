@@ -8,6 +8,7 @@ import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.PurchaseRedeemRecord;
+import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
 import com.guhe.portfolio.Stock.Exchange;
 import com.guhe.portfolio.TradeRecord;
 import com.guhe.util.CommonUtil;
@@ -128,6 +129,13 @@ public class PortfolioCalculator {
 		vd.setShare(record.getShare());
 		vd.setNetWorth(record.getNetWorth());
 		vd.setFee(record.getFee());
+		double money = record.getShare() * record.getNetWorth();
+		if (record.getPurchaseOrRedeem() == PurchaseOrRedeem.PURCHASE) {
+			money += record.getFee();
+		} else {
+			money -= record.getFee();
+		}
+		vd.setMoney(money);
 		vd.setDate(CommonUtil.formatDate("yyy-MM-dd", record.getDate()));
 		return vd;
 	}

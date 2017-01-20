@@ -21,4 +21,7 @@ public interface PortfolioManager {
 	void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee,
 			Date date);
 
+	void purchase(String portfolioId, String holderName, double money, double netWorth, double fee, Date date);
+
+	void redeem(String portfolioId, String holderName, double share, double netWorth, double fee, Date date);
 }

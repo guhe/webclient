@@ -9,7 +9,7 @@
 <script>
 	var portfolioId = $.getUrlVar("id");
 
-	function loadPurchaseRedeemRecord(){
+	function loadPurchaseRedeemRecord() {
 		$.get({
 			url : "rest/Portfolio/" + portfolioId + "/PurchaseRedeem",
 			dataType : 'json',
@@ -19,24 +19,75 @@
 				result.sort(function(a, b) {
 					return a["date"] > b["date"];
 				});
-				
+
 				$.each(result, function(key, row_data) {
 					var isPurchase = row_data["purchaseOrRedeem"] == "PURCHASE";
 					var row = $("<tr/>").appendTo($("#detail tbody"));
 					$("<td/>").html(isPurchase ? "申购" : "赎回").appendTo(row); // 类型
 					$("<td/>").html(row_data["holder"]).appendTo(row); // 持有人
-					$("<td/>").html(row_data["share"].toFixed(0)).appendTo(row); // 份额
+					$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row); // 份额
 					$("<td/>").html(row_data["netWorth"].toFixed(4)).appendTo(row); // 净值
 					$("<td/>").html(row_data["fee"].toFixed(2)).appendTo(row); // 费用
+					$("<td/>").html(row_data["money"].toFixed(2)).appendTo(row); // 金額
 					$("<td/>").html(row_data["date"]).appendTo(row); // 日期
 				});
 			},
 		});
 	}
 	
+	function addPurchaseRedeemRecord(){
+		var data = {};
+		data["purchaseOrRedeem"] = $(".inputArea input[name='purchaseOrRedeem']:checked").val();
+		var isPurchase = data["purchaseOrRedeem"] == "PURCHASE";
+		data["holder"] = $(".inputArea input[name='holder']").val();
+		data["money"] = isPurchase ? $(".inputArea input[name='money']").val() * 1 : 0;
+		data["share"] = isPurchase ? 0: $(".inputArea input[name='share']").val() * 1;
+		data["netWorth"] = $(".inputArea input[name='netWorth']").val() * 1;
+		data["fee"] = $(".inputArea input[name='fee']").val() * 1;
+		data["date"] = $(".inputArea input[name='date']").val();
+		
+		$.post({
+			url : "rest/Portfolio/" + portfolioId + "/PurchaseRedeem",
+			contentType : "application/json; charset=utf-8",
+			dataType : 'json',
+			data : JSON.stringify(data),
+			async : false,
+			success : function(result) {
+				if (result["rltCode"] == 0) {
+					$("#tradeTip span").text("操作成功。");
+					
+					loadTradeRecord();
+				} else {
+					$("#tradeTip span").text(result["message"]);
+				}
+				
+				loadPurchaseRedeemRecord();
+			},
+			error : function() {
+				$("#tradeTip span").text("操作失败。");
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
+
+		$("#shareTr").hide();
+		$("#purchaseInput").change(function() {
+			$("#moneyTr").show();
+			$("#shareTr").hide();
+		});
+		$("#redeemInput").change(function() {
+			$("#moneyTr").hide();
+			$("#shareTr").show();
+		});
 		
+		$(".inputArea form").submit(function(event) {
+			event.preventDefault();
+
+			addPurchaseRedeemRecord();
+		});
+
 		$.get({
 			url : "rest/Portfolio/" + portfolioId,
 			dataType : 'json',
@@ -45,7 +96,7 @@
 				$('title').text("申赎-" + result["name"]);
 			},
 		});
-		
+
 		loadPurchaseRedeemRecord();
 	});
 </script>
@@ -62,9 +113,10 @@
 					<tr>
 						<th>类型</th>
 						<th>持有人</th>
-						<th>数量</th>
+						<th>份额</th>
 						<th>净值</th>
 						<th>费用</th>
+						<th>金额</th>
 						<th>日期</th>
 					</tr>
 				</thead>
@@ -73,20 +125,25 @@
 			</table>
 		</div>
 		<div style="height: 20px"></div>
-		<div class="trade" align="center">
+		<div class="inputArea" align="center">
 			<form>
 				<table>
 					<tr>
 						<td><span>类型：</span></td>
-						<td align="center"><input type="radio" name="purchaseOrRedeem"
-							value="PURCHASE" checked="checked">申购<input type="radio"
-							name="purchaseOrRedeem" value="REDEEM">赎回</td>
+						<td align="center"><input id="purchaseInput" type="radio"
+							name="purchaseOrRedeem" value="PURCHASE" checked="checked">申购<input
+							id="redeemInput" type="radio" name="purchaseOrRedeem"
+							value="REDEEM">赎回</td>
 					</tr>
 					<tr>
 						<td><span>持有人：</span></td>
 						<td><input type="text" name="holder"></td>
 					</tr>
-					<tr>
+					<tr id="moneyTr">
+						<td><span>金额：</span></td>
+						<td><input type="text" name="money"></td>
+					</tr>
+					<tr id="shareTr">
 						<td><span>份额：</span></td>
 						<td><input type="text" name="share"></td>
 					</tr>

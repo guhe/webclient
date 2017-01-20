@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioManager;
+import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 
@@ -92,17 +93,17 @@ public class PortfolioResource {
 	@POST
 	@Path("{portfolio}/Trade")
 	public Response addTradeRecord(@PathParam("portfolio") String portfolioId, TradeRecordViewData viewData) {
-		TradeResultViewData result;
+		PortfolioResultViewData result;
 		try {
 			BuyOrSell buyOrSell = BuyOrSell.valueOf(viewData.getBuyOrSell());
 			Date date = CommonUtil.parseDate("yyyy-MM-dd", viewData.getDate());
 			pm.trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(), viewData.getAmount(),
 					viewData.getFee(), date);
-			result = new TradeResultViewData(0, "OK");
+			result = new PortfolioResultViewData(0, "OK");
 		} catch (PortfolioException e) {
 			LOGGER.warning("Failed to trade, PortfolioId: " + portfolioId + ", Trade: " + viewData + ", reason: "
 					+ e.getMessage());
-			result = new TradeResultViewData(-1, e.getMessage());
+			result = new PortfolioResultViewData(-1, e.getMessage());
 		}
 		return Response.ok(result).build();
 	}
@@ -117,5 +118,28 @@ public class PortfolioResource {
 
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
 		return calculator.getPurchaseRedeemVDs();
+	}
+
+	@POST
+	@Path("{portfolio}/PurchaseRedeem")
+	public Response addPurchaseRedeemRecord(@PathParam("portfolio") String portfolioId,
+			PurchaseRedeemViewData viewData) {
+		PortfolioResultViewData result;
+		try {
+			Date date = CommonUtil.parseDate("yyyy-MM-dd", viewData.getDate());
+			if (PurchaseOrRedeem.valueOf(viewData.getPurchaseOrRedeem()) == PurchaseOrRedeem.PURCHASE) {
+				pm.purchase(portfolioId, viewData.getHolder(), viewData.getMoney(), viewData.getNetWorth(),
+						viewData.getFee(), date);
+			} else {
+				pm.redeem(portfolioId, viewData.getHolder(), viewData.getShare(), viewData.getNetWorth(),
+						viewData.getFee(), date);
+			}
+			result = new PortfolioResultViewData(0, "OK");
+		} catch (PortfolioException e) {
+			LOGGER.warning("Failed to purchase or redeem, PortfolioId: " + portfolioId + ", PurchaseRedeem: " + viewData
+					+ ", reason: " + e.getMessage());
+			result = new PortfolioResultViewData(-1, e.getMessage());
+		}
+		return Response.ok(result).build();
 	}
 }

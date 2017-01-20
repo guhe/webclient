@@ -2,12 +2,12 @@ package com.guhe.webclient;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
-class TradeResultViewData {
+@XmlRootElement(name = "portfolioResult")
+class PortfolioResultViewData {
 	private int rltCode;
 	private String message;
 
-	public TradeResultViewData(int rltCode, String message) {
+	public PortfolioResultViewData(int rltCode, String message) {
 		this.rltCode = rltCode;
 		this.message = message;
 	}

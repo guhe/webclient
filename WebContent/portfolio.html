@@ -62,7 +62,7 @@
 		function appendRowToHolderTable(row_data) {
 			var row = $("<tr/>").appendTo($("#holder_detail tbody"));
 			$("<td/>").html(row_data["name"]).appendTo(row);
-			$("<td/>").html(row_data["share"].toFixed(0)).appendTo(row);
+			$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row);
 			$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row);
 			$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row);
 			$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row);
