@@ -197,6 +197,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 			if (CommonUtil.dCompare(ph.getShare(), share, 2) < 0) {
 				throw new PortfolioException("No enough share to redeem.");
 			} else if (CommonUtil.dCompare(ph.getShare(), share, 2) == 0) {
+				portfolio.getHolders().remove(ph);
 				em.remove(ph);
 			} else {
 				ph.setShare(CommonUtil.dRound(ph.getShare() - share, 2));
