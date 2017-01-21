@@ -155,15 +155,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 				ph.setShare(CommonUtil.dRound(ph.getShare() + share, 2));
 			}
 
-			PurchaseRedeemRecord record = new PurchaseRedeemRecord();
-			record.setPortfolio(portfolio);
-			record.setHolder(holder);
-			record.setPurchaseOrRedeem(PurchaseOrRedeem.PURCHASE);
-			record.setShare(CommonUtil.dRound(share, 2));
-			record.setNetWorth(CommonUtil.dRound(netWorth, 4));
-			record.setFee(CommonUtil.dRound(fee, 4));
-			record.setDate(date);
-			em.persist(record);
+			savePurchaseRedeemRecord(portfolio, holder, PurchaseOrRedeem.PURCHASE, share, netWorth, fee, date);
 		});
 	}
 
@@ -203,16 +195,21 @@ public class JpaPortfolioManager implements PortfolioManager {
 				ph.setShare(CommonUtil.dRound(ph.getShare() - share, 2));
 			}
 
-			PurchaseRedeemRecord record = new PurchaseRedeemRecord();
-			record.setPortfolio(portfolio);
-			record.setHolder(holder);
-			record.setPurchaseOrRedeem(PurchaseOrRedeem.REDEEM);
-			record.setShare(CommonUtil.dRound(share, 2));
-			record.setNetWorth(CommonUtil.dRound(netWorth, 4));
-			record.setFee(CommonUtil.dRound(fee, 4));
-			record.setDate(date);
-			em.persist(record);
+			savePurchaseRedeemRecord(portfolio, holder, PurchaseOrRedeem.REDEEM, share, netWorth, fee, date);
 		});
+	}
+
+	private void savePurchaseRedeemRecord(Portfolio portfolio, Holder holder, PurchaseOrRedeem purchaseOrRedeem,
+			double share, double netWorth, double fee, Date date) {
+		PurchaseRedeemRecord record = new PurchaseRedeemRecord();
+		record.setPortfolio(portfolio);
+		record.setHolder(holder);
+		record.setPurchaseOrRedeem(purchaseOrRedeem);
+		record.setShare(CommonUtil.dRound(share, 2));
+		record.setNetWorth(CommonUtil.dRound(netWorth, 4));
+		record.setFee(CommonUtil.dRound(fee, 4));
+		record.setDate(date);
+		em.persist(record);
 	}
 
 	private void doInTransaction(Runnable r) {
