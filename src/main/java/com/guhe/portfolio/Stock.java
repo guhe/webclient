@@ -1,5 +1,8 @@
 package com.guhe.portfolio;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -50,12 +53,13 @@ public class Stock {
 	}
 
 	public enum Exchange {
-		ShangHai('6'), ShenZheng('0');
+		ShangHai('6'), ShenZheng('0', '3');
 
-		private char first;
+		private List<Character> prefixChars;
 
-		private Exchange(char first) {
-			this.first = first;
+		private Exchange(Character... firsts) {
+			prefixChars = Arrays.asList(firsts);
+			
 		}
 
 		public static Exchange get(String code) {
@@ -63,7 +67,7 @@ public class Stock {
 				throw new RuntimeException();
 			}
 			for (Exchange ex : values()) {
-				if (code.charAt(0) == ex.first) {
+				if (ex.prefixChars.contains(code.charAt(0))) {
 					return ex;
 				}
 			}

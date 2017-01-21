@@ -11,13 +11,21 @@ public class TencentStockMarket implements StockMarket {
 
 	private Map<String, StockData> cache = new HashMap<>();
 
+	public TencentStockMarket(){
+		StockData sd = new StockData();
+		sd.price = 4.55;
+		sd.pe = 22.98;
+		sd.pb = 3;
+		cache.put("300603", sd);
+	}
+	
 	@Override
 	public synchronized StockData getStockData(String stockCode) {
 		if (!cache.containsKey(stockCode)) {
 			String url = "http://qt.gtimg.cn/q=";
 			if (stockCode.charAt(0) == '6') {
 				url += "sh" + stockCode;
-			} else if (stockCode.charAt(0) == '0') {
+			} else if (stockCode.charAt(0) == '0' || stockCode.charAt(0) == '3') {
 				url += "sz" + stockCode;
 			} else {
 				throw new RuntimeException("unknown stock code : " + stockCode);
