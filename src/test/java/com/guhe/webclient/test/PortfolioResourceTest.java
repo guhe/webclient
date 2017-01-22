@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
@@ -71,10 +72,12 @@ public class PortfolioResourceTest extends JerseyTest {
 		portfolio.add(record2);
 
 		PortfolioHolder holder1 = new PortfolioHolder();
+		holder1.setHolder(new Holder("Tiger"));
 		holder1.setShare(70000.0);
 		holder1.setTotalInvestment(50000);
 		portfolio.add(holder1);
 		PortfolioHolder holder2 = new PortfolioHolder();
+		holder2.setHolder(new Holder("Angel"));
 		holder2.setShare(80000.0);
 		holder2.setTotalInvestment(50000);
 		portfolio.add(holder2);
@@ -242,5 +245,32 @@ public class PortfolioResourceTest extends JerseyTest {
 		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(-1));
 		expectObj.set("message", mapper.getNodeFactory().textNode("mock expection"));
 		assertEquals(expectObj, response.readEntity(ObjectNode.class));
+	}
+
+	@Test
+	public void test_get_holders_by_portfolio_id() {
+		JsonNode actual = target("/Portfolio/P00000001/Holder").request().accept(MediaType.APPLICATION_JSON)
+				.get(JsonNode.class);
+
+		ArrayNode expect = mapper.createArrayNode();
+		ObjectNode obj1 = mapper.createObjectNode();
+		obj1.set("name", mapper.getNodeFactory().textNode("Tiger"));
+		obj1.set("share", mapper.getNodeFactory().numberNode(70000.0));
+		obj1.set("netWorth", mapper.getNodeFactory().numberNode(88461.014133));
+		obj1.set("totalInvestment", mapper.getNodeFactory().numberNode(50000.0));
+		obj1.set("rateOfReturn", mapper.getNodeFactory().numberNode(0.769220));
+		obj1.set("proportion", mapper.getNodeFactory().numberNode(0.466667));
+		expect.add(obj1);
+
+		ObjectNode obj2 = mapper.createObjectNode();
+		obj2.set("name", mapper.getNodeFactory().textNode("Angel"));
+		obj2.set("share", mapper.getNodeFactory().numberNode(80000.0));
+		obj2.set("netWorth", mapper.getNodeFactory().numberNode(101098.301867));
+		obj2.set("totalInvestment", mapper.getNodeFactory().numberNode(50000.0));
+		obj2.set("rateOfReturn", mapper.getNodeFactory().numberNode(1.021966));
+		obj2.set("proportion", mapper.getNodeFactory().numberNode(0.533333));
+		expect.add(obj2);
+
+		assertEquals(expect, actual);
 	}
 }
