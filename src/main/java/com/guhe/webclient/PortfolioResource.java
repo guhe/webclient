@@ -128,10 +128,10 @@ public class PortfolioResource {
 		try {
 			Date date = CommonUtil.parseDate("yyyy-MM-dd", viewData.getDate());
 			if (PurchaseOrRedeem.valueOf(viewData.getPurchaseOrRedeem()) == PurchaseOrRedeem.PURCHASE) {
-				pm.purchase(portfolioId, viewData.getHolder(), viewData.getMoney(), viewData.getNetWorth(),
+				pm.purchase(portfolioId, viewData.getHolder(), viewData.getMoney(), viewData.getNetWorthPerUnit(),
 						viewData.getFee(), date);
 			} else {
-				pm.redeem(portfolioId, viewData.getHolder(), viewData.getShare(), viewData.getNetWorth(),
+				pm.redeem(portfolioId, viewData.getHolder(), viewData.getShare(), viewData.getNetWorthPerUnit(),
 						viewData.getFee(), date);
 			}
 			result = new PortfolioResultViewData(0, "OK");

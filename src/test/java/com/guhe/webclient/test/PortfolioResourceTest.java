@@ -88,7 +88,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		prRecord1.setHolder(new Holder("Tiger"));
 		prRecord1.setPurchaseOrRedeem(PurchaseOrRedeem.PURCHASE);
 		prRecord1.setShare(60000.0);
-		prRecord1.setNetWorth(1.0);
+		prRecord1.setNetWorthPerUnit(1.0);
 		prRecord1.setFee(5.0);
 		prRecord1.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-10"));
 		portfolio.add(prRecord1);
@@ -96,7 +96,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		prRecord2.setHolder(new Holder("Tiger"));
 		prRecord2.setPurchaseOrRedeem(PurchaseOrRedeem.REDEEM);
 		prRecord2.setShare(10000.0);
-		prRecord2.setNetWorth(1.0);
+		prRecord2.setNetWorthPerUnit(1.0);
 		prRecord2.setFee(5.0);
 		prRecord2.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
 		portfolio.add(prRecord2);
@@ -303,7 +303,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj1.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("PURCHASE"));
 		obj1.set("holder", mapper.getNodeFactory().textNode("Tiger"));
 		obj1.set("share", mapper.getNodeFactory().numberNode(60000.0));
-		obj1.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		obj1.set("netWorthPerUnit", mapper.getNodeFactory().numberNode(1.0));
 		obj1.set("money", mapper.getNodeFactory().numberNode(60005.0));
 		obj1.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
@@ -312,7 +312,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj2.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("REDEEM"));
 		obj2.set("holder", mapper.getNodeFactory().textNode("Tiger"));
 		obj2.set("share", mapper.getNodeFactory().numberNode(10000.0));
-		obj2.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		obj2.set("netWorthPerUnit", mapper.getNodeFactory().numberNode(1.0));
 		obj2.set("money", mapper.getNodeFactory().numberNode(9995.0));
 		obj2.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		obj2.set("date", mapper.getNodeFactory().textNode("2016-08-11"));
@@ -327,7 +327,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		reqMsg.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("REDEEM"));
 		reqMsg.set("holder", mapper.getNodeFactory().textNode("Angel"));
 		reqMsg.set("share", mapper.getNodeFactory().numberNode(10000.0));
-		reqMsg.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		reqMsg.set("netWorthPerUnit", mapper.getNodeFactory().numberNode(1.0));
 		reqMsg.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		reqMsg.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
 
@@ -355,7 +355,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		reqMsg.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("REDEEM"));
 		reqMsg.set("holder", mapper.getNodeFactory().textNode("Angel"));
 		reqMsg.set("share", mapper.getNodeFactory().numberNode(10000.0));
-		reqMsg.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		reqMsg.set("netWorthPerUnit", mapper.getNodeFactory().numberNode(1.0));
 		reqMsg.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		reqMsg.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
 		Entity<String> entity = Entity.json(reqMsg.toString());

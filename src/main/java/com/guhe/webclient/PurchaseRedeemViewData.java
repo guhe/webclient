@@ -7,7 +7,7 @@ class PurchaseRedeemViewData {
 	private String purchaseOrRedeem;
 	private String holder;
 	private double share;
-	private double netWorth;
+	private double netWorthPerUnit;
 	private double money;
 	private double fee;
 	private String date;
@@ -36,12 +36,12 @@ class PurchaseRedeemViewData {
 		this.share = share;
 	}
 
-	public Double getNetWorth() {
-		return netWorth;
+	public Double getNetWorthPerUnit() {
+		return netWorthPerUnit;
 	}
 
-	public void setNetWorth(Double netWorth) {
-		this.netWorth = netWorth;
+	public void setNetWorthPerUnit(Double netWorthPerUnit) {
+		this.netWorthPerUnit = netWorthPerUnit;
 	}
 
 	public Double getMoney() {

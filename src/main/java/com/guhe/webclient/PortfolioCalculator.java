@@ -127,9 +127,9 @@ public class PortfolioCalculator {
 		vd.setPurchaseOrRedeem(record.getPurchaseOrRedeem().toString());
 		vd.setHolder(record.getHolder().getName());
 		vd.setShare(record.getShare());
-		vd.setNetWorth(record.getNetWorth());
+		vd.setNetWorthPerUnit(record.getNetWorthPerUnit());
 		vd.setFee(record.getFee());
-		double money = record.getShare() * record.getNetWorth();
+		double money = record.getShare() * record.getNetWorthPerUnit();
 		if (record.getPurchaseOrRedeem() == PurchaseOrRedeem.PURCHASE) {
 			money += record.getFee();
 		} else {

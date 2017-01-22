@@ -26,7 +26,7 @@
 					$("<td/>").html(isPurchase ? "申购" : "赎回").appendTo(row); // 类型
 					$("<td/>").html(row_data["holder"]).appendTo(row); // 持有人
 					$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row); // 份额
-					$("<td/>").html(row_data["netWorth"].toFixed(4)).appendTo(row); // 净值
+					$("<td/>").html(row_data["netWorthPerUnit"].toFixed(4)).appendTo(row); // 净值
 					$("<td/>").html(row_data["fee"].toFixed(2)).appendTo(row); // 费用
 					$("<td/>").html(row_data["money"].toFixed(2)).appendTo(row); // 金額
 					$("<td/>").html(row_data["date"]).appendTo(row); // 日期
@@ -42,7 +42,7 @@
 		data["holder"] = $(".inputArea input[name='holder']").val();
 		data["money"] = isPurchase ? $(".inputArea input[name='money']").val() * 1 : 0;
 		data["share"] = isPurchase ? 0: $(".inputArea input[name='share']").val() * 1;
-		data["netWorth"] = $(".inputArea input[name='netWorth']").val() * 1;
+		data["netWorthPerUnit"] = $(".inputArea input[name='netWorthPerUnit']").val() * 1;
 		data["fee"] = $(".inputArea input[name='fee']").val() * 1;
 		data["date"] = $(".inputArea input[name='date']").val();
 		
@@ -149,7 +149,7 @@
 					</tr>
 					<tr>
 						<td><span>净值：</span></td>
-						<td><input type="text" name="netWorth"></td>
+						<td><input type="text" name="netWorthPerUnit"></td>
 					</tr>
 					<tr>
 						<td><span>费用：</span></td>

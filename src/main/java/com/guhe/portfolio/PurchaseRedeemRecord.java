@@ -27,7 +27,7 @@ public class PurchaseRedeemRecord {
 	
 	private double share;
 
-	private double netWorth;
+	private double netWorthPerUnit;
 
 	private double fee;
 	
@@ -73,12 +73,12 @@ public class PurchaseRedeemRecord {
 		this.share = share;
 	}
 
-	public double getNetWorth() {
-		return netWorth;
+	public double getNetWorthPerUnit() {
+		return netWorthPerUnit;
 	}
 
-	public void setNetWorth(double netWorth) {
-		this.netWorth = netWorth;
+	public void setNetWorthPerUnit(double netWorthPerUnit) {
+		this.netWorthPerUnit = netWorthPerUnit;
 	}
 
 	public double getFee() {

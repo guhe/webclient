@@ -206,7 +206,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 		record.setHolder(holder);
 		record.setPurchaseOrRedeem(purchaseOrRedeem);
 		record.setShare(CommonUtil.dRound(share, 2));
-		record.setNetWorth(CommonUtil.dRound(netWorth, 4));
+		record.setNetWorthPerUnit(CommonUtil.dRound(netWorth, 4));
 		record.setFee(CommonUtil.dRound(fee, 4));
 		record.setDate(date);
 		em.persist(record);
