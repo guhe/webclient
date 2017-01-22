@@ -26,6 +26,8 @@ import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.PortfolioManager;
+import com.guhe.portfolio.PurchaseRedeemRecord;
+import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
 import com.guhe.portfolio.Stock;
 import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
@@ -54,6 +56,17 @@ public class PortfolioResourceTest extends JerseyTest {
 		Stock zhong_guo_ping_an = new Stock("601318", "中国平安");
 		portfolio.add(new Holding(zhong_guo_ping_an, 3600));
 
+		PortfolioHolder holder1 = new PortfolioHolder();
+		holder1.setHolder(new Holder("Tiger"));
+		holder1.setShare(70000.0);
+		holder1.setTotalInvestment(50000);
+		portfolio.add(holder1);
+		PortfolioHolder holder2 = new PortfolioHolder();
+		holder2.setHolder(new Holder("Angel"));
+		holder2.setShare(80000.0);
+		holder2.setTotalInvestment(50000);
+		portfolio.add(holder2);
+		
 		TradeRecord record1 = new TradeRecord();
 		record1.setBuyOrSell(TradeRecord.BuyOrSell.BUY);
 		record1.setAmount(500);
@@ -71,17 +84,23 @@ public class PortfolioResourceTest extends JerseyTest {
 		record2.setStock(zhong_guo_ping_an);
 		portfolio.add(record2);
 
-		PortfolioHolder holder1 = new PortfolioHolder();
-		holder1.setHolder(new Holder("Tiger"));
-		holder1.setShare(70000.0);
-		holder1.setTotalInvestment(50000);
-		portfolio.add(holder1);
-		PortfolioHolder holder2 = new PortfolioHolder();
-		holder2.setHolder(new Holder("Angel"));
-		holder2.setShare(80000.0);
-		holder2.setTotalInvestment(50000);
-		portfolio.add(holder2);
-
+		PurchaseRedeemRecord prRecord1 = new PurchaseRedeemRecord();
+		prRecord1.setHolder(new Holder("Tiger"));
+		prRecord1.setPurchaseOrRedeem(PurchaseOrRedeem.PURCHASE);
+		prRecord1.setShare(60000.0);
+		prRecord1.setNetWorth(1.0);
+		prRecord1.setFee(5.0);
+		prRecord1.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-10"));
+		portfolio.add(prRecord1);
+		PurchaseRedeemRecord prRecord2 = new PurchaseRedeemRecord();
+		prRecord2.setHolder(new Holder("Tiger"));
+		prRecord2.setPurchaseOrRedeem(PurchaseOrRedeem.REDEEM);
+		prRecord2.setShare(10000.0);
+		prRecord2.setNetWorth(1.0);
+		prRecord2.setFee(5.0);
+		prRecord2.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
+		portfolio.add(prRecord2);
+		
 		return portfolio;
 	}
 
@@ -269,6 +288,34 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj2.set("totalInvestment", mapper.getNodeFactory().numberNode(50000.0));
 		obj2.set("rateOfReturn", mapper.getNodeFactory().numberNode(1.021966));
 		obj2.set("proportion", mapper.getNodeFactory().numberNode(0.533333));
+		expect.add(obj2);
+
+		assertEquals(expect, actual);
+	}
+	
+	@Test
+	public void test_get_purchase_redeem_record_by_portfolio_id() {
+		JsonNode actual = target("/Portfolio/P00000001/PurchaseRedeem").request().accept(MediaType.APPLICATION_JSON)
+				.get(JsonNode.class);
+
+		ArrayNode expect = mapper.createArrayNode();
+		ObjectNode obj1 = mapper.createObjectNode();
+		obj1.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("PURCHASE"));
+		obj1.set("holder", mapper.getNodeFactory().textNode("Tiger"));
+		obj1.set("share", mapper.getNodeFactory().numberNode(60000.0));
+		obj1.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		obj1.set("money", mapper.getNodeFactory().numberNode(60005.0));
+		obj1.set("fee", mapper.getNodeFactory().numberNode(5.0));
+		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		expect.add(obj1);
+		ObjectNode obj2 = mapper.createObjectNode();
+		obj2.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("REDEEM"));
+		obj2.set("holder", mapper.getNodeFactory().textNode("Tiger"));
+		obj2.set("share", mapper.getNodeFactory().numberNode(10000.0));
+		obj2.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		obj2.set("money", mapper.getNodeFactory().numberNode(9995.0));
+		obj2.set("fee", mapper.getNodeFactory().numberNode(5.0));
+		obj2.set("date", mapper.getNodeFactory().textNode("2016-08-11"));
 		expect.add(obj2);
 
 		assertEquals(expect, actual);

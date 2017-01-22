@@ -93,6 +93,10 @@ public class Portfolio {
 	public List<TradeRecord> getTradeRecords() {
 		return tradeRecords;
 	}
+	
+	public void add(PurchaseRedeemRecord prRecord){
+		purchaseRedeemRecords.add(prRecord);
+	}
 
 	public List<PurchaseRedeemRecord> getPurchaseRedeemRecords() {
 		return purchaseRedeemRecords;
