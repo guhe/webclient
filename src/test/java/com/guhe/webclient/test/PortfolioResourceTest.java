@@ -66,7 +66,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		holder2.setShare(80000.0);
 		holder2.setTotalInvestment(50000);
 		portfolio.add(holder2);
-		
+
 		TradeRecord record1 = new TradeRecord();
 		record1.setBuyOrSell(TradeRecord.BuyOrSell.BUY);
 		record1.setAmount(500);
@@ -100,7 +100,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		prRecord2.setFee(5.0);
 		prRecord2.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
 		portfolio.add(prRecord2);
-		
+
 		return portfolio;
 	}
 
@@ -292,7 +292,7 @@ public class PortfolioResourceTest extends JerseyTest {
 
 		assertEquals(expect, actual);
 	}
-	
+
 	@Test
 	public void test_get_purchase_redeem_record_by_portfolio_id() {
 		JsonNode actual = target("/Portfolio/P00000001/PurchaseRedeem").request().accept(MediaType.APPLICATION_JSON)
@@ -319,5 +319,54 @@ public class PortfolioResourceTest extends JerseyTest {
 		expect.add(obj2);
 
 		assertEquals(expect, actual);
+	}
+
+	@Test
+	public void test_post_purchase_redeem_and_succ() {
+		ObjectNode reqMsg = mapper.createObjectNode();
+		reqMsg.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("REDEEM"));
+		reqMsg.set("holder", mapper.getNodeFactory().textNode("Angel"));
+		reqMsg.set("share", mapper.getNodeFactory().numberNode(10000.0));
+		reqMsg.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		reqMsg.set("fee", mapper.getNodeFactory().numberNode(5.0));
+		reqMsg.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+
+		Entity<String> entity = Entity.json(reqMsg.toString());
+
+		Response response = target("/Portfolio/P00000001/PurchaseRedeem").request().accept(MediaType.APPLICATION_JSON)
+				.post(entity);
+
+		verify(pm).redeem("P00000001", "Angel", 10000.0, 1.0, 5.0, CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"));
+
+		assertEquals(200, response.getStatus());
+
+		ObjectNode expectObj = mapper.createObjectNode();
+		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(0));
+		expectObj.set("message", mapper.getNodeFactory().textNode("OK"));
+		assertEquals(expectObj, response.readEntity(ObjectNode.class));
+	}
+
+	@Test
+	public void test_post_purchase_redeem_and_fail() {
+		doThrow(new PortfolioException("mock expection")).when(pm).redeem("P00000001", "Angel", 10000.0, 1.0, 5.0,
+				CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"));
+
+		ObjectNode reqMsg = mapper.createObjectNode();
+		reqMsg.set("purchaseOrRedeem", mapper.getNodeFactory().textNode("REDEEM"));
+		reqMsg.set("holder", mapper.getNodeFactory().textNode("Angel"));
+		reqMsg.set("share", mapper.getNodeFactory().numberNode(10000.0));
+		reqMsg.set("netWorth", mapper.getNodeFactory().numberNode(1.0));
+		reqMsg.set("fee", mapper.getNodeFactory().numberNode(5.0));
+		reqMsg.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		Entity<String> entity = Entity.json(reqMsg.toString());
+		Response response = target("/Portfolio/P00000001/PurchaseRedeem").request().accept(MediaType.APPLICATION_JSON)
+				.post(entity);
+
+		assertEquals(200, response.getStatus());
+
+		ObjectNode expectObj = mapper.createObjectNode();
+		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(-1));
+		expectObj.set("message", mapper.getNodeFactory().textNode("mock expection"));
+		assertEquals(expectObj, response.readEntity(ObjectNode.class));
 	}
 }
