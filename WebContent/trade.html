@@ -15,19 +15,21 @@
 			dataType : 'json',
 			success : function(result) {
 				$("#detail tbody tr").remove();
-				
 				result.sort(function(a, b) {
-					return a["date"] > b["date"];
+					if (a["date"] == b["date"]) {
+						return 0
+					}
+					return a["date"] > b["date"] ? 1 : -1;
 				});
 				$.each(result, function(key, row_data) {
 					var isBuy = row_data["buyOrSell"] == "BUY";
 					var row = $("<tr/>").appendTo($("#detail tbody"));
-					$("<td/>").html(isBuy ? "买入" : "卖出").appendTo(row); 
-					$("<td/>").html(row_data["stockName"] + row_data["stockCode"]).appendTo(row); 
-					$("<td/>").html(row_data["amount"]).appendTo(row); 
-					$("<td/>").html(row_data["price"].toFixed(2)).appendTo(row); 
-					$("<td/>").html(row_data["fee"].toFixed(2)).appendTo(row); 
-					$("<td/>").html(row_data["date"]).appendTo(row); 
+					$("<td/>").html(isBuy ? "买入" : "卖出").appendTo(row);
+					$("<td/>").html(row_data["stockName"] + row_data["stockCode"]).appendTo(row);
+					$("<td/>").html(row_data["amount"]).appendTo(row);
+					$("<td/>").html(row_data["price"].toFixed(2)).appendTo(row);
+					$("<td/>").html(row_data["fee"].toFixed(2)).appendTo(row);
+					$("<td/>").html(row_data["date"]).appendTo(row);
 
 					if (isBuy) {
 						row.css("background", "#800");
@@ -57,7 +59,7 @@
 			success : function(result) {
 				if (result["rltCode"] == 0) {
 					$("#tradeTip span").text("操作成功。");
-					
+
 					loadTradeRecord();
 				} else {
 					$("#tradeTip span").text(result["message"]);
@@ -71,7 +73,7 @@
 
 	$(document).ready(function() {
 		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
-		
+
 		$.get({
 			url : "rest/Portfolio/" + portfolioId,
 			dataType : 'json',
