@@ -138,7 +138,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 				throw new PortfolioException("no such holder name.");
 			}
 
-			portfolio.setCash(CommonUtil.dRound(portfolio.getCash() + money, 2));
+			portfolio.setCash(CommonUtil.dRound(portfolio.getCash() + money - fee, 2));
 
 			PortfolioHolder ph = portfolio.getHolders().stream().filter(e -> e.getHolder().getName().equals(holderName))
 					.findFirst().orElse(null);
@@ -178,7 +178,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 			if (CommonUtil.dCompare(portfolio.getCash(), money, 2) < 0) {
 				throw new PortfolioException("No enough cash to redeem.");
 			}
-			portfolio.setCash(CommonUtil.dRound(portfolio.getCash() - money, 2));
+			portfolio.setCash(CommonUtil.dRound(portfolio.getCash() - share * netWorth, 2));
 
 			PortfolioHolder ph = portfolio.getHolders().stream().filter(e -> e.getHolder().getName().equals(holderName))
 					.findFirst().orElse(null);
@@ -193,6 +193,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 				em.remove(ph);
 			} else {
 				ph.setShare(CommonUtil.dRound(ph.getShare() - share, 2));
+				ph.setTotalInvestment(ph.getTotalInvestment() - money);
 			}
 
 			savePurchaseRedeemRecord(portfolio, holder, PurchaseOrRedeem.REDEEM, share, netWorth, fee, date);

@@ -21,7 +21,7 @@ import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 
-public class PortfolioTradeTest extends PortfolioTestBase {
+public class TradeTest extends PortfolioTestBase {
 
 	private Portfolio portfolio;
 

@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.guhe.portfolio.Portfolio;
 
-public class PortfolioManagerTest extends PortfolioTestBase {
+public class PortfolioTest extends PortfolioTestBase {
 
 	@Test
 	public void save_get_remove_portfolio() {
