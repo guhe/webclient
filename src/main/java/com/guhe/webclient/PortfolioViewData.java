@@ -11,6 +11,7 @@ class PortfolioViewData {
 	private double projectedLiabilities;
 	private double stockNetWorth;
 	private double netWorth;
+	private double profit;
 	private double netWorthPerUnit;
 	private double proportionOfStock;
 	private double rateOfReturnYear;
@@ -71,6 +72,14 @@ class PortfolioViewData {
 
 	public void setNetWorth(Double netWorth) {
 		this.netWorth = netWorth;
+	}
+
+	public Double getProfit() {
+		return profit;
+	}
+
+	public void setProfit(Double profit) {
+		this.profit = profit;
 	}
 
 	public Double getStockNetWorth() {

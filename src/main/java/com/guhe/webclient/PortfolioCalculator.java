@@ -31,6 +31,7 @@ public class PortfolioCalculator {
 		viewData.setProjectedLiabilities(getProjectedLiabilities());
 		viewData.setStockNetWorth(getStockNetWorth());
 		viewData.setNetWorth(getNetWorth());
+		viewData.setProfit(viewData.getNetWorth() - getTotalInvestment());
 		viewData.setNetWorthPerUnit(getNetWorthPerUnit());
 		viewData.setProportionOfStock(getProportionOfStock());
 		viewData.setRateOfReturnYear(getRateOfReturnYear());
@@ -58,6 +59,10 @@ public class PortfolioCalculator {
 
 	private double getNetWorth() {
 		return getTotalWorth() - getProjectedLiabilities();
+	}
+
+	private double getTotalInvestment() {
+		return portfolio.getHolders().stream().map(e -> e.getTotalInvestment()).reduce(0.0, Double::sum);
 	}
 
 	private double getStockNetWorth() {

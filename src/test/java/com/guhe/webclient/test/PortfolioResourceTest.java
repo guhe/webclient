@@ -146,6 +146,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		expect.set("totalWorth", mapper.getNodeFactory().numberNode(189770.0));
 		expect.set("projectedLiabilities", mapper.getNodeFactory().numberNode(210.684));
 		expect.set("netWorth", mapper.getNodeFactory().numberNode(189559.316));
+		expect.set("profit", mapper.getNodeFactory().numberNode(89559.316));
 		expect.set("stockNetWorth", mapper.getNodeFactory().numberNode(166493.316));
 		expect.set("cash", mapper.getNodeFactory().numberNode(23066.0));
 		expect.set("proportionOfStock", mapper.getNodeFactory().numberNode(0.878318));
