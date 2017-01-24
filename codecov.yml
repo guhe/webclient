@@ -8,4 +8,4 @@ coverage:
     changes: false
     patch: false
     project:
-      target: 70
+      target: 60
