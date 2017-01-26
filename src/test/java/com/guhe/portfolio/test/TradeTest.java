@@ -73,10 +73,6 @@ public class TradeTest extends PortfolioTestBase {
 		assertEquals(1, holdings.size());
 		assertThat(holdings.get(0), "ID001", "000001", 400);
 
-		List<TradeRecord> tradeRecords = portfolio.getTradeRecords();
-		assertEquals(1, tradeRecords.size());
-		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, 5.0, "2016-12-14");
-
 		// sell
 		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-15"));
 
@@ -87,7 +83,7 @@ public class TradeTest extends PortfolioTestBase {
 		assertEquals(1, holdings.size());
 		assertThat(holdings.get(0), "ID001", "000001", 100);
 
-		tradeRecords = portfolio.getTradeRecords();
+		List<TradeRecord> tradeRecords = portfolio.getTradeRecords();
 		assertEquals(2, tradeRecords.size());
 		assertThat(tradeRecords.get(0), "ID001", "000001", BuyOrSell.BUY, 400, 8.5, 5.0, "2016-12-14");
 		assertThat(tradeRecords.get(1), "ID001", "000001", BuyOrSell.SELL, 300, 10.0, 8.3, "2016-12-15");

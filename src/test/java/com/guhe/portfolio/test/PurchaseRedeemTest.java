@@ -8,12 +8,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.PurchaseRedeemRecord;
 import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
@@ -30,6 +32,7 @@ public class PurchaseRedeemTest extends PortfolioTestBase {
 		EntityManager em = testEmf.createEntityManager();
 		em.getTransaction().begin();
 		em.persist(new Holder("Tiger"));
+		em.persist(new Holder("Angel"));
 		em.getTransaction().commit();
 		em.close();
 	}
@@ -82,6 +85,68 @@ public class PurchaseRedeemTest extends PortfolioTestBase {
 		assertThat(records.get(0), PurchaseOrRedeem.PURCHASE, "Tiger", 4997.5, 2.0, 5.0, "2017-01-22");
 		assertThat(records.get(1), PurchaseOrRedeem.REDEEM, "Tiger", 2997.5, 2.0, 5.0, "2017-01-23");
 		assertThat(records.get(2), PurchaseOrRedeem.REDEEM, "Tiger", 2000, 2.0, 5.0, "2017-01-24");
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void purchase_with_nonexistent_portfolio() {
+		pm.purchase("ID002", "Tiger", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void purchase_with_nonexistent_holder() {
+		pm.purchase("ID001", "Fake", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+	}
+
+	@Test
+	public void purchase_with_holder_already_purchased() {
+		pm.purchase("ID001", "Tiger", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+		pm.purchase("ID001", "Tiger", 6000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-23"));
+
+		portfolio = pm.getPortfolio("ID001");
+		assertEquals(15990, portfolio.getCash(), 0.000001);
+		List<PortfolioHolder> holders = portfolio.getHolders();
+		assertEquals(1, holders.size());
+		assertThat(holders.get(0), "Tiger", 7995, 16000);
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void redeem_with_nonexistent_portfolio() {
+		pm.redeem("ID002", "Tiger", 5000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void redeem_with_nonexistent_holder() {
+		pm.redeem("ID001", "Fake", 5000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void redeem_but_no_such_holder_in_given_portfolio() {
+		pm.redeem("ID001", "Angel", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+	}
+
+	@Test
+	public void redeem_with_no_enough_share() {
+		pm.purchase("ID001", "Tiger", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+
+		try {
+			pm.redeem("ID001", "Tiger", 10001.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+			Assert.fail();
+		} catch (PortfolioException e) {
+		}
+	}
+
+	@Test
+	public void redeem_but_no_enough_money_in_portfolio() {
+		pm.purchase("ID001", "Tiger", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+
+		portfolio.setCash(8000);
+		pm.savePortfolio(portfolio);
+
+		try {
+			pm.redeem("ID001", "Tiger", 4997.5, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
+			Assert.fail();
+		} catch (PortfolioException e) {
+		}
 	}
 
 	private void assertThat(PortfolioHolder ph, String holderName, double share, double totalInvestment) {
