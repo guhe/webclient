@@ -12,11 +12,6 @@ public class TencentStockMarket implements StockMarket {
 	private Map<String, StockData> cache = new HashMap<>();
 
 	public TencentStockMarket(){
-		StockData sd = new StockData();
-		sd.price = 4.55;
-		sd.pe = 22.98;
-		sd.pb = 3;
-		cache.put("300603", sd);
 	}
 	
 	@Override
