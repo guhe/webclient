@@ -105,10 +105,18 @@ public class JpaPortfolioManager implements PortfolioManager {
 				em.persist(holding);
 			} else {
 				Holding holding = holdings.get(0);
-				if (buyOrSell == BuyOrSell.SELL && holding.getAmount() < amount) {
-					throw new PortfolioException("No enough holdings to sell.");
+				if (buyOrSell == BuyOrSell.SELL) {
+					if (holding.getAmount() < amount) {
+						throw new PortfolioException("No enough holdings to sell.");
+					} else if (holding.getAmount() == amount) {
+						em.remove(holding);
+					} else {
+						holding.setAmount(holding.getAmount() - amount);
+					}
+				} else {
+					holding.setAmount(holding.getAmount() + amount);
 				}
-				holding.setAmount(holding.getAmount() + (buyOrSell == BuyOrSell.SELL ? -amount : amount));
+
 			}
 
 			TradeRecord tradeRecord = new TradeRecord();

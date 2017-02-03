@@ -1,6 +1,7 @@
 package com.guhe.portfolio;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -18,6 +19,8 @@ public class Portfolio {
 	private double netWorthPerUnitLastYear;
 
 	private double cash;
+	
+	private Date createdTime;
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Holding> holdings = new ArrayList<>();
@@ -68,6 +71,14 @@ public class Portfolio {
 
 	public void setCash(double cash) {
 		this.cash = cash;
+	}
+
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
 	}
 
 	public void add(Holding holding) {
