@@ -83,40 +83,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 				throw new PortfolioException("no such stock code.");
 			}
 
-			if (buyOrSell == BuyOrSell.BUY && portfolio.getCash() - fee - amount * price < 0) {
-				throw new PortfolioException("no enough money to buy.");
-			}
-			portfolio.setCash(CommonUtil
-					.dRound(portfolio.getCash() - (buyOrSell == BuyOrSell.SELL ? -amount : amount) * price - fee, 2));
-
-			TypedQuery<Holding> query = em.createQuery("FROM Holding WHERE portfolio.id=:pId AND stock.code=:code",
-					Holding.class);
-			query.setParameter("pId", portfolioId);
-			query.setParameter("code", stockCode);
-			List<Holding> holdings = query.getResultList();
-			if (holdings.isEmpty()) {
-				if (buyOrSell == BuyOrSell.SELL) {
-					throw new PortfolioException("no such holding to sell.");
-				}
-				Holding holding = new Holding();
-				holding.setStock(stock);
-				holding.setPortfolio(portfolio);
-				holding.setAmount(amount);
-				em.persist(holding);
+			if (buyOrSell == BuyOrSell.BUY) {
+				updatePortfolioWithBuy(portfolio, stock, price, amount, fee);
 			} else {
-				Holding holding = holdings.get(0);
-				if (buyOrSell == BuyOrSell.SELL) {
-					if (holding.getAmount() < amount) {
-						throw new PortfolioException("No enough holdings to sell.");
-					} else if (holding.getAmount() == amount) {
-						em.remove(holding);
-					} else {
-						holding.setAmount(holding.getAmount() - amount);
-					}
-				} else {
-					holding.setAmount(holding.getAmount() + amount);
-				}
-
+				updatePortfolioWithSell(portfolio, stock, price, amount, fee);
 			}
 
 			TradeRecord tradeRecord = new TradeRecord();
@@ -129,6 +99,46 @@ public class JpaPortfolioManager implements PortfolioManager {
 			tradeRecord.setStock(getStockByCode(stockCode));
 			em.persist(tradeRecord);
 		});
+	}
+
+	private void updatePortfolioWithBuy(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
+		if (portfolio.getCash() - fee - amount * price < 0) {
+			throw new PortfolioException("no enough money to buy.");
+		}
+
+		portfolio.setCash(CommonUtil.dRound(portfolio.getCash() - amount * price - fee, 2));
+
+		Holding holding = portfolio.getHoldings().stream().filter(e -> e.getStock().getCode().equals(stock.getCode()))
+				.findFirst().orElse(null);
+		if (holding == null) {
+			holding = new Holding();
+			holding.setStock(stock);
+			holding.setPortfolio(portfolio);
+			holding.setAmount(amount);
+			em.persist(holding);
+		} else {
+			holding.setAmount(holding.getAmount() + amount);
+		}
+	}
+
+	private void updatePortfolioWithSell(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
+		portfolio.setCash(CommonUtil.dRound(portfolio.getCash() + amount * price - fee, 2));
+
+		List<Holding> holdings = portfolio.getHoldings();
+		Holding holding = holdings.stream().filter(e -> e.getStock().getCode().equals(stock.getCode()))
+				.findFirst().orElse(null);
+		if (holding == null) {
+			throw new PortfolioException("no such holding to sell.");
+		}
+
+		if (holding.getAmount() < amount) {
+			throw new PortfolioException("No enough holdings to sell.");
+		} else if (holding.getAmount() == amount) {
+			holdings.remove(holding);
+			em.remove(holding);
+		} else {
+			holding.setAmount(holding.getAmount() - amount);
+		}
 	}
 
 	@Override
