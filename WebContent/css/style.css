@@ -81,14 +81,14 @@ html, body {
 	border-width: 1px;
 }
 
-/* ---------- index.html ---------- */
-#global-more {
+.with-border {
 	width: 800px;
 	margin: 0 auto;
 	border-style: solid;
 	border-width: 1px;
 }
 
+/* ---------- index.html ---------- */
 .gmt {
 	width: 100%;
 }
@@ -127,4 +127,38 @@ html, body {
 	width: 300px;
 	border-style: solid;
 	border-width: 1px;
+}
+
+.button {
+	width: 128px;
+	line-height: 38px;
+	text-align: center;
+	font-weight: bold;
+	color: #fff;
+	text-shadow:1px 1px 1px #333;
+	border-radius: 5px;
+	position: relative;
+	overflow: hidden;
+}
+
+.button.black {
+	border:1px solid #333;
+	box-shadow: 0 1px 2px #8b8b8b inset,0 -1px 0 #3d3d3d inset,0 -2px 3px #8b8b8b inset;
+	background: -webkit-linear-gradient(top,#656565,#4c4c4c);
+	background: -moz-linear-gradient(top,#656565,#4a4a4a);
+	background: linear-gradient(top,#656565,#4a4a4a);
+}
+
+.black:active{
+top:1px;
+box-shadow: 0 1px 3px #111 inset,0 3px 0 #fff;
+background: -webkit-linear-gradient(top,#424242,#575757);
+background: -moz-linear-gradient(top,#424242,#575757);
+background: linear-gradient(top,#424242,#575757);
+}
+
+.black:hover{
+background: -webkit-linear-gradient(top,#818181,#575757);
+background: -moz-linear-gradient(top,#818181,#575757);
+background: linear-gradient(top,#818181,#575757);
 }

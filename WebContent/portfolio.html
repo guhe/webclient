@@ -10,11 +10,91 @@
 	var portfolioId = $.getUrlVar("id");
 
 	$(document).ready(function() {
-		$("#stock_detail tbody tr").remove();
-
 		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
 		$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
+		
+		function setCurrentView(chooser){
+			var all = ["#stock_detail", "#holder_detail"];
+			all.forEach(function(e){
+				if(e == chooser){
+					$(e).show();
+				}else{
+					$(e).hide();
+				}
+			});
+		}
+		
+		//click stock button
+		$("#stock_bt").click(function(){
+			setCurrentView("#stock_detail");
+			$("#stock_detail tbody tr").remove();
+			$.get({
+				url : "rest/Portfolio/" + portfolioId + "/HoldingStock",
+				dataType : 'json',
+				success : function(result) {
+					result.sort(function(a, b) {
+						return b["proportion"] - a["proportion"];
+					});
+					$.each(result, function(key, row_data) {
+						var row = $("<tr/>").appendTo($("#stock_detail tbody"));
+						$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
+						$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
+						$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
+						$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
+						$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
+						$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
+						$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
+						$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
+					});
+				}
+			});
+		});
+		
+		//click holder button
+		$("#holder_bt").click(function(){
+			setCurrentView("#holder_detail");
+			$("#holder_detail tbody tr").remove();
+			$.get({
+				url : "rest/Portfolio/" + portfolioId + "/Holder",
+				dataType : 'json',
+				success : function(result) {
+					result.sort(function(a, b) {
+						return b["name"] - a["name"];
+					});
+					var total = {
+						"name" : "总计",
+						"share" : 0,
+						"netWorth" : 0,
+						"totalInvestment" : 0,
+						"rateOfReturn" : 0,
+						"proportion" : 0
+					};
+					$.each(result, function(key, row_data) {
+						appendRowToHolderTable(row_data);
 
+						total["share"] += row_data["share"];
+						total["netWorth"] += row_data["netWorth"];
+						total["totalInvestment"] += row_data["totalInvestment"];
+						total["proportion"] += row_data["proportion"];
+
+					});
+					total["rateOfReturn"] += total["netWorth"] / total["totalInvestment"] - 1;
+					appendRowToHolderTable(total);
+				}
+			});
+			
+			function appendRowToHolderTable(row_data) {
+				var row = $("<tr/>").appendTo($("#holder_detail tbody"));
+				$("<td/>").html(row_data["name"]).appendTo(row);
+				$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row);
+				$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row);
+				$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row);
+				$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row);
+				$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
+			}
+		});
+		
+		//load portfolio data
 		$.get({
 			url : "rest/Portfolio/" + portfolioId,
 			dataType : 'json',
@@ -37,67 +117,9 @@
 				}
 			}
 		});
-
-		$.get({
-			url : "rest/Portfolio/" + portfolioId + "/HoldingStock",
-			dataType : 'json',
-			success : function(result) {
-				result.sort(function(a, b) {
-					return b["proportion"] - a["proportion"];
-				});
-				$.each(result, function(key, row_data) {
-					var row = $("<tr/>").appendTo($("#stock_detail tbody"));
-					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
-					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
-					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
-					$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
-					$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
-					$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
-					$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
-					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
-				});
-			}
-		});
-
-		function appendRowToHolderTable(row_data) {
-			var row = $("<tr/>").appendTo($("#holder_detail tbody"));
-			$("<td/>").html(row_data["name"]).appendTo(row);
-			$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row);
-			$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row);
-			$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row);
-			$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row);
-			$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
-		}
-
-		$.get({
-			url : "rest/Portfolio/" + portfolioId + "/Holder",
-			dataType : 'json',
-			success : function(result) {
-				result.sort(function(a, b) {
-					return b["name"] - a["name"];
-				});
-				var total = {
-					"name" : "总计",
-					"share" : 0,
-					"netWorth" : 0,
-					"totalInvestment" : 0,
-					"rateOfReturn" : 0,
-					"proportion" : 0
-				};
-				$.each(result, function(key, row_data) {
-					appendRowToHolderTable(row_data);
-
-					total["share"] += row_data["share"];
-					total["netWorth"] += row_data["netWorth"];
-					total["totalInvestment"] += row_data["totalInvestment"];
-					total["proportion"] += row_data["proportion"];
-
-				});
-				total["rateOfReturn"] += total["netWorth"] / total["totalInvestment"] - 1;
-				appendRowToHolderTable(total);
-			}
-		});
-
+		
+		// set current view is stock detail
+		$("#stock_bt").click();
 	});
 </script>
 </head>
@@ -119,7 +141,7 @@
 		</div>
 	</div>
 	<div style="height: 5px"></div>
-	<div id="global-more">
+	<div id="global-more" class="with-border">
 		<table class="gmt">
 			<tr>
 				<td class="gmt-detail-title">净资产</td>
@@ -138,6 +160,15 @@
 				<td id="proportionOfStock" class="gmt-detail-value"></td>
 			</tr>
 		</table>
+	</div>
+	<hr style="width: 800px" />
+	<div style="width: 800px;margin: 0 auto;" >
+		<button id="stock_bt" type="button" class="button black">持仓清单</button>
+		<button id="holder_bt" type="button" class="button black">持有人清单</button>
+		<button type="button" class="button black">0</button>
+		<button type="button" class="button black">0</button>
+		<button type="button" class="button black">0</button>
+		<button type="button" class="button black">0</button>
 	</div>
 	<hr style="width: 800px" />
 	<div id="stock_detail" class="detail">
@@ -161,7 +192,6 @@
 			</tbody>
 		</table>
 	</div>
-	<hr style="width: 800px" />
 	<div id="holder_detail" class="detail">
 		<table class="zebra">
 			<caption>
