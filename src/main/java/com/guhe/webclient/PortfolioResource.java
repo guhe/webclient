@@ -142,4 +142,11 @@ public class PortfolioResource {
 		}
 		return Response.ok(result).build();
 	}
+	
+	@POST
+	@Path("{portfolio}/calculateHistoryNetWorthPerUnit")
+	public Response calculateHistoryNetWorthPerUnit(@PathParam("portfolio") String portfolioId){
+		PortfolioResultViewData result = new PortfolioResultViewData(0, "OK");
+		return Response.ok(result).build();
+	}
 }
