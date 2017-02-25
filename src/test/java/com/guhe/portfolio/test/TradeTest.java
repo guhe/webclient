@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
@@ -32,6 +33,7 @@ public class TradeTest extends PortfolioTestBase {
 		EntityManager em = testEmf.createEntityManager();
 		em.getTransaction().begin();
 		em.persist(new Stock("000001", "平安银行"));
+		em.persist(new Holder("Tiger"));
 		em.getTransaction().commit();
 		em.close();
 	}
@@ -47,6 +49,8 @@ public class TradeTest extends PortfolioTestBase {
 		portfolio.setNetWorthPerUnitLastYear(1.1);
 
 		PortfolioHolder holder = new PortfolioHolder();
+		holder.setPortfolio(portfolio);
+		holder.setHolder(pm.getHolderByName("Tiger"));
 		holder.setShare(100.0);
 		holder.setTotalInvestment(110);
 		portfolio.add(holder);

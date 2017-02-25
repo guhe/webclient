@@ -22,71 +22,57 @@ public class PortfolioCalculator {
 		this.market = market;
 	}
 
-	public PortfolioViewData getViewData() {
-		PortfolioViewData viewData = new PortfolioViewData();
-		viewData.setId(portfolio.getId());
-		viewData.setName(portfolio.getName());
-		viewData.setCash(portfolio.getCash());
-		viewData.setTotalWorth(getTotalWorth());
-		viewData.setProjectedLiabilities(getProjectedLiabilities());
-		viewData.setStockNetWorth(getStockNetWorth());
-		viewData.setNetWorth(getNetWorth());
-		viewData.setProfit(viewData.getNetWorth() - getTotalInvestment());
-		viewData.setNetWorthPerUnit(getNetWorthPerUnit());
-		viewData.setProportionOfStock(getProportionOfStock());
-		viewData.setRateOfReturnYear(getRateOfReturnYear());
-		viewData.setPe(getPE());
-		viewData.setPb(getPB());
-		return viewData;
+	public Portfolio getPortfolio(){
+		return portfolio;
 	}
 
-	private double getNumberOfShares() {
+	public double getNumberOfShares() {
 		return portfolio.getHolders().stream().map(e -> e.getShare()).reduce(0.0, Double::sum);
 	}
 
-	private double getStockTotalWorth() {
+	public double getStockTotalWorth() {
 		return getHoldingCalculatorStream().map(e -> e.getMarketWorth()).reduce(0.0, Double::sum);
 	}
 
-	private double getTotalWorth() {
+	public double getTotalWorth() {
 		return getStockTotalWorth() + portfolio.getCash();
 	}
 
-	private double getProjectedLiabilities() {
+	public double getProjectedLiabilities() {
 		return getHoldingCalculatorStream().map(e -> e.getEstimatedTax() + e.getEstimatedCommission()).reduce(0.0,
 				Double::sum);
 	}
 
-	private double getNetWorth() {
+	public double getNetWorth() {
 		return getTotalWorth() - getProjectedLiabilities();
 	}
 
-	private double getTotalInvestment() {
+	public double getTotalInvestment() {
 		return portfolio.getHolders().stream().map(e -> e.getTotalInvestment()).reduce(0.0, Double::sum);
 	}
 
-	private double getStockNetWorth() {
+	public double getStockNetWorth() {
 		return getStockTotalWorth() - getProjectedLiabilities();
 	}
 
-	private double getNetWorthPerUnit() {
+	public double getNetWorthPerUnit() {
 		return getNetWorth() / getNumberOfShares();
 	}
 
-	private double getProportionOfStock() {
+	public double getProportionOfStock() {
 		return getStockNetWorth() / getNetWorth();
 	}
 
-	private double getRateOfReturnYear() {
+	public double getRateOfReturnYear() {
 		return getNetWorthPerUnit() / portfolio.getNetWorthPerUnitLastYear() - 1;
 	}
 
-	private double getPE() {
+	public double getPE() {
 		return getStockTotalWorth()
 				/ getHoldingCalculatorStream().map(e -> e.getMarketWorth() / e.getPE()).reduce(0.0, Double::sum);
 	}
 
-	private double getPB() {
+	public double getPB() {
 		return getStockTotalWorth()
 				/ getHoldingCalculatorStream().map(e -> e.getMarketWorth() / e.getPB()).reduce(0.0, Double::sum);
 	}

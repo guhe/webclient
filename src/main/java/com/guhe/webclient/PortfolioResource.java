@@ -38,7 +38,7 @@ public class PortfolioResource {
 	@GET
 	public List<PortfolioViewData> getPortfolios() {
 		List<Portfolio> portfolios = pm.getPortfolios();
-		return portfolios.stream().map(e -> new PortfolioCalculator(e, stockMarket).getViewData())
+		return portfolios.stream().map(e -> createPortfolioViewData(new PortfolioCalculator(e, stockMarket)))
 				.collect(Collectors.toList());
 	}
 
@@ -51,7 +51,25 @@ public class PortfolioResource {
 		}
 
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-		return calculator.getViewData();
+		return createPortfolioViewData(calculator);
+	}
+
+	private PortfolioViewData createPortfolioViewData(PortfolioCalculator portfolioCalculator) {
+		PortfolioViewData viewData = new PortfolioViewData();
+		viewData.setId(portfolioCalculator.getPortfolio().getId());
+		viewData.setName(portfolioCalculator.getPortfolio().getName());
+		viewData.setCash(portfolioCalculator.getPortfolio().getCash());
+		viewData.setTotalWorth(portfolioCalculator.getTotalWorth());
+		viewData.setProjectedLiabilities(portfolioCalculator.getProjectedLiabilities());
+		viewData.setStockNetWorth(portfolioCalculator.getStockNetWorth());
+		viewData.setNetWorth(portfolioCalculator.getNetWorth());
+		viewData.setProfit(viewData.getNetWorth() - portfolioCalculator.getTotalInvestment());
+		viewData.setNetWorthPerUnit(portfolioCalculator.getNetWorthPerUnit());
+		viewData.setProportionOfStock(portfolioCalculator.getProportionOfStock());
+		viewData.setRateOfReturnYear(portfolioCalculator.getRateOfReturnYear());
+		viewData.setPe(portfolioCalculator.getPE());
+		viewData.setPb(portfolioCalculator.getPB());
+		return viewData;
 	}
 
 	@GET
