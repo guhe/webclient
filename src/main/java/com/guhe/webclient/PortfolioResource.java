@@ -15,9 +15,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.PortfolioCalculator;
 import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioManager;
+import com.guhe.portfolio.PurchaseRedeemRecord;
 import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
+import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 
@@ -54,21 +57,21 @@ public class PortfolioResource {
 		return createPortfolioViewData(calculator);
 	}
 
-	private PortfolioViewData createPortfolioViewData(PortfolioCalculator portfolioCalculator) {
+	private PortfolioViewData createPortfolioViewData(PortfolioCalculator calculator) {
 		PortfolioViewData viewData = new PortfolioViewData();
-		viewData.setId(portfolioCalculator.getPortfolio().getId());
-		viewData.setName(portfolioCalculator.getPortfolio().getName());
-		viewData.setCash(portfolioCalculator.getPortfolio().getCash());
-		viewData.setTotalWorth(portfolioCalculator.getTotalWorth());
-		viewData.setProjectedLiabilities(portfolioCalculator.getProjectedLiabilities());
-		viewData.setStockNetWorth(portfolioCalculator.getStockNetWorth());
-		viewData.setNetWorth(portfolioCalculator.getNetWorth());
-		viewData.setProfit(viewData.getNetWorth() - portfolioCalculator.getTotalInvestment());
-		viewData.setNetWorthPerUnit(portfolioCalculator.getNetWorthPerUnit());
-		viewData.setProportionOfStock(portfolioCalculator.getProportionOfStock());
-		viewData.setRateOfReturnYear(portfolioCalculator.getRateOfReturnYear());
-		viewData.setPe(portfolioCalculator.getPE());
-		viewData.setPb(portfolioCalculator.getPB());
+		viewData.setId(calculator.getPortfolio().getId());
+		viewData.setName(calculator.getPortfolio().getName());
+		viewData.setCash(calculator.getPortfolio().getCash());
+		viewData.setTotalWorth(calculator.getTotalWorth());
+		viewData.setProjectedLiabilities(calculator.getProjectedLiabilities());
+		viewData.setStockNetWorth(calculator.getStockNetWorth());
+		viewData.setNetWorth(calculator.getNetWorth());
+		viewData.setProfit(viewData.getNetWorth() - calculator.getTotalInvestment());
+		viewData.setNetWorthPerUnit(calculator.getNetWorthPerUnit());
+		viewData.setProportionOfStock(calculator.getProportionOfStock());
+		viewData.setRateOfReturnYear(calculator.getRateOfReturnYear());
+		viewData.setPe(calculator.getPE());
+		viewData.setPb(calculator.getPB());
 		return viewData;
 	}
 
@@ -81,7 +84,25 @@ public class PortfolioResource {
 		}
 
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-		return calculator.getHoldingStockVDs();
+		return createHoldingStockVDs(calculator);
+	}
+
+	private List<HoldingStockViewData> createHoldingStockVDs(PortfolioCalculator calculator) {
+		return calculator.getHoldingCalculatorStream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	public HoldingStockViewData createViewData(PortfolioCalculator.HoldingCalculator calculator) {
+		HoldingStockViewData vd = new HoldingStockViewData();
+		vd.setCode(calculator.getHolding().getStock().getCode());
+		vd.setName(calculator.getHolding().getStock().getName());
+		vd.setAmount(calculator.getHolding().getAmount());
+		vd.setCurPrice(calculator.getPrice());
+		vd.setMarketWorth(calculator.getMarketWorth());
+		vd.setEstimatedCommission(calculator.getEstimatedCommission());
+		vd.setEstimatedTax(calculator.getEstimatedTax());
+		vd.setNetWorth(calculator.getNetWorth());
+		vd.setProportion(calculator.getProportion());
+		return vd;
 	}
 
 	@GET
@@ -93,7 +114,22 @@ public class PortfolioResource {
 		}
 
 		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-		return calculator.getHolderVDs();
+		return getHolderVDs(calculator);
+	}
+
+	private List<PortfolioHolderViewData> getHolderVDs(PortfolioCalculator calculator) {
+		return calculator.getHolderCalculatorStream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	public PortfolioHolderViewData createViewData(PortfolioCalculator.HolderCalculator calculator) {
+		PortfolioHolderViewData vd = new PortfolioHolderViewData();
+		vd.setName(calculator.getPortfolioHolder().getHolder().getName());
+		vd.setShare(calculator.getPortfolioHolder().getShare());
+		vd.setNetWorth(calculator.getNetWorth());
+		vd.setProportion(calculator.getProportion());
+		vd.setRateOfReturn(calculator.getRateOfReturn());
+		vd.setTotalInvestment(calculator.getPortfolioHolder().getTotalInvestment());
+		return vd;
 	}
 
 	@GET
@@ -104,8 +140,19 @@ public class PortfolioResource {
 			return null;
 		}
 
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-		return calculator.getTradeRecordVDs();
+		return portfolio.getTradeRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	private TradeRecordViewData createViewData(TradeRecord record) {
+		TradeRecordViewData vd = new TradeRecordViewData();
+		vd.setBuyOrSell(record.getBuyOrSell().toString());
+		vd.setStockCode(record.getStock().getCode());
+		vd.setStockName(record.getStock().getName());
+		vd.setAmount(record.getAmount());
+		vd.setPrice(record.getPrice());
+		vd.setFee(record.getFee());
+		vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", record.getDate()));
+		return vd;
 	}
 
 	@POST
@@ -134,8 +181,25 @@ public class PortfolioResource {
 			return null;
 		}
 
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-		return calculator.getPurchaseRedeemVDs();
+		return portfolio.getPurchaseRedeemRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	private PurchaseRedeemViewData createViewData(PurchaseRedeemRecord record) {
+		PurchaseRedeemViewData vd = new PurchaseRedeemViewData();
+		vd.setPurchaseOrRedeem(record.getPurchaseOrRedeem().toString());
+		vd.setHolder(record.getHolder().getName());
+		vd.setShare(record.getShare());
+		vd.setNetWorthPerUnit(record.getNetWorthPerUnit());
+		vd.setFee(record.getFee());
+		double money = record.getShare() * record.getNetWorthPerUnit();
+		if (record.getPurchaseOrRedeem() == PurchaseOrRedeem.PURCHASE) {
+			money += record.getFee();
+		} else {
+			money -= record.getFee();
+		}
+		vd.setMoney(money);
+		vd.setDate(CommonUtil.formatDate("yyy-MM-dd", record.getDate()));
+		return vd;
 	}
 
 	@POST
