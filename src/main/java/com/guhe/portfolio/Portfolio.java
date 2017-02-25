@@ -33,6 +33,9 @@ public class Portfolio {
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PurchaseRedeemRecord> purchaseRedeemRecords = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DailyData> historyNetWorthPerUnits = new ArrayList<>();
 
 	public Portfolio() {
 	}
@@ -111,5 +114,9 @@ public class Portfolio {
 
 	public List<PurchaseRedeemRecord> getPurchaseRedeemRecords() {
 		return purchaseRedeemRecords;
+	}
+
+	public List<DailyData> getHistoryNetWorthPerUnits() {
+		return historyNetWorthPerUnits;
 	}
 }

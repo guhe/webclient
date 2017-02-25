@@ -24,4 +24,8 @@ public interface PortfolioManager {
 	void purchase(String portfolioId, String holderName, double money, double netWorth, double fee, Date date);
 
 	void redeem(String portfolioId, String holderName, double share, double netWorth, double fee, Date date);
+
+	List<DailyData> getDailyData(String portfolioId, Date startDate, Date endDate);
+	
+	void supplementDailyData(String portfolioId);
 }

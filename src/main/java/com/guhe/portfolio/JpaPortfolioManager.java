@@ -1,7 +1,10 @@
 package com.guhe.portfolio;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.function.BinaryOperator;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -125,8 +128,8 @@ public class JpaPortfolioManager implements PortfolioManager {
 		portfolio.setCash(CommonUtil.dRound(portfolio.getCash() + amount * price - fee, 2));
 
 		List<Holding> holdings = portfolio.getHoldings();
-		Holding holding = holdings.stream().filter(e -> e.getStock().getCode().equals(stock.getCode()))
-				.findFirst().orElse(null);
+		Holding holding = holdings.stream().filter(e -> e.getStock().getCode().equals(stock.getCode())).findFirst()
+				.orElse(null);
 		if (holding == null) {
 			throw new PortfolioException("no such holding to sell.");
 		}
@@ -231,6 +234,27 @@ public class JpaPortfolioManager implements PortfolioManager {
 		em.persist(record);
 	}
 
+	public List<DailyData> getDailyData(String portfolioId, Date startDate, Date endDate) {
+		return null;
+	}
+
+	@Override
+	public void supplementDailyData(String portfolioId) {
+		Portfolio portfolio = getPortfolio(portfolioId);
+		if (portfolio == null) {
+			throw new PortfolioException("no such portfolio.");
+		}
+
+		Calendar firstDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+		firstDay.setTime(portfolio.getCreatedTime());
+		portfolio.getHistoryNetWorthPerUnits().stream().reduce(BinaryOperator.maxBy((e1, e2) -> {
+			return e1.getDate().compareTo(e2.getDate());
+		})).ifPresent(e -> {
+			firstDay.setTime(e.getDate());
+			firstDay.add(Calendar.DAY_OF_MONTH, 1);
+		});
+	}
+
 	private void doInTransaction(Runnable r) {
 		em.getTransaction().begin();
 		try {
@@ -241,4 +265,5 @@ public class JpaPortfolioManager implements PortfolioManager {
 			throw e;
 		}
 	}
+
 }
