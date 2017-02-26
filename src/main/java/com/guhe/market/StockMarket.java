@@ -1,4 +1,4 @@
-package com.guhe.webclient;
+package com.guhe.market;
 
 import org.jvnet.hk2.annotations.Contract;
 

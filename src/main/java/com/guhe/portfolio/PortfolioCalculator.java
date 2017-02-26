@@ -2,8 +2,8 @@ package com.guhe.portfolio;
 
 import java.util.stream.Stream;
 
-import com.guhe.webclient.StockData;
-import com.guhe.webclient.StockMarket;
+import com.guhe.market.StockData;
+import com.guhe.market.StockMarket;
 
 public class PortfolioCalculator {
 	private Portfolio portfolio;

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.guhe.market.StockData;
+import com.guhe.market.StockMarket;
 import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
@@ -33,8 +35,6 @@ import com.guhe.portfolio.TradeRecord;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 import com.guhe.webclient.PortfolioResource;
-import com.guhe.webclient.StockData;
-import com.guhe.webclient.StockMarket;
 
 public class PortfolioResourceTest extends JerseyTest {
 

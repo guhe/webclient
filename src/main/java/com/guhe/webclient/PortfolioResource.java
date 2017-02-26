@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.guhe.market.StockMarket;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioCalculator;
 import com.guhe.portfolio.PortfolioException;

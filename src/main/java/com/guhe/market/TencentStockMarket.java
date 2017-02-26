@@ -1,4 +1,4 @@
-package com.guhe.webclient;
+package com.guhe.market;
 
 import java.text.MessageFormat;
 import java.util.HashMap;

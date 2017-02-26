@@ -14,9 +14,9 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import com.guhe.market.StockMarket;
+import com.guhe.market.TencentStockMarket;
 import com.guhe.portfolio.PortfolioManager;
-import com.guhe.webclient.StockMarket;
-import com.guhe.webclient.TencentStockMarket;
 
 @ApplicationPath("rest")
 public class JerseyConfig extends ResourceConfig {
