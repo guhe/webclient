@@ -2,6 +2,7 @@ package com.guhe.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public abstract class CommonUtil {
@@ -34,6 +35,13 @@ public abstract class CommonUtil {
 	public static String formatDate(String format, Date source) {
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		return sdf.format(source);
+	}
+
+	public static void clearToDay(Calendar day) {
+		day.set(Calendar.MILLISECOND, 0);
+		day.set(Calendar.SECOND, 0);
+		day.set(Calendar.MINUTE, 0);
+		day.set(Calendar.HOUR_OF_DAY, 0);
 	}
 
 }

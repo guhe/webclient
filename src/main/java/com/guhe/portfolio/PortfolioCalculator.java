@@ -1,5 +1,6 @@
 package com.guhe.portfolio;
 
+import java.util.Calendar;
 import java.util.stream.Stream;
 
 import com.guhe.market.StockData;
@@ -8,10 +9,17 @@ import com.guhe.market.StockMarket;
 public class PortfolioCalculator {
 	private Portfolio portfolio;
 	private StockMarket market;
+	private Calendar day;
 
 	public PortfolioCalculator(Portfolio portfolio, StockMarket market) {
 		this.portfolio = portfolio;
 		this.market = market;
+	}
+
+	public PortfolioCalculator(Portfolio portfolio, StockMarket market, Calendar day) {
+		this.portfolio = portfolio;
+		this.market = market;
+		this.day = day;
 	}
 
 	public Portfolio getPortfolio() {
@@ -87,7 +95,7 @@ public class PortfolioCalculator {
 
 		public HoldingCalculator(Holding holding) {
 			this.holding = holding;
-			this.data = market.getStockData(holding.getStock().getCode());
+			this.data = market.getStockData(holding.getStock().getCode(), day);
 		}
 
 		public Holding getHolding() {
@@ -134,20 +142,20 @@ public class PortfolioCalculator {
 		public HolderCalculator(PortfolioHolder holder) {
 			this.holder = holder;
 		}
-		
-		public PortfolioHolder getPortfolioHolder(){
+
+		public PortfolioHolder getPortfolioHolder() {
 			return holder;
 		}
-		
-		public double getNetWorth(){
+
+		public double getNetWorth() {
 			return holder.getShare() * getNetWorthPerUnit();
 		}
 
-		public double getProportion(){
+		public double getProportion() {
 			return holder.getShare() / getNumberOfShares();
 		}
-		
-		public double getRateOfReturn(){
+
+		public double getRateOfReturn() {
 			return getNetWorth() / holder.getTotalInvestment() - 1;
 		}
 	}

@@ -1,28 +1,71 @@
 package com.guhe.market;
 
 import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.ClientBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guhe.util.CommonUtil;
 
 public class TencentStockMarket implements StockMarket {
 	private static final Logger LOGGER = Logger.getLogger(TencentStockMarket.class.getName());
 
 	private Map<String, StockData> cache = new HashMap<>();
+	private Map<String, StockData> hisCache = new HashMap<>();
 
 	public TencentStockMarket() {
 	}
 
 	@Override
-	public synchronized StockData getStockData(String stockCode) {
+	public synchronized StockData getStockData(String stockCode, Calendar day) {
+		if (day == null || CommonUtil.formatDate("yyyy-MM-dd", day.getTime()) == CommonUtil.formatDate("yyyy-MM-dd",
+				new Date())) {
+			return getCurrentStockData(stockCode);
+		} else {
+			return getHistoryStockData(stockCode, day);
+		}
+	}
+
+	private StockData getHistoryStockData(String stockCode, Calendar day) {
+		String dayStr = CommonUtil.formatDate("yyyy-MM-dd", day.getTime());
+		String key = stockCode + "#" + dayStr;
+		if (!hisCache.containsKey(key)) {
+			String stockFullCode = toStockFullCode(stockCode);
+			String url = toUrl(stockFullCode, day);
+
+			String data = ClientBuilder.newClient().target(url).request().get(String.class);
+			parseHisData(data, stockFullCode, stockCode);
+		}
+		return hisCache.get(key);
+	}
+
+	private void parseHisData(String data, String stockFullCode, String stockCode) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode dataNode = mapper.readTree(data);
+			dataNode = dataNode.get("data").get(stockFullCode).get("day");
+			for (JsonNode node : dataNode) {
+				StockData sd = new StockData();
+				String dayStr = node.get(0).asText();
+				sd.price = node.get(2).asDouble();
+				hisCache.put(stockCode + "#" + dayStr, sd);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private StockData getCurrentStockData(String stockCode) {
 		if (!cache.containsKey(stockCode)) {
 			String stockFullCode = toStockFullCode(stockCode);
-			String url = toUrl(stockFullCode);
+			String url = toUrl(stockFullCode, null);
 
 			String data = ClientBuilder.newClient().target(url).request().get(String.class);
 			StockData sd = buildStockData(data, stockFullCode);
@@ -44,9 +87,17 @@ public class TencentStockMarket implements StockMarket {
 		}
 	}
 
-	private String toUrl(String stockFullCode) {
-		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,1,";
-		return MessageFormat.format(urlPattern, stockFullCode);
+	private String toUrl(String stockFullCode, Calendar day) {
+		int days = 1;
+		if (day != null) {
+			Calendar today = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+			CommonUtil.clearToDay(today);
+			CommonUtil.clearToDay(day);
+			days = (int) ((today.getTimeInMillis() - day.getTimeInMillis()) / (1000 * 60 * 60 * 24));
+		}
+
+		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,{1},";
+		return MessageFormat.format(urlPattern, stockFullCode, days);
 	}
 
 	private StockData buildStockData(String dataStr, String stockFullCode) {
@@ -63,5 +114,9 @@ public class TencentStockMarket implements StockMarket {
 			throw new RuntimeException(e);
 		}
 	}
+}
 
+class StockDataAndHis {
+	StockData current;
+	Map<String, StockData> history = new HashMap<>();
 }

@@ -8,24 +8,30 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"portfolio_id", "holder_id"})
-})
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "portfolio_id", "holder_id" }) })
 public class PortfolioHolder {
 
 	@Id
 	@GeneratedValue
 	private long id;
-	
+
 	@ManyToOne
 	private Portfolio portfolio;
-	
+
 	@ManyToOne
 	private Holder holder;
-	
+
 	private double share;
-	
+
 	private double totalInvestment;
+
+	public void addShare(double newShare) {
+		share += newShare;
+	}
+
+	public void addInvestment(double newInvestment) {
+		totalInvestment += newInvestment;
+	}
 
 	public long getId() {
 		return id;
@@ -65,5 +71,13 @@ public class PortfolioHolder {
 
 	public void setTotalInvestment(double totalInvestment) {
 		this.totalInvestment = totalInvestment;
+	}
+
+	protected PortfolioHolder clone() {
+		try {
+			return (PortfolioHolder) super.clone();
+		} catch (CloneNotSupportedException e) {
+		}
+		return null;
 	}
 }

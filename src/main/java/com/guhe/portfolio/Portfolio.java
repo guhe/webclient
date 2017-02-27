@@ -3,6 +3,7 @@ package com.guhe.portfolio;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ public class Portfolio {
 	private double netWorthPerUnitLastYear;
 
 	private double cash;
-	
+
 	private Date createdTime;
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,7 +34,7 @@ public class Portfolio {
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PurchaseRedeemRecord> purchaseRedeemRecords = new ArrayList<>();
-	
+
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DailyData> historyNetWorthPerUnits = new ArrayList<>();
 
@@ -42,6 +43,10 @@ public class Portfolio {
 
 	public Portfolio(String id) {
 		this.id = id;
+	}
+	
+	public void addCash(double newCash){
+		cash += newCash;
 	}
 
 	public String getId() {
@@ -91,8 +96,8 @@ public class Portfolio {
 	public List<Holding> getHoldings() {
 		return holdings;
 	}
-	
-	public void add(PortfolioHolder holder){
+
+	public void add(PortfolioHolder holder) {
 		holders.add(holder);
 	}
 
@@ -107,8 +112,8 @@ public class Portfolio {
 	public List<TradeRecord> getTradeRecords() {
 		return tradeRecords;
 	}
-	
-	public void add(PurchaseRedeemRecord prRecord){
+
+	public void add(PurchaseRedeemRecord prRecord) {
 		purchaseRedeemRecords.add(prRecord);
 	}
 
@@ -118,5 +123,32 @@ public class Portfolio {
 
 	public List<DailyData> getHistoryNetWorthPerUnits() {
 		return historyNetWorthPerUnits;
+	}
+
+	@Override
+	protected Portfolio clone() {
+		try {
+			Portfolio cloned = (Portfolio) super.clone();
+			cloned.setCreatedTime((Date) createdTime.clone());
+
+			cloned.holders = holders.stream().map(e -> {
+				PortfolioHolder ph = e.clone();
+				ph.setPortfolio(cloned);
+				return ph;
+			}).collect(Collectors.toList());
+
+			cloned.holdings = holdings.stream().map(e -> {
+				Holding hg = e.clone();
+				hg.setPortfolio(cloned);
+				return hg;
+			}).collect(Collectors.toList());
+
+			cloned.purchaseRedeemRecords = null;
+			cloned.tradeRecords = null;
+
+			return cloned;
+		} catch (CloneNotSupportedException e) {
+		}
+		return null;
 	}
 }

@@ -111,13 +111,13 @@ public class PortfolioResourceTest extends JerseyTest {
 		data1.setPrice(8.88);
 		data1.setPe(8);
 		data1.setPb(1.11);
-		when(market.getStockData("000001")).thenReturn(data1);
+		when(market.getStockData("000001", null)).thenReturn(data1);
 
 		StockData data2 = new StockData();
 		data2.setPrice(32.0);
 		data2.setPe(10);
 		data2.setPb(2);
-		when(market.getStockData("601318")).thenReturn(data2);
+		when(market.getStockData("601318", null)).thenReturn(data2);
 
 		pm = mock(PortfolioManager.class);
 		when(pm.getPortfolio("P00000001")).thenReturn(createPortfolio());

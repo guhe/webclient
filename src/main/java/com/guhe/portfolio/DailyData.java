@@ -38,35 +38,76 @@ public class DailyData {
 	
 	private double growthRate;
 
+	public Portfolio getPortfolio() {
+		return portfolio;
+	}
+
+	public void setPortfolio(Portfolio portfolio) {
+		this.portfolio = portfolio;
+	}
+
 	public Date getDate() {
 		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 	public double getNetWorthPerUnit() {
 		return netWorthPerUnit;
 	}
 
+	public void setNetWorthPerUnit(double netWorthPerUnit) {
+		this.netWorthPerUnit = netWorthPerUnit;
+	}
+
 	public double getNetWorth() {
 		return netWorth;
+	}
+
+	public void setNetWorth(double netWorth) {
+		this.netWorth = netWorth;
 	}
 
 	public double getShare() {
 		return share;
 	}
 
+	public void setShare(double share) {
+		this.share = share;
+	}
+
 	public double getPb() {
 		return pb;
+	}
+
+	public void setPb(double pb) {
+		this.pb = pb;
 	}
 
 	public double getPe() {
 		return pe;
 	}
 
+	public void setPe(double pe) {
+		this.pe = pe;
+	}
+
 	public double getProportionOfStock() {
 		return proportionOfStock;
+	}
+
+	public void setProportionOfStock(double proportionOfStock) {
+		this.proportionOfStock = proportionOfStock;
 	}
 
 	public double getGrowthRate() {
 		return growthRate;
 	}
+
+	public void setGrowthRate(double growthRate) {
+		this.growthRate = growthRate;
+	}
+
 }

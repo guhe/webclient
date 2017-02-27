@@ -8,9 +8,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"portfolio_id", "stock_id"})
-})
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "portfolio_id", "stock_id" }) })
 public class Holding {
 
 	@Id
@@ -19,7 +17,7 @@ public class Holding {
 
 	@ManyToOne
 	private Stock stock;
-	
+
 	@ManyToOne
 	private Portfolio portfolio;
 
@@ -33,6 +31,10 @@ public class Holding {
 		super();
 		this.stock = stock;
 		this.amount = amount;
+	}
+	
+	public void addAmount(long newAmount){
+		amount += newAmount;
 	}
 
 	public Stock getStock() {
@@ -59,4 +61,11 @@ public class Holding {
 		this.amount = amount;
 	}
 
+	protected Holding clone() {
+		try {
+			return (Holding) super.clone();
+		} catch (CloneNotSupportedException e) {
+		}
+		return null;
+	}
 }
