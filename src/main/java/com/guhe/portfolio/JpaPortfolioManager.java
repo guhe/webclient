@@ -23,11 +23,15 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	private EntityManager em;
 
-	@Inject
 	private StockMarket market;
 
 	public JpaPortfolioManager(EntityManager em) {
 		this.em = em;
+	}
+
+	@Inject
+	public void setMarket(StockMarket market) {
+		this.market = market;
 	}
 
 	public EntityManager getEm() {
@@ -242,11 +246,26 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	public List<DailyData> getDailyData(String portfolioId, Date startDate, Date endDate) {
-		return null;
+		String startDay = CommonUtil.formatDate("yyyy-MM-dd", startDate);
+		String endDay = CommonUtil.formatDate("yyyy-MM-dd", endDate);
+
+		if (startDay.compareTo(endDay) > 0) {
+			throw new PortfolioException("start day is after end day.");
+		}
+
+		Portfolio portfolio = getPortfolio(portfolioId);
+		if (portfolio == null) {
+			throw new PortfolioException("no such portfolio.");
+		}
+
+		return portfolio.getDailyDatas().stream().filter(e -> {
+			String curDay = CommonUtil.formatDate("yyyy-MM-dd", e.getDate());
+			return curDay.compareTo(startDay) >= 0 && curDay.compareTo(endDay) <= 0;
+		}).collect(Collectors.toList());
 	}
 
 	@Override
-	public void supplementDailyData(String portfolioId) {
+	public void supplementDailyData(String portfolioId, Date endDate) {
 		LOGGER.info("supplement daily data: portfolioId:" + portfolioId);
 		doInTransaction(() -> {
 			Portfolio portfolio = getPortfolio(portfolioId);
@@ -254,28 +273,26 @@ public class JpaPortfolioManager implements PortfolioManager {
 				throw new PortfolioException("no such portfolio.");
 			}
 
-			Calendar firstDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-			firstDay.setTime(portfolio.getCreatedTime());
-			portfolio.getHistoryNetWorthPerUnits().stream().reduce(BinaryOperator.maxBy((e1, e2) -> {
+			Calendar startDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+			startDay.setTime(portfolio.getCreatedTime());
+			portfolio.getDailyDatas().stream().reduce(BinaryOperator.maxBy((e1, e2) -> {
 				return e1.getDate().compareTo(e2.getDate());
 			})).ifPresent(e -> {
-				firstDay.setTime(e.getDate());
-				firstDay.add(Calendar.DAY_OF_MONTH, 1);
+				startDay.setTime(e.getDate());
+				startDay.add(Calendar.DAY_OF_MONTH, 1);
 			});
-			CommonUtil.clearToDay(firstDay);
+			CommonUtil.clearToDay(startDay);
 
-			Calendar lastDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-			if (lastDay.get(Calendar.HOUR_OF_DAY) < 15) {
-				lastDay.add(Calendar.DAY_OF_MONTH, -1);
-			}
-			CommonUtil.clearToDay(lastDay);
+			Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+			endDay.setTime(endDate);
+			CommonUtil.clearToDay(endDay);
 
 			Map<Calendar, List<PurchaseRedeemRecord>> prRecords = portfolio.getPurchaseRedeemRecords().stream()
 					.filter(e -> {
 						Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 						day.setTime(e.getDate());
 						CommonUtil.clearToDay(day);
-						return day.after(firstDay) && day.before(lastDay) || day.equals(lastDay);
+						return day.after(startDay) && day.before(endDay) || day.equals(endDay);
 					}).collect(Collectors.groupingBy(e -> {
 						Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 						day.setTime(e.getDate());
@@ -287,7 +304,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 				Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 				day.setTime(e.getDate());
 				CommonUtil.clearToDay(day);
-				return day.after(firstDay) && day.before(lastDay) || day.equals(lastDay);
+				return day.after(startDay) && day.before(endDay) || day.equals(endDay);
 			}).collect(Collectors.groupingBy(e -> {
 				Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 				day.setTime(e.getDate());
@@ -297,7 +314,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 			Portfolio clonedPortfolio = portfolio.clone();
 
-			for (Calendar day = lastDay; day.after(firstDay) || day.equals(firstDay); day.add(Calendar.DAY_OF_MONTH,
+			for (Calendar day = endDay; day.after(startDay) || day.equals(startDay); day.add(Calendar.DAY_OF_MONTH,
 					-1)) {
 				DailyData dd = calcDailyData(clonedPortfolio, day);
 				em.persist(dd);
@@ -308,6 +325,9 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	private void undoTrade(Portfolio portfolio, List<TradeRecord> tradeRecord) {
+		if (tradeRecord == null) {
+			return;
+		}
 		tradeRecord.forEach(tr -> {
 			Holding holding = portfolio.getHoldings().stream().filter(hg -> hg.getStock().equals(tr.getStock()))
 					.findAny().orElse(null);
@@ -328,7 +348,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	private void undoPurchaseRedeem(Portfolio portfolio, List<PurchaseRedeemRecord> prRecord) {
-		portfolio.getPurchaseRedeemRecords().forEach(prr -> {
+		if (prRecord == null) {
+			return;
+		}
+		prRecord.forEach(prr -> {
 			PortfolioHolder ph = portfolio.getHolders().stream().filter(h -> h.getHolder().equals(prr.getHolder()))
 					.findAny().orElse(null);
 			if (ph == null) {
@@ -353,7 +376,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 		DailyData dd = new DailyData();
 		dd.setPortfolio(portfolio);
 		dd.setDate(day.getTime());
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market, day);
 		dd.setNetWorth(calculator.getNetWorth());
 		dd.setNetWorthPerUnit(calculator.getNetWorthPerUnit());
 		dd.setProportionOfStock(calculator.getProportionOfStock());

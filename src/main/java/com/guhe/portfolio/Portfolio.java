@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Portfolio {
+public class Portfolio implements Cloneable {
 
 	@Id
 	private String id;
@@ -36,7 +36,7 @@ public class Portfolio {
 	private List<PurchaseRedeemRecord> purchaseRedeemRecords = new ArrayList<>();
 
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DailyData> historyNetWorthPerUnits = new ArrayList<>();
+	private List<DailyData> dailyDatas = new ArrayList<>();
 
 	public Portfolio() {
 	}
@@ -120,9 +120,9 @@ public class Portfolio {
 	public List<PurchaseRedeemRecord> getPurchaseRedeemRecords() {
 		return purchaseRedeemRecords;
 	}
-
-	public List<DailyData> getHistoryNetWorthPerUnits() {
-		return historyNetWorthPerUnits;
+	
+	public List<DailyData> getDailyDatas() {
+		return dailyDatas;
 	}
 
 	@Override

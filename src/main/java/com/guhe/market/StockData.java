@@ -7,6 +7,17 @@ public class StockData {
 	double pe;
 	double pb;
 
+	public StockData() {
+		
+	}
+	
+	public StockData(double price, double pe, double pb) {
+		super();
+		this.price = price;
+		this.pe = pe;
+		this.pb = pb;
+	}
+
 	public double getPrice() {
 		return price;
 	}

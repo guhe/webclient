@@ -9,7 +9,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "portfolio_id", "holder_id" }) })
-public class PortfolioHolder {
+public class PortfolioHolder implements Cloneable {
 
 	@Id
 	@GeneratedValue

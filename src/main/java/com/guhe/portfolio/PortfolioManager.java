@@ -27,5 +27,5 @@ public interface PortfolioManager {
 
 	List<DailyData> getDailyData(String portfolioId, Date startDate, Date endDate);
 	
-	void supplementDailyData(String portfolioId);
+	void supplementDailyData(String portfolioId, Date endDate);
 }

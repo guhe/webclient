@@ -12,8 +12,7 @@ public class PortfolioCalculator {
 	private Calendar day;
 
 	public PortfolioCalculator(Portfolio portfolio, StockMarket market) {
-		this.portfolio = portfolio;
-		this.market = market;
+		this(portfolio, market, null);
 	}
 
 	public PortfolioCalculator(Portfolio portfolio, StockMarket market, Calendar day) {
