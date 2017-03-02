@@ -266,7 +266,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	@Override
 	public void supplementDailyData(String portfolioId, Date endDate) {
-		LOGGER.info("supplement daily data: portfolioId:" + portfolioId);
+		LOGGER.info("supplement daily data, portfolioId:" + portfolioId + ", endDate:" + endDate);
 		doInTransaction(() -> {
 			Portfolio portfolio = getPortfolio(portfolioId);
 			if (portfolio == null) {
@@ -286,6 +286,11 @@ public class JpaPortfolioManager implements PortfolioManager {
 			Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 			endDay.setTime(endDate);
 			CommonUtil.clearToDay(endDay);
+
+			if (endDay.before(startDay)) {
+				LOGGER.info("no daily data need be supplemented, portfolioId:" + portfolioId + ", endDate:" + endDate);
+				return;
+			}
 
 			Map<Calendar, List<PurchaseRedeemRecord>> prRecords = portfolio.getPurchaseRedeemRecords().stream()
 					.filter(e -> {

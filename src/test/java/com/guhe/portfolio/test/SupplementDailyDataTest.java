@@ -23,12 +23,13 @@ import com.guhe.portfolio.DailyData;
 import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
+import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioHolder;
 import com.guhe.portfolio.Stock;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 
-public class DailyDataTest extends PortfolioTestBase {
+public class SupplementDailyDataTest extends PortfolioTestBase {
 
 	private StockMarket market;
 
@@ -74,17 +75,6 @@ public class DailyDataTest extends PortfolioTestBase {
 		portfolio.add(holding);
 
 		pm.savePortfolio(portfolio);
-
-		///// trade, purchase, redeem
-		
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"));
-		pm.purchase("ID001", "Tiger", 10100, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"));
-
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 8, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"));
-		pm.redeem("ID001", "Tiger", 10000, 1.0, 200, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"));
-
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
-		pm.redeem("ID001", "Tiger", 5000, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
 	}
 
 	@After
@@ -96,6 +86,15 @@ public class DailyDataTest extends PortfolioTestBase {
 
 	@Test
 	public void save_get_remove_portfolio() {
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"));
+		pm.purchase("ID001", "Tiger", 10100, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"));
+
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 8, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"));
+		pm.redeem("ID001", "Tiger", 10000, 1.0, 200, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"));
+
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
+		pm.redeem("ID001", "Tiger", 5000, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
+
 		when(market.getStockData("000001", getDay("2017-01-10"))).thenReturn(new StockData(6, 0, 0));
 		when(market.getStockData("000001", getDay("2017-01-11"))).thenReturn(new StockData(7, 0, 0));
 		when(market.getStockData("000001", getDay("2017-01-12"))).thenReturn(new StockData(8, 0, 0));
@@ -109,6 +108,28 @@ public class DailyDataTest extends PortfolioTestBase {
 				.mapToDouble(e -> e.getNetWorthPerUnit()).toArray();
 		assertArrayEquals("actuals are: " + Arrays.toString(actuals), new double[] { 1.0720, 1.2892, 1.3391, 2.1672 },
 				actuals, 0.0001);
+	}
+
+	@Test
+	public void no_daily_need_be_supplemented() {
+		pm.supplementDailyData("ID001", CommonUtil.parseDate("yyyy-MM-dd", "2017-01-09"));
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void supplement_when_portfolio_id_not_exists() {
+		pm.supplementDailyData("ID002", CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void get_daily_data_when_start_date_after_end_data() {
+		pm.getDailyData("ID001", CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"),
+				CommonUtil.parseDate("yyyy-MM-dd", "2017-01-09"));
+	}
+
+	@Test(expected = PortfolioException.class)
+	public void get_daily_data_when_portfolio_id_not_exists() {
+		pm.getDailyData("ID002", CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"),
+				CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
 	}
 
 	private Calendar getDay(String dayStr) {
