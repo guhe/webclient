@@ -259,6 +259,8 @@ public class JpaPortfolioManager implements PortfolioManager {
 		return portfolio.getDailyDatas().stream().filter(e -> {
 			String curDay = CommonUtil.formatDate("yyyy-MM-dd", e.getDate());
 			return curDay.compareTo(startDay) >= 0 && curDay.compareTo(endDay) <= 0;
+		}).sorted((e1, e2) -> {
+			return e1.getDate().compareTo(e2.getDate());
 		}).collect(Collectors.toList());
 	}
 
@@ -307,7 +309,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 				Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 				day.setTime(e.getDate());
 				CommonUtil.clearToDay(day);
-				return day.after(startDay) && day.before(endDay) || day.equals(endDay);
+				return (day.after(startDay) && day.before(endDay)) || day.equals(endDay);
 			}).collect(Collectors.groupingBy(e -> {
 				Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 				day.setTime(e.getDate());

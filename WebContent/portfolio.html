@@ -31,52 +31,58 @@
 		$("#net_worth_bt").click(function(){
 			setCurrentView("#net_worth_chart");
 			var ctx = $("#net_worth_chart");
-			new Chart(ctx, {
-			    type: 'line',
-			    data: {
-			        labels: ["2017-01-01", "2017-02-01", "2017-03-01", "2017-04-01", "2017-05-01", "2017-06-01"],
-			        datasets: [{
-			            label: '迷之组合',
-			            fill: false,
-			            data: [0, 0.11, 0.14, 0.17, 0.12, 0.22],
-			            borderColor: 'rgba(255,99,132,1)',
-			            borderWidth: 1
-			        },{
-			            label: '沪深300',
-			            fill: false,
-			            data: [0, 0.03, 0.05, 0.06, -0.02, 0.07],
-			            borderColor: 'rgba(54, 162, 235, 1)',
-			            borderWidth: 1
-			        }]
-			    },
-			    options: {
-			        scales: {
-			            yAxes: [{
-			                ticks: {
-			                    callback: function(value){
-				            		return value.toPercent();
+			$.get({
+				url : "rest/Portfolio/" + portfolioId + "/DailyData/NetWorthPerUnit",
+				dataType : 'json',
+				success : function(result) {
+					var labels = [];
+					var data = [];
+					if(result[0]) {
+						var first = result[0]["netWorthPerUnit"];
+						$.each(result, function(key, row) {
+							labels[key] = row["date"];
+							data[key] = row["netWorthPerUnit"]/first - 1;
+						});
+					}
+					new Chart(ctx, {
+					    type: 'line',
+					    data: {
+					        labels: labels,
+					        datasets: [{
+					            label: '迷之组合',
+					            fill: false,
+					            data: data,
+					            borderColor: 'rgba(255,99,132,1)',
+					            borderWidth: 1
+					        }]
+					    },
+					    options: {
+					        scales: {
+					            yAxes: [{
+					                ticks: {
+					                    callback: function(value){
+						            		return value.toPercent();
+						            	}
+					                }
+					            }],
+					            xAxes: [{
+					                ticks: {
+					                    callback: function(value){
+					                    	return value;
+						            	}
+					                }
+					            }]
+					        },
+				            tooltips: {
+				            	callbacks: {
+				            		label: function(tooltipItem, data){
+				            			return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toPercent(2);
+				            		}
 				            	}
-			                }
-			            }],
-			            xAxes: [{
-			                ticks: {
-			                    callback: function(value){
-			                    	if(value == "2017-02-01"){
-					            		return null;
-			                    	}
-			                    	return value;
-				            	}
-			                }
-			            }]
-			        },
-		            tooltips: {
-		            	callbacks: {
-		            		label: function(tooltipItem, data){
-		            			return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toPercent();
-		            		}
-		            	}
-		            }
-			    }
+				            }
+					    }
+					});
+				}
 			});
 		});
 		

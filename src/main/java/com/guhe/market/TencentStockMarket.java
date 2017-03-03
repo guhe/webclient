@@ -111,8 +111,12 @@ public class TencentStockMarket implements StockMarket {
 	}
 
 	private String toUrl(String stockFullCode, Calendar day) {
-		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,180,";
-		return MessageFormat.format(urlPattern, stockFullCode);
+		int days = 1;
+		if (day != null) {
+			days = 180;
+		}
+		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,{1},";
+		return MessageFormat.format(urlPattern, stockFullCode, days);
 	}
 
 	private StockData buildStockData(String dataStr, String stockFullCode) {
