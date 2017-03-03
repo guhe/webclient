@@ -9,7 +9,6 @@ import java.util.function.BinaryOperator;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -29,7 +28,6 @@ public class JpaPortfolioManager implements PortfolioManager {
 		this.em = em;
 	}
 
-	@Inject
 	public void setMarket(StockMarket market) {
 		this.market = market;
 	}
@@ -321,10 +319,12 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 			for (Calendar day = endDay; day.after(startDay) || day.equals(startDay); day.add(Calendar.DAY_OF_MONTH,
 					-1)) {
-				DailyData dd = calcDailyData(clonedPortfolio, day);
-				em.persist(dd);
-				undoPurchaseRedeem(clonedPortfolio, prRecords.get(day));
-				undoTrade(clonedPortfolio, tradeRecords.get(day));
+				if (market.isOpen(day)) {
+					DailyData dd = calcDailyData(clonedPortfolio, day);
+					em.persist(dd);
+					undoPurchaseRedeem(clonedPortfolio, prRecords.get(day));
+					undoTrade(clonedPortfolio, tradeRecords.get(day));
+				}
 			}
 		});
 	}
@@ -348,6 +348,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 			} else {
 				portfolio.addCash(tr.getFee() - tr.getAmount() * tr.getPrice());
 				holding.addAmount(tr.getAmount());
+			}
+
+			if (holding.getAmount() == 0) {
+				portfolio.getHoldings().remove(holding);
 			}
 		});
 	}

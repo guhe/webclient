@@ -2,9 +2,9 @@ package com.guhe.webclient;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "historyNetWorthPerUnit")
-public class HistoryNetWorthPerUnitViewData {
-
+@XmlRootElement(name = "dailyNWPU")
+public class DailyNWPUViewData {
+ 
 	private String date;
 	private double netWorthPerUnit;
 	

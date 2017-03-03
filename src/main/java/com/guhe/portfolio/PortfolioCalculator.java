@@ -95,6 +95,9 @@ public class PortfolioCalculator {
 		public HoldingCalculator(Holding holding) {
 			this.holding = holding;
 			this.data = market.getStockData(holding.getStock().getCode(), day);
+			if(data == null){
+				throw new RuntimeException("no stock data, stock: "+holding.getStock().getCode()+", day: "+day);
+			}
 		}
 
 		public Holding getHolding() {

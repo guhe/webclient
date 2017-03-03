@@ -4,8 +4,9 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.TimeZone;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -19,6 +20,7 @@ public class TencentStockMarket implements StockMarket {
 
 	private Map<String, StockData> cache = new HashMap<>();
 	private Map<String, StockData> hisCache = new HashMap<>();
+	private Set<String> openDays = new HashSet<>();
 
 	public TencentStockMarket() {
 	}
@@ -31,6 +33,27 @@ public class TencentStockMarket implements StockMarket {
 		} else {
 			return getHistoryStockData(stockCode, day);
 		}
+	}
+
+	@Override
+	public boolean isOpen(Calendar day) {
+		if (openDays.isEmpty()) {
+			String url = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,,,180,";
+			try {
+				String data = ClientBuilder.newClient().target(url).request().get(String.class);
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode dataNode = mapper.readTree(data);
+				dataNode = dataNode.get("data").get("sh000001").get("day");
+				for (JsonNode node : dataNode) {
+					String dayStr = node.get(0).asText();
+					openDays.add(dayStr);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		return openDays.contains(CommonUtil.formatDate("yyyy-MM-dd", day.getTime()));
 	}
 
 	private StockData getHistoryStockData(String stockCode, Calendar day) {
@@ -88,16 +111,8 @@ public class TencentStockMarket implements StockMarket {
 	}
 
 	private String toUrl(String stockFullCode, Calendar day) {
-		int days = 1;
-		if (day != null) {
-			Calendar today = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-			CommonUtil.clearToDay(today);
-			CommonUtil.clearToDay(day);
-			days = (int) ((today.getTimeInMillis() - day.getTimeInMillis()) / (1000 * 60 * 60 * 24));
-		}
-
-		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,{1},";
-		return MessageFormat.format(urlPattern, stockFullCode, days);
+		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,180,";
+		return MessageFormat.format(urlPattern, stockFullCode);
 	}
 
 	private StockData buildStockData(String dataStr, String stockFullCode) {

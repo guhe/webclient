@@ -3,6 +3,7 @@ package com.guhe.portfolio.test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -95,6 +96,8 @@ public class SupplementDailyDataTest extends PortfolioTestBase {
 		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
 		pm.redeem("ID001", "Tiger", 5000, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
 
+		when(market.isOpen(any())).thenReturn(true);
+		
 		when(market.getStockData("000001", getDay("2017-01-10"))).thenReturn(new StockData(6, 0, 0));
 		when(market.getStockData("000001", getDay("2017-01-11"))).thenReturn(new StockData(7, 0, 0));
 		when(market.getStockData("000001", getDay("2017-01-12"))).thenReturn(new StockData(8, 0, 0));

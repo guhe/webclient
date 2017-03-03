@@ -1,7 +1,9 @@
 package com.guhe.webclient;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -15,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import com.guhe.market.StockMarket;
+import com.guhe.portfolio.DailyData;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioCalculator;
 import com.guhe.portfolio.PortfolioException;
@@ -226,10 +229,43 @@ public class PortfolioResource {
 		return Response.ok(result).build();
 	}
 
+	@POST
+	@Path("{portfolio}/DailyData/Supplement")
+	public Response supplementDailyData(@PathParam("portfolio") String portfolioId) {
+		Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+		if (endDay.get(Calendar.HOUR_OF_DAY) <= 15) {
+			endDay.add(Calendar.DAY_OF_MONTH, -1);
+		}
+
+		PortfolioResultViewData result;
+		try {
+			pm.supplementDailyData(portfolioId, endDay.getTime());
+			result = new PortfolioResultViewData(0, "OK");
+		} catch (Exception e) {
+			LOGGER.warning("Failed to supplement daily data, PortfolioId: " + portfolioId);
+			result = new PortfolioResultViewData(-1, e.getMessage());
+			e.printStackTrace();
+		}
+		return Response.ok(result).build();
+	}
+
 	@GET
-	@Path("{portfolio}/HistoryNetWorthPerUnit")
-	public List<HistoryNetWorthPerUnitViewData> getHistoryNetWorthPerUnit(@PathParam("portfolio") String portfolioId,
-			GetHistoryParam param) {
-		return null;
+	@Path("{portfolio}/DailyData/NetWorthPerUnit")
+	public List<DailyNWPUViewData> getDailyNWPU(@PathParam("portfolio") String portfolioId) {
+		Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+		if (endDay.get(Calendar.HOUR_OF_DAY) <= 15) {
+			endDay.add(Calendar.DAY_OF_MONTH, -1);
+		}
+
+		Calendar startDay = (Calendar) endDay.clone();
+		startDay.add(Calendar.MONTH, -6);
+
+		List<DailyData> dailyDatas = pm.getDailyData(portfolioId, startDay.getTime(), endDay.getTime());
+		return dailyDatas.stream().map(e -> {
+			DailyNWPUViewData vd = new DailyNWPUViewData();
+			vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", e.getDate()));
+			vd.setNetWorthPerUnit(e.getNetWorthPerUnit());
+			return vd;
+		}).collect(Collectors.toList());
 	}
 }

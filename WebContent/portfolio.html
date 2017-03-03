@@ -4,7 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>组合</title>
 <link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/dialog.css" type="text/css" />
 <script src="js/jquery-3.0.0.js"></script>
+<script src="js/dialog.js"></script>
 <script src="js/chart.js"></script>
 <script src="js/extends.js"></script>
 <script>
@@ -100,6 +102,26 @@
 						$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
 						$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
 					});
+				}
+			});
+		});
+		
+		//click supplement button
+		$("#supplement_bt").click(function(){
+			$.post({
+				url : "rest/Portfolio/" + portfolioId + "/DailyData/Supplement",
+				contentType : "application/json; charset=utf-8",
+				dataType : 'json',
+				async : false,
+				success : function(result) {
+					if (result["rltCode"] == 0) {
+						new Dialog("操作成功。").show();
+					} else {
+						new Dialog(result["message"]).show();
+					}
+				},
+				error : function() {
+					new Dialog("操作失败。").show();
 				}
 			});
 		});
@@ -223,6 +245,7 @@
 		<button type="button" class="button black">0</button>
 		<button type="button" class="button black">0</button>
 		<button type="button" class="button black">0</button>
+		<button id="supplement_bt" type="button" class="button black">补录历史净值</button>
 	</div>
 	
 	<hr style="width: 800px" />
@@ -269,6 +292,5 @@
 			</tbody>
 		</table>
 	</div>
-	<div id="log"></div>
 </body>
 </html>
