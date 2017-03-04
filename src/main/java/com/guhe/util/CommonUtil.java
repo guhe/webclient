@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public abstract class CommonUtil {
 
@@ -24,7 +25,7 @@ public abstract class CommonUtil {
 	}
 
 	public static Date parseDate(String format, String source) {
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.CHINESE);
 		try {
 			return sdf.parse(source);
 		} catch (ParseException e) {
@@ -33,7 +34,7 @@ public abstract class CommonUtil {
 	}
 
 	public static String formatDate(String format, Date source) {
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.CHINESE);
 		return sdf.format(source);
 	}
 
