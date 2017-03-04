@@ -8,12 +8,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import com.guhe.market.StockMarket;
@@ -35,9 +33,6 @@ public class PortfolioResource {
 
 	@Inject
 	private StockMarket stockMarket;
-
-	@Context
-	private HttpServletRequest httpRequest;
 
 	@Inject
 	private PortfolioManager pm;
