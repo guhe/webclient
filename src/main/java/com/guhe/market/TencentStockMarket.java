@@ -133,7 +133,3 @@ public class TencentStockMarket implements StockMarket {
 	}
 }
 
-class StockDataAndHis {
-	StockData current;
-	Map<String, StockData> history = new HashMap<>();
-}
