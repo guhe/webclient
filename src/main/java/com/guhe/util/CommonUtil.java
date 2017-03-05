@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
+import java.util.TimeZone;
 
 public abstract class CommonUtil {
 
@@ -25,7 +25,8 @@ public abstract class CommonUtil {
 	}
 
 	public static Date parseDate(String format, String source) {
-		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.CHINESE);
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
 		try {
 			return sdf.parse(source);
 		} catch (ParseException e) {
@@ -34,7 +35,8 @@ public abstract class CommonUtil {
 	}
 
 	public static String formatDate(String format, Date source) {
-		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.CHINESE);
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
 		return sdf.format(source);
 	}
 
