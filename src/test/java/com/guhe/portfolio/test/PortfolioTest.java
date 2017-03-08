@@ -14,14 +14,14 @@ public class PortfolioTest extends PortfolioTestBase {
 		Portfolio portfolio = new Portfolio();
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
-		portfolio.setCash(123.4);
+		portfolio.setRmbCash(123.4);
 		portfolio.setNetWorthPerUnitLastYear(1.1);
 		pm.savePortfolio(portfolio);
 
 		Portfolio saved = pm.getPortfolio("ID001");
 		assertEquals("ID001", saved.getId());
 		assertEquals("Test Portfolio Name", saved.getName());
-		assertEquals(123.4, saved.getCash(), 0.000001);
+		assertEquals(123.4, saved.getRmbCash(), 0.000001);
 		assertEquals(1.1, saved.getNetWorthPerUnitLastYear(), 0.000001);
 
 		pm.deletePortfolio("ID001");

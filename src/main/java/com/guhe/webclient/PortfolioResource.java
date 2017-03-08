@@ -60,7 +60,7 @@ public class PortfolioResource {
 		PortfolioViewData viewData = new PortfolioViewData();
 		viewData.setId(calculator.getPortfolio().getId());
 		viewData.setName(calculator.getPortfolio().getName());
-		viewData.setCash(calculator.getPortfolio().getCash());
+		viewData.setCash(calculator.getPortfolio().getRmbCash());
 		viewData.setTotalWorth(calculator.getTotalWorth());
 		viewData.setProjectedLiabilities(calculator.getProjectedLiabilities());
 		viewData.setStockNetWorth(calculator.getStockNetWorth());

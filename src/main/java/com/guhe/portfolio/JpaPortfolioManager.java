@@ -114,11 +114,11 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	private void updatePortfolioWithBuy(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
-		if (portfolio.getCash() - fee - amount * price < 0) {
+		if (portfolio.getRmbCash() - fee - amount * price < 0) {
 			throw new PortfolioException("no enough money to buy.");
 		}
 
-		portfolio.setCash(CommonUtil.dRound(portfolio.getCash() - amount * price - fee, 2));
+		portfolio.setRmbCash(CommonUtil.dRound(portfolio.getRmbCash() - amount * price - fee, 2));
 
 		Holding holding = portfolio.getHoldings().stream().filter(e -> e.getStock().getCode().equals(stock.getCode()))
 				.findFirst().orElse(null);
@@ -134,7 +134,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	private void updatePortfolioWithSell(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
-		portfolio.setCash(CommonUtil.dRound(portfolio.getCash() + amount * price - fee, 2));
+		portfolio.setRmbCash(CommonUtil.dRound(portfolio.getRmbCash() + amount * price - fee, 2));
 
 		List<Holding> holdings = portfolio.getHoldings();
 		Holding holding = holdings.stream().filter(e -> e.getStock().getCode().equals(stock.getCode())).findFirst()
@@ -168,7 +168,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 				throw new PortfolioException("no such holder name.");
 			}
 
-			portfolio.setCash(CommonUtil.dRound(portfolio.getCash() + money - fee, 2));
+			portfolio.setRmbCash(CommonUtil.dRound(portfolio.getRmbCash() + money - fee, 2));
 
 			PortfolioHolder ph = portfolio.getHolders().stream().filter(e -> e.getHolder().getName().equals(holderName))
 					.findFirst().orElse(null);
@@ -205,10 +205,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 			}
 
 			double money = share * netWorth - fee;
-			if (CommonUtil.dCompare(portfolio.getCash(), money, 2) < 0) {
+			if (CommonUtil.dCompare(portfolio.getRmbCash(), money, 2) < 0) {
 				throw new PortfolioException("No enough cash to redeem.");
 			}
-			portfolio.setCash(CommonUtil.dRound(portfolio.getCash() - share * netWorth, 2));
+			portfolio.setRmbCash(CommonUtil.dRound(portfolio.getRmbCash() - share * netWorth, 2));
 
 			PortfolioHolder ph = portfolio.getHolders().stream().filter(e -> e.getHolder().getName().equals(holderName))
 					.findFirst().orElse(null);
@@ -345,10 +345,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 			}
 
 			if (tr.getBuyOrSell() == TradeRecord.BuyOrSell.BUY) {
-				portfolio.addCash(tr.getAmount() * tr.getPrice() + tr.getFee());
+				portfolio.addRmbCash(tr.getAmount() * tr.getPrice() + tr.getFee());
 				holding.addAmount(-tr.getAmount());
 			} else {
-				portfolio.addCash(tr.getFee() - tr.getAmount() * tr.getPrice());
+				portfolio.addRmbCash(tr.getFee() - tr.getAmount() * tr.getPrice());
 				holding.addAmount(tr.getAmount());
 			}
 
@@ -372,11 +372,11 @@ public class JpaPortfolioManager implements PortfolioManager {
 			}
 
 			if (prr.getPurchaseOrRedeem() == PurchaseRedeemRecord.PurchaseOrRedeem.PURCHASE) {
-				portfolio.addCash(-prr.getShare() * prr.getNetWorthPerUnit());
+				portfolio.addRmbCash(-prr.getShare() * prr.getNetWorthPerUnit());
 				ph.addShare(-prr.getShare());
 				ph.addInvestment(-prr.getFee() - prr.getShare() * prr.getNetWorthPerUnit());
 			} else {
-				portfolio.addCash(prr.getShare() * prr.getNetWorthPerUnit());
+				portfolio.addRmbCash(prr.getShare() * prr.getNetWorthPerUnit());
 				ph.addShare(prr.getShare());
 				ph.addInvestment(-prr.getFee() + prr.getShare() * prr.getNetWorthPerUnit());
 			}

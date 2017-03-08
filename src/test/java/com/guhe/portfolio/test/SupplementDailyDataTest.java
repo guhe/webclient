@@ -58,7 +58,7 @@ public class SupplementDailyDataTest extends PortfolioTestBase {
 		portfolio = new Portfolio();
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
-		portfolio.setCash(8000);
+		portfolio.setRmbCash(8000);
 		portfolio.setNetWorthPerUnitLastYear(1.0);
 		portfolio.setCreatedTime(CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"));
 

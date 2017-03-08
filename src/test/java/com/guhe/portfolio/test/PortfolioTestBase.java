@@ -2,7 +2,8 @@ package com.guhe.portfolio.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -19,7 +20,7 @@ import com.guhe.util.DerbyUtil;
 public class PortfolioTestBase {
 
 	protected static EntityManagerFactory testEmf;
-	
+
 	protected JpaPortfolioManager pm;
 
 	@BeforeClass
@@ -27,9 +28,10 @@ public class PortfolioTestBase {
 		FileUtils.deleteDirectory(new File("test_temp"));
 		System.setProperty("derby.stream.error.file", "test_temp/derby.log");
 
-		String jdbcUrl = "jdbc:derby:test_temp/guhe;create=true";
-		testEmf = Persistence.createEntityManagerFactory("GUHE",
-				Collections.singletonMap("javax.persistence.jdbc.url", jdbcUrl));
+		Map<String, String> properties = new HashMap<>();
+		properties.put("javax.persistence.jdbc.url", "jdbc:derby:test_temp/guhe;create=true");
+		properties.put("hibernate.hbm2ddl.auto", "update");
+		testEmf = Persistence.createEntityManagerFactory("GUHE", properties);
 	}
 
 	@AfterClass

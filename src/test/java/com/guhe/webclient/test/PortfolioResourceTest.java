@@ -48,7 +48,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		Portfolio portfolio = new Portfolio();
 		portfolio.setId("P00000001");
 		portfolio.setName("范昌虎测试组合1");
-		portfolio.setCash(23066);
+		portfolio.setRmbCash(23066);
 		portfolio.setNetWorthPerUnitLastYear(1.0822);
 
 		Stock ping_an_yin_hang = new Stock("000001", "平安银行");

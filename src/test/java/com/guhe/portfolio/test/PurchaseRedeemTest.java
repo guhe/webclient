@@ -44,7 +44,7 @@ public class PurchaseRedeemTest extends PortfolioTestBase {
 		portfolio = new Portfolio();
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
-		portfolio.setCash(0);
+		portfolio.setRmbCash(0);
 		portfolio.setNetWorthPerUnitLastYear(1);
 
 		pm.savePortfolio(portfolio);
@@ -61,21 +61,21 @@ public class PurchaseRedeemTest extends PortfolioTestBase {
 	public void test_purchase_redeem() {
 		pm.purchase("ID001", "Tiger", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(9995.0, portfolio.getCash(), 0.000001);
+		assertEquals(9995.0, portfolio.getRmbCash(), 0.000001);
 		List<PortfolioHolder> holders = portfolio.getHolders();
 		assertEquals(1, holders.size());
 		assertThat(holders.get(0), "Tiger", 4997.5, 10000);
 
 		pm.redeem("ID001", "Tiger", 2997.5, 2.0, 5, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-23"));
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(4000, portfolio.getCash(), 0.000001);
+		assertEquals(4000, portfolio.getRmbCash(), 0.000001);
 		holders = portfolio.getHolders();
 		assertEquals(1, holders.size());
 		assertThat(holders.get(0), "Tiger", 2000, 4010);
 
 		pm.redeem("ID001", "Tiger", 2000.0, 2.0, 5, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-24"));
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(0, portfolio.getCash(), 0.000001);
+		assertEquals(0, portfolio.getRmbCash(), 0.000001);
 		holders = portfolio.getHolders();
 		assertEquals(0, holders.size());
 
@@ -103,7 +103,7 @@ public class PurchaseRedeemTest extends PortfolioTestBase {
 		pm.purchase("ID001", "Tiger", 6000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-23"));
 
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(15990, portfolio.getCash(), 0.000001);
+		assertEquals(15990, portfolio.getRmbCash(), 0.000001);
 		List<PortfolioHolder> holders = portfolio.getHolders();
 		assertEquals(1, holders.size());
 		assertThat(holders.get(0), "Tiger", 7995, 16000);
@@ -139,7 +139,7 @@ public class PurchaseRedeemTest extends PortfolioTestBase {
 	public void redeem_but_no_enough_money_in_portfolio() {
 		pm.purchase("ID001", "Tiger", 10000.0, 2.0, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-22"));
 
-		portfolio.setCash(8000);
+		portfolio.setRmbCash(8000);
 		pm.savePortfolio(portfolio);
 
 		try {

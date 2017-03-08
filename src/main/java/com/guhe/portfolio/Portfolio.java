@@ -19,7 +19,11 @@ public class Portfolio implements Cloneable {
 
 	private double netWorthPerUnitLastYear;
 
-	private double cash;
+	private double rmbCash;
+	
+	private double hkdCash;
+	
+	private double usdCash;
 
 	private Date createdTime;
 
@@ -45,8 +49,8 @@ public class Portfolio implements Cloneable {
 		this.id = id;
 	}
 	
-	public void addCash(double newCash){
-		cash += newCash;
+	public void addRmbCash(double newCash){
+		rmbCash += newCash;
 	}
 
 	public String getId() {
@@ -73,12 +77,28 @@ public class Portfolio implements Cloneable {
 		this.netWorthPerUnitLastYear = netWorthPerUnitLastYear;
 	}
 
-	public double getCash() {
-		return cash;
+	public double getRmbCash() {
+		return rmbCash;
 	}
 
-	public void setCash(double cash) {
-		this.cash = cash;
+	public void setRmbCash(double cash) {
+		this.rmbCash = cash;
+	}
+ 
+	public double getHkdCash() {
+		return hkdCash;
+	}
+
+	public void setHkdCash(double hkdCash) {
+		this.hkdCash = hkdCash;
+	}
+
+	public double getUsdCash() {
+		return usdCash;
+	}
+
+	public void setUsdCash(double usdCash) {
+		this.usdCash = usdCash;
 	}
 
 	public Date getCreatedTime() {

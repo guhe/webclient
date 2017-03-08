@@ -45,7 +45,7 @@ public class TradeTest extends PortfolioTestBase {
 		portfolio = new Portfolio();
 		portfolio.setId("ID001");
 		portfolio.setName("Test Portfolio Name");
-		portfolio.setCash(12300.4);
+		portfolio.setRmbCash(12300.4);
 		portfolio.setNetWorthPerUnitLastYear(1.1);
 
 		PortfolioHolder holder = new PortfolioHolder();
@@ -71,7 +71,7 @@ public class TradeTest extends PortfolioTestBase {
 		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"));
 
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(8895.4, portfolio.getCash(), 0.000001);
+		assertEquals(8895.4, portfolio.getRmbCash(), 0.000001);
 
 		List<Holding> holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
@@ -81,7 +81,7 @@ public class TradeTest extends PortfolioTestBase {
 		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-15"));
 
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(11887.1, portfolio.getCash(), 0.000001);
+		assertEquals(11887.1, portfolio.getRmbCash(), 0.000001);
 
 		holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
@@ -91,7 +91,7 @@ public class TradeTest extends PortfolioTestBase {
 		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 100, 6.5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-16"));
 		
 		portfolio = pm.getPortfolio("ID001");
-		assertEquals(12880.6, portfolio.getCash(), 0.000001);
+		assertEquals(12880.6, portfolio.getRmbCash(), 0.000001);
 		
 		holdings = portfolio.getHoldings();
 		assertEquals(0, holdings.size());

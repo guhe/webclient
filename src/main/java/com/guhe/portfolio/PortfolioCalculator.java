@@ -34,7 +34,7 @@ public class PortfolioCalculator {
 	}
 
 	public double getTotalWorth() {
-		return getStockTotalWorth() + portfolio.getCash();
+		return getStockTotalWorth() + portfolio.getRmbCash();
 	}
 
 	public double getProjectedLiabilities() {
