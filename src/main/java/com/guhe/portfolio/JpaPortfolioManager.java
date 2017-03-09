@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import com.guhe.market.MoneyName;
 import com.guhe.market.StockMarket;
 import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
@@ -396,6 +397,42 @@ public class JpaPortfolioManager implements PortfolioManager {
 		dd.setPb(0); // TODO
 		dd.setPe(0); // TODO
 		return dd;
+	}
+
+	@Override
+	public void exchangeMoney(String portfolioId, MoneyName target, double exchangeRate, double targetAmount,
+			Date date) {
+		LOGGER.info("exchange money, portfolioId: " + portfolioId + ", target: " + target + ", exchangeRate: "
+				+ exchangeRate + "targetAmount: " + targetAmount + ", date: " + date);
+
+		if (target == MoneyName.RMB) {
+			throw new PortfolioException("Can not exchange for same money. portfolioId: " + portfolioId);
+		}
+
+		doInTransaction(() -> {
+			Portfolio portfolio = getPortfolio(portfolioId);
+			if (portfolio == null) {
+				throw new PortfolioException("no such portfolio.");
+			}
+
+			double requiredAmount = targetAmount * exchangeRate;
+			if (CommonUtil.dCompare(portfolio.getCashByName(MoneyName.RMB), requiredAmount, 2) < 0) {
+				throw new PortfolioException("No enough money to exchange. portfolioId: " + portfolioId
+						+ ", current RMB: " + portfolio.getCashByName(MoneyName.RMB) + ", required: " + requiredAmount
+						+ ", target: " + target);
+			}
+
+			portfolio.addCashByName(MoneyName.RMB, -requiredAmount);
+			portfolio.addCashByName(target, targetAmount);
+
+			ExchangeMoneyRecord record = new ExchangeMoneyRecord();
+			record.setPortfolio(portfolio);
+			record.setTarget(target);
+			record.setExchangeRate(exchangeRate);
+			record.setAmount(targetAmount);
+			record.setDate(date);
+			em.persist(record);
+		});
 	}
 
 	private void doInTransaction(Runnable r) {

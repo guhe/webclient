@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.client.ClientBuilder;
 
-public class ZsExchangeRateCalculator implements ExchangeRateCalculator {
+public class ZsExchanger implements Exchanger {
 	private Map<MoneyName, MoneyPrice> moneyPrices = new HashMap<>();
 
 	@Override
@@ -39,7 +39,7 @@ public class ZsExchangeRateCalculator implements ExchangeRateCalculator {
 	}
 
 	public static void main(String[] args) {
-		ZsExchangeRateCalculator calculator = new ZsExchangeRateCalculator();
+		ZsExchanger calculator = new ZsExchanger();
 		calculator.loadExchangeRate();
 		System.out.println(calculator.moneyPrices);
 	}

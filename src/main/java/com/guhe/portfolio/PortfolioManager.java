@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jvnet.hk2.annotations.Contract;
 
+import com.guhe.market.MoneyName;
 import com.guhe.portfolio.TradeRecord.BuyOrSell;
 
 @Contract
@@ -26,6 +27,8 @@ public interface PortfolioManager {
 	void redeem(String portfolioId, String holderName, double share, double netWorth, double fee, Date date);
 
 	List<DailyData> getDailyData(String portfolioId, Date startDate, Date endDate);
-	
+
 	void supplementDailyData(String portfolioId, Date endDate);
+
+	void exchangeMoney(String portfolioId, MoneyName target, double exchangeRate, double amount, Date date);
 }

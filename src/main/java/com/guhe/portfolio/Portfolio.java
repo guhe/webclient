@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.guhe.market.MoneyName;
+
 @Entity
 public class Portfolio implements Cloneable {
 
@@ -20,9 +22,9 @@ public class Portfolio implements Cloneable {
 	private double netWorthPerUnitLastYear;
 
 	private double rmbCash;
-	
+
 	private double hkdCash;
-	
+
 	private double usdCash;
 
 	private Date createdTime;
@@ -42,14 +44,17 @@ public class Portfolio implements Cloneable {
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DailyData> dailyDatas = new ArrayList<>();
 
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ExchangeMoneyRecord> exchangeMoneyRecords = new ArrayList<>();
+	
 	public Portfolio() {
 	}
 
 	public Portfolio(String id) {
 		this.id = id;
 	}
-	
-	public void addRmbCash(double newCash){
+
+	public void addRmbCash(double newCash) {
 		rmbCash += newCash;
 	}
 
@@ -84,7 +89,7 @@ public class Portfolio implements Cloneable {
 	public void setRmbCash(double cash) {
 		this.rmbCash = cash;
 	}
- 
+
 	public double getHkdCash() {
 		return hkdCash;
 	}
@@ -140,9 +145,39 @@ public class Portfolio implements Cloneable {
 	public List<PurchaseRedeemRecord> getPurchaseRedeemRecords() {
 		return purchaseRedeemRecords;
 	}
-	
+
 	public List<DailyData> getDailyDatas() {
 		return dailyDatas;
+	}
+
+	public List<ExchangeMoneyRecord> getExchangeMoneyRecords() {
+		return exchangeMoneyRecords;
+	}
+
+	public double getCashByName(MoneyName name) {
+		if (name == MoneyName.RMB) {
+			return rmbCash;
+		} else if (name == MoneyName.HKD) {
+			return hkdCash;
+		} else if (name == MoneyName.USD) {
+			return usdCash;
+		} else {
+			throw new PortfolioException(
+					"portfolio does not support this money. portfolioId: " + id + ", money name: " + name);
+		}
+	}
+
+	public void addCashByName(MoneyName name, double money) {
+		if (name == MoneyName.RMB) {
+			rmbCash += money;
+		} else if (name == MoneyName.HKD) {
+			hkdCash += money;
+		} else if (name == MoneyName.USD) {
+			usdCash += money;
+		} else {
+			throw new PortfolioException(
+					"portfolio does not support this money. portfolioId: " + id + ", money name: " + name);
+		}
 	}
 
 	@Override

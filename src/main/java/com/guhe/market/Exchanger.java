@@ -2,7 +2,7 @@ package com.guhe.market;
 
 import com.guhe.util.Reflector;
 
-public interface ExchangeRateCalculator {
+public interface Exchanger {
 	
 	MoneyPrice getMoneyPrice(MoneyName moneyName);
 	

@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import com.guhe.market.MoneyName;
 import com.guhe.market.StockMarket;
 import com.guhe.portfolio.DailyData;
 import com.guhe.portfolio.Portfolio;
@@ -165,7 +166,7 @@ public class PortfolioResource {
 					viewData.getFee(), date);
 			result = new PortfolioResultViewData(0, "OK");
 		} catch (PortfolioException e) {
-			LOGGER.warning("Failed to trade, PortfolioId: " + portfolioId + ", Trade: " + viewData + ", reason: "
+			LOGGER.warning("Failed to trade, portfolioId: " + portfolioId + ", trade: " + viewData + ", reason: "
 					+ e.getMessage());
 			result = new PortfolioResultViewData(-1, e.getMessage());
 		}
@@ -217,7 +218,7 @@ public class PortfolioResource {
 			}
 			result = new PortfolioResultViewData(0, "OK");
 		} catch (PortfolioException e) {
-			LOGGER.warning("Failed to purchase or redeem, PortfolioId: " + portfolioId + ", PurchaseRedeem: " + viewData
+			LOGGER.warning("Failed to purchase or redeem, portfolioId: " + portfolioId + ", purchaseRedeem: " + viewData
 					+ ", reason: " + e.getMessage());
 			result = new PortfolioResultViewData(-1, e.getMessage());
 		}
@@ -237,9 +238,26 @@ public class PortfolioResource {
 			pm.supplementDailyData(portfolioId, endDay.getTime());
 			result = new PortfolioResultViewData(0, "OK");
 		} catch (Exception e) {
-			LOGGER.warning("Failed to supplement daily data, PortfolioId: " + portfolioId);
+			LOGGER.warning(
+					"Failed to supplement daily data, portfolioId: " + portfolioId + ", reason: " + e.getMessage());
 			result = new PortfolioResultViewData(-1, e.getMessage());
-			e.printStackTrace();
+		}
+		return Response.ok(result).build();
+	}
+
+	@POST
+	@Path("{portfolio}/ExchangeMoney")
+	public Response exchangeMoney(@PathParam("portfolio") String portfolioId, ExchangeMoneyParam param) {
+		PortfolioResultViewData result;
+		try {
+			Date date = CommonUtil.parseDate("yyyy-MM-dd", param.getDate());
+			pm.exchangeMoney(portfolioId, MoneyName.valueOf(param.getTarget()), param.getExchangeRate(),
+					param.getAmount(), date);
+			result = new PortfolioResultViewData(0, "OK");
+		} catch (Exception e) {
+			LOGGER.warning("Failed to convert money, portfolioId: " + portfolioId + ", param: " + param + ", reason: "
+					+ e.getMessage());
+			result = new PortfolioResultViewData(-1, e.getMessage());
 		}
 		return Response.ok(result).build();
 	}
