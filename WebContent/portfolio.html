@@ -12,277 +12,310 @@
 <script>
 	var portfolioId = $.getUrlVar("id");
 
-	$(document).ready(
-			function() {
-				$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
-				$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
+	function setCurrentView(chooser) {
+		var all = [ "#stock_detail", "#holder_detail", "#net_worth_chart", "#cash_detail" ];
+		all.forEach(function(e) {
+			if (e == chooser) {
+				$(e).show();
+			} else {
+				$(e).hide();
+			}
+		});
+	}
 
-				function setCurrentView(chooser) {
-					var all = [ "#stock_detail", "#holder_detail", "#net_worth_chart" ];
-					all.forEach(function(e) {
-						if (e == chooser) {
-							$(e).show();
-						} else {
-							$(e).hide();
+	function showNetworthChart() {
+		setCurrentView("#net_worth_chart");
+		var ctx = $("#net_worth_chart");
+		var chart = new Chart(ctx, {
+			type : 'line',
+			data : {
+				labels : [],
+				datasets : [ {
+					label : '迷之组合',
+					fill : false,
+					data : [],
+					borderColor : 'rgba(255,0,0,1)',
+					pointRadius : 0,
+					pointHitRadius : 5,
+					borderWidth : 2
+				}, {
+					label : '沪深300',
+					fill : false,
+					data : [],
+					borderColor : 'rgba(0,128,0,1)',
+					pointRadius : 0,
+					pointHitRadius : 5,
+					borderWidth : 2
+				}, {
+					label : '中证500',
+					fill : false,
+					data : [],
+					borderColor : 'rgba(0,64,255,1)',
+					pointRadius : 0,
+					pointHitRadius : 5,
+					borderWidth : 2
+				} ]
+			},
+			options : {
+				scales : {
+					yAxes : [ {
+						position : "right",
+						ticks : {
+							callback : function(value, index, values) {
+								return value.toPercent();
+							},
+							labelOffset : 0
+						},
+						gridLines : {
+							color : 'rgba(255,255,255,0.25)',
+							zeroLineColor : 'rgba(255,255,255,0.5)',
+							tickMarkLength : 0
 						}
-					});
-				}
-
-				//click net worth button
-				$("#net_worth_bt").click(
-						function() {
-							setCurrentView("#net_worth_chart");
-							var ctx = $("#net_worth_chart");
-							var chart = new Chart(ctx, {
-								type : 'line',
-								data : {
-									labels : [],
-									datasets : [ {
-										label : '迷之组合',
-										fill : false,
-										data : [],
-										borderColor : 'rgba(255,0,0,1)',
-										pointRadius : 0,
-										pointHitRadius : 5,
-										borderWidth : 2
-									}, {
-										label : '沪深300',
-										fill : false,
-										data : [],
-										borderColor : 'rgba(0,128,0,1)',
-										pointRadius : 0,
-										pointHitRadius : 5,
-										borderWidth : 2
-									}, {
-										label : '中证500',
-										fill : false,
-										data : [],
-										borderColor : 'rgba(0,64,255,1)',
-										pointRadius : 0,
-										pointHitRadius : 5,
-										borderWidth : 2
-									} ]
-								},
-								options : {
-									scales : {
-										yAxes : [ {
-											position : "right",
-											ticks : {
-												callback : function(value, index, values) {
-													return value.toPercent();
-												},
-												labelOffset : 0
-											},
-											gridLines : {
-												color : 'rgba(255,255,255,0.25)',
-												zeroLineColor : 'rgba(255,255,255,0.5)',
-												tickMarkLength : 0
-											}
-										} ],
-										xAxes : [ {
-											ticks : {
-												autoSkip: false,
-												callback : function(value, index, values) {
-													var offset = (values.length - 1) / 4;
-													if (index == 0 || index == values.length - 1) {
-														return value;
-													}
-													if (index == Math.ceil(offset) || index == Math.ceil(offset * 2) || index == Math.ceil(offset * 3)) {
-														return value;
-													}
-													return null;
-												}
-											},
-											gridLines : {
-												zeroLineColor : 'rgba(255,255,255,0.5)',
-												tickMarkLength : 0
-											}
-										} ]
-									},
-									tooltips : {
-										callbacks : {
-											label : function(tooltipItem, data) {
-												return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
-														.toPercent(2);
-											}
-										}
-									}
+					} ],
+					xAxes : [ {
+						ticks : {
+							autoSkip : false,
+							callback : function(value, index, values) {
+								var offset = (values.length - 1) / 4;
+								if (index == 0 || index == values.length - 1) {
+									return value;
 								}
-							});
-							var curve_count = 0;
-							$.get({
-								url : "rest/Portfolio/" + portfolioId + "/DailyData/NetWorthPerUnit",
-								dataType : 'json',
-								success : function(result) {
-									var labels = [];
-									var data = [];
-									if (result[0]) {
-										var first = result[0]["netWorthPerUnit"];
-										$.each(result, function(key, row) {
-											labels[key] = row["date"];
-											data[key] = row["netWorthPerUnit"] / first - 1;
-										});
-									}
-									chart.data.labels = labels;
-									chart.data.datasets[0].data = data;
-									if(++curve_count == 3){
-										chart.update();
-									}
+								if (index == Math.ceil(offset) || index == Math.ceil(offset * 2)
+										|| index == Math.ceil(offset * 3)) {
+									return value;
 								}
-							});
-							$.get({
-								url : "rest/Market/Stock/sh000001",
-								dataType : 'json',
-								success : function(result) {
-									var data = [];
-									if (result[0]) {
-										var first = result[0]["netWorthPerUnit"];
-										$.each(result, function(key, row) {
-											data[key] = row["netWorthPerUnit"] / first - 1;
-										});
-									}
-									chart.data.datasets[1].data = data;
-									if(++curve_count == 3){
-										chart.update();
-									}
-								}
-							});
-							$.get({
-								url : "rest/Market/Stock/sz399905",
-								dataType : 'json',
-								success : function(result) {
-									var data = [];
-									if (result[0]) {
-										var first = result[0]["netWorthPerUnit"];
-										$.each(result, function(key, row) {
-											data[key] = row["netWorthPerUnit"] / first - 1;
-										});
-									}
-									chart.data.datasets[2].data = data;
-									if(++curve_count == 3){
-										chart.update();
-									}
-								}
-							});
-						});
-
-				//click stock button
-				$("#stock_bt").click(function() {
-					setCurrentView("#stock_detail");
-					$("#stock_detail tbody tr").remove();
-					$.get({
-						url : "rest/Portfolio/" + portfolioId + "/HoldingStock",
-						dataType : 'json',
-						success : function(result) {
-							result.sort(function(a, b) {
-								return b["proportion"] - a["proportion"];
-							});
-							$.each(result, function(key, row_data) {
-								var row = $("<tr/>").appendTo($("#stock_detail tbody"));
-								$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
-								$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
-								$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
-								$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
-								$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
-								$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
-								$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
-								$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
-							});
-						}
-					});
-				});
-
-				//click supplement button
-				$("#supplement_bt").click(function() {
-					$.post({
-						url : "rest/Portfolio/" + portfolioId + "/DailyData/Supplement",
-						contentType : "application/json; charset=utf-8",
-						dataType : 'json',
-						async : false,
-						success : function(result) {
-							if (result["rltCode"] == 0) {
-								new Dialog("操作成功。").show();
-							} else {
-								new Dialog(result["message"]).show();
+								return null;
 							}
 						},
-						error : function() {
-							new Dialog("操作失败。").show();
+						gridLines : {
+							zeroLineColor : 'rgba(255,255,255,0.5)',
+							tickMarkLength : 0
 						}
-					});
-				});
-
-				//click holder button
-				$("#holder_bt").click(function() {
-					setCurrentView("#holder_detail");
-					$("#holder_detail tbody tr").remove();
-					$.get({
-						url : "rest/Portfolio/" + portfolioId + "/Holder",
-						dataType : 'json',
-						success : function(result) {
-							result.sort(function(a, b) {
-								return b["name"] - a["name"];
-							});
-							var total = {
-								"name" : "总计",
-								"share" : 0,
-								"netWorth" : 0,
-								"totalInvestment" : 0,
-								"rateOfReturn" : 0,
-								"proportion" : 0
-							};
-							$.each(result, function(key, row_data) {
-								appendRowToHolderTable(row_data);
-
-								total["share"] += row_data["share"];
-								total["netWorth"] += row_data["netWorth"];
-								total["totalInvestment"] += row_data["totalInvestment"];
-								total["proportion"] += row_data["proportion"];
-
-							});
-							total["rateOfReturn"] += total["netWorth"] / total["totalInvestment"] - 1;
-							appendRowToHolderTable(total);
-						}
-					});
-
-					function appendRowToHolderTable(row_data) {
-						var row = $("<tr/>").appendTo($("#holder_detail tbody"));
-						$("<td/>").html(row_data["name"]).appendTo(row);
-						$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row);
-						$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row);
-						$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row);
-						$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row);
-						$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
-					}
-				});
-
-				//load portfolio data
-				$.get({
-					url : "rest/Portfolio/" + portfolioId,
-					dataType : 'json',
-					success : function(result) {
-						$('title').text("组合-" + result["name"]);
-
-						$("#netWorthPerUnit").html(result["netWorthPerUnit"].toFixed(4));
-						$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
-						$("#netWorth").html(result["netWorth"].toFixed(0));
-						$("#profit").html(result["profit"].toFixed(0));
-						$("#cash").html(result["cash"].toFixed(0));
-						$("#pb").html(result["pb"].toFixed(2));
-						$("#pe").html(result["pe"].toFixed(1));
-						$("#proportionOfStock").html(result["proportionOfStock"].toPercent(1));
-
-						if (result["rateOfReturnYear"] < 0) {
-							$("#rateOfReturnYear").css("color", "green");
-						} else {
-							$("#rateOfReturnYear").css("color", "red");
+					} ]
+				},
+				tooltips : {
+					callbacks : {
+						label : function(tooltipItem, data) {
+							return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toPercent(2);
 						}
 					}
-				});
+				}
+			}
+		});
+		var curve_count = 0;
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/DailyData/NetWorthPerUnit",
+			dataType : 'json',
+			success : function(result) {
+				var labels = [];
+				var data = [];
+				if (result[0]) {
+					var first = result[0]["netWorthPerUnit"];
+					$.each(result, function(key, row) {
+						labels[key] = row["date"];
+						data[key] = row["netWorthPerUnit"] / first - 1;
+					});
+				}
+				chart.data.labels = labels;
+				chart.data.datasets[0].data = data;
+				if (++curve_count == 3) {
+					chart.update();
+				}
+			}
+		});
+		$.get({
+			url : "rest/Market/Stock/sh000001",
+			dataType : 'json',
+			success : function(result) {
+				var data = [];
+				if (result[0]) {
+					var first = result[0]["netWorthPerUnit"];
+					$.each(result, function(key, row) {
+						data[key] = row["netWorthPerUnit"] / first - 1;
+					});
+				}
+				chart.data.datasets[1].data = data;
+				if (++curve_count == 3) {
+					chart.update();
+				}
+			}
+		});
+		$.get({
+			url : "rest/Market/Stock/sz399905",
+			dataType : 'json',
+			success : function(result) {
+				var data = [];
+				if (result[0]) {
+					var first = result[0]["netWorthPerUnit"];
+					$.each(result, function(key, row) {
+						data[key] = row["netWorthPerUnit"] / first - 1;
+					});
+				}
+				chart.data.datasets[2].data = data;
+				if (++curve_count == 3) {
+					chart.update();
+				}
+			}
+		});
+	}
 
-				// set current view is stock detail
-				$("#net_worth_bt").click();
-			});
+	function showHoldingStockDetail() {
+		setCurrentView("#stock_detail");
+		$("#stock_detail tbody tr").remove();
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/HoldingStock",
+			dataType : 'json',
+			success : function(result) {
+				result.sort(function(a, b) {
+					return b["proportion"] - a["proportion"];
+				});
+				$.each(result, function(key, row_data) {
+					var row = $("<tr/>").appendTo($("#stock_detail tbody"));
+					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
+					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
+					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
+					$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
+					$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
+					$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
+					$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
+					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
+				});
+			}
+		});
+	}
+
+	function doSupplementDailyData() {
+		$.post({
+			url : "rest/Portfolio/" + portfolioId + "/DailyData/Supplement",
+			contentType : "application/json; charset=utf-8",
+			dataType : 'json',
+			async : false,
+			success : function(result) {
+				if (result["rltCode"] == 0) {
+					new Dialog("操作成功。").show();
+				} else {
+					new Dialog(result["message"]).show();
+				}
+			},
+			error : function() {
+				new Dialog("操作失败。").show();
+			}
+		});
+	}
+
+	function showHolderDetail() {
+		setCurrentView("#holder_detail");
+		$("#holder_detail tbody tr").remove();
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/Holder",
+			dataType : 'json',
+			success : function(result) {
+				result.sort(function(a, b) {
+					return b["name"] - a["name"];
+				});
+				var total = {
+					"name" : "总计",
+					"share" : 0,
+					"netWorth" : 0,
+					"totalInvestment" : 0,
+					"rateOfReturn" : 0,
+					"proportion" : 0
+				};
+				$.each(result, function(key, row_data) {
+					appendRowToHolderTable(row_data);
+
+					total["share"] += row_data["share"];
+					total["netWorth"] += row_data["netWorth"];
+					total["totalInvestment"] += row_data["totalInvestment"];
+					total["proportion"] += row_data["proportion"];
+
+				});
+				total["rateOfReturn"] += total["netWorth"] / total["totalInvestment"] - 1;
+				appendRowToHolderTable(total);
+			}
+		});
+
+		function appendRowToHolderTable(row_data) {
+			var row = $("<tr/>").appendTo($("#holder_detail tbody"));
+			$("<td/>").html(row_data["name"]).appendTo(row);
+			$("<td/>").html(row_data["share"].toFixed(2)).appendTo(row);
+			$("<td/>").html(row_data["netWorth"].toFixed(2)).appendTo(row);
+			$("<td/>").html(row_data["totalInvestment"].toFixed(2)).appendTo(row);
+			$("<td/>").html(row_data["rateOfReturn"].toPercent(1)).appendTo(row);
+			$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row);
+		}
+	}
+
+	function showCashDetail() {
+		setCurrentView("#cash_detail");
+		$("#cash_detail tbody tr").remove();
+
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/CashDetail",
+			dataType : 'json',
+			success : function(result) {
+				$.each(result, function(key, row_data) {
+					var row = $("<tr/>").appendTo($("#cash_detail tbody"));
+					$("<td/>").html(row_data["moneyName"]).appendTo(row);
+					$("<td/>").html(row_data["amount"].toFixed(2)).appendTo(row);
+					$("<td/>").html(row_data["rmbAmount"].toFixed(2)).appendTo(row);
+					$("<td/>").html((row_data["buyPrice"] * 100).toFixed(2)).appendTo(row);
+					$("<td/>").html((row_data["sellPrice"] * 100).toFixed(2)).appendTo(row);
+				});
+			}
+		});
+	}
+
+	function loadPortfolioBaseData() {
+		$.get({
+			url : "rest/Portfolio/" + portfolioId,
+			dataType : 'json',
+			success : function(result) {
+				$('title').text("组合-" + result["name"]);
+
+				$("#netWorthPerUnit").html(result["netWorthPerUnit"].toFixed(4));
+				$("#rateOfReturnYear").html(result["rateOfReturnYear"].toPercent(2));
+				$("#netWorth").html(result["netWorth"].toFixed(0));
+				$("#profit").html(result["profit"].toFixed(0));
+				$("#cash").html(result["cash"].toFixed(0));
+				$("#pb").html(result["pb"].toFixed(2));
+				$("#pe").html(result["pe"].toFixed(1));
+				$("#proportionOfStock").html(result["proportionOfStock"].toPercent(1));
+
+				if (result["rateOfReturnYear"] < 0) {
+					$("#rateOfReturnYear").css("color", "green");
+				} else {
+					$("#rateOfReturnYear").css("color", "red");
+				}
+			}
+		});
+	}
+
+	$(document).ready(function() {
+		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
+		$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
+
+		//click net worth button
+		$("#net_worth_bt").click(showNetworthChart);
+
+		//click stock button
+		$("#stock_bt").click(showHoldingStockDetail);
+
+		//click holder button
+		$("#holder_bt").click(showHolderDetail);
+
+		//click cash button
+		$("#cash_bt").click(showCashDetail);
+
+		//click supplement button
+		$("#supplement_bt").click(doSupplementDailyData);
+
+		//load portfolio data
+		loadPortfolioBaseData();
+
+		// set current view is stock detail
+		$("#net_worth_bt").click();
+	});
 </script>
 </head>
 
@@ -328,10 +361,11 @@
 		<button id="net_worth_bt" type="button" class="button black">净值曲线</button>
 		<button id="stock_bt" type="button" class="button black">持仓清单</button>
 		<button id="holder_bt" type="button" class="button black">持有人清单</button>
-		<button type="button" class="button black">0</button>
+		<button id="cash_bt" type="button" class="button black">现金管理</button>
 		<button type="button" class="button black">0</button>
 		<button type="button" class="button black">0</button>
 		<button id="supplement_bt" type="button" class="button black">补录历史净值</button>
+		<button type="button" class="button black">0</button>
 	</div>
 
 	<hr style="width: 800px" />
@@ -372,6 +406,24 @@
 					<th>总投入</th>
 					<th>收益率</th>
 					<th>占比</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<div id="cash_detail" class="detail">
+		<table class="zebra">
+			<caption>
+				<span>现金明细</span> <a href="#">兑换</a>
+			</caption>
+			<thead>
+				<tr>
+					<th>货币名称</th>
+					<th>金额(本币计价)</th>
+					<th>金额(RMB计价)</th>
+					<th>汇率(RMB->HKD)</th>
+					<th>汇率(HKD->RMB)</th>
 				</tr>
 			</thead>
 			<tbody>

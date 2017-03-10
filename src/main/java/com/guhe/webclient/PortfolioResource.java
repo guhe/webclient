@@ -1,5 +1,6 @@
 package com.guhe.webclient;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -285,5 +286,40 @@ public class PortfolioResource {
 			vd.setNetWorthPerUnit(e.getNetWorthPerUnit());
 			return vd;
 		}).collect(Collectors.toList());
+	}
+
+	@GET
+	@Path("{portfolio}/CashDetail")
+	public List<CashDetailViewData> getCashDetail(@PathParam("portfolio") String portfolioId) {
+		Portfolio portfolio = pm.getPortfolio(portfolioId);
+
+		List<CashDetailViewData> cashDetails = new ArrayList<>();
+
+		CashDetailViewData rmb = new CashDetailViewData();
+		rmb.setMoneyName(MoneyName.RMB.name());
+		rmb.setAmount(portfolio.getRmbCash());
+		rmb.setBuyPrice(1.0);
+		rmb.setSellPrice(1.0);
+		rmb.setRmbAmount(portfolio.getRmbCash());
+		cashDetails.add(rmb);
+
+		tryAddMoney(portfolio, MoneyName.HKD, cashDetails);
+		tryAddMoney(portfolio, MoneyName.USD, cashDetails);
+
+		return cashDetails;
+	}
+
+	private void tryAddMoney(Portfolio portfolio, MoneyName name, List<CashDetailViewData> cashDetails) {
+		double cash = portfolio.getCashByName(name);
+		if (CommonUtil.dCompare(cash, 0.0, 2) > 0) {
+			CashDetailViewData cashDetail = new CashDetailViewData();
+			cashDetail.setMoneyName(name.name());
+			cashDetail.setAmount(cash);
+			MoneyExchanger.MoneyPrice price = moneyExchanger.getMoneyPrice(name);
+			cashDetail.setBuyPrice(price.getBuy());
+			cashDetail.setSellPrice(price.getSell());
+			cashDetail.setRmbAmount(cash * price.getBuy());
+			cashDetails.add(cashDetail);
+		}
 	}
 }

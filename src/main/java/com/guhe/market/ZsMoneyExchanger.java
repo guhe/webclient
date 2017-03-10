@@ -11,7 +11,7 @@ public class ZsMoneyExchanger implements MoneyExchanger {
 	private Map<MoneyName, MoneyPrice> moneyPrices = new HashMap<>();
 
 	@Override
-	public MoneyPrice getMoneyPrice(MoneyName moneyName) {
+	public synchronized MoneyPrice getMoneyPrice(MoneyName moneyName) {
 		if (moneyPrices.isEmpty()) {
 			loadExchangeRate();
 		}
