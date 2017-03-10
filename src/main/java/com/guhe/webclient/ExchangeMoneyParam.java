@@ -4,11 +4,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.guhe.util.Reflector;
 
-@XmlRootElement(name = "MoneyConvertParam")
+@XmlRootElement(name = "ExchangeMoneyParam")
 public class ExchangeMoneyParam {
 	private String target;
-	private double exchangeRate;
-	private double amount;
+	private double targetAmount;
+	private double rmbAmount;
 	private String date;
 
 	public String getTarget() {
@@ -19,20 +19,20 @@ public class ExchangeMoneyParam {
 		this.target = target;
 	}
 
-	public double getExchangeRate() {
-		return exchangeRate;
+	public double getTargetAmount() {
+		return targetAmount;
 	}
 
-	public void setExchangeRate(double exchangeRate) {
-		this.exchangeRate = exchangeRate;
+	public void setTargetAmount(double targetAmount) {
+		this.targetAmount = targetAmount;
 	}
 
-	public double getAmount() {
-		return amount;
+	public double getRmbAmount() {
+		return rmbAmount;
 	}
 
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public void setRmbAmount(double rmbAmount) {
+		this.rmbAmount = rmbAmount;
 	}
 
 	public String getDate() {

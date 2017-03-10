@@ -256,8 +256,8 @@ public class PortfolioResource {
 		PortfolioResultViewData result;
 		try {
 			Date date = CommonUtil.parseDate("yyyy-MM-dd", param.getDate());
-			pm.exchangeMoney(portfolioId, MoneyName.valueOf(param.getTarget()), param.getExchangeRate(),
-					param.getAmount(), date);
+			pm.exchangeMoney(portfolioId, MoneyName.valueOf(param.getTarget()), param.getTargetAmount(),
+					param.getRmbAmount(), date);
 			result = new PortfolioResultViewData(0, "OK");
 		} catch (Exception e) {
 			LOGGER.warning("Failed to convert money, portfolioId: " + portfolioId + ", param: " + param + ", reason: "

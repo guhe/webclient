@@ -415,19 +415,21 @@ public class JpaPortfolioManager implements PortfolioManager {
 			throw new PortfolioException("Can not exchange for same money. portfolioId: " + portfolioId);
 		}
 
+		if (targetAmount * rmbAmount >= 0) {
+			throw new PortfolioException("Both money are reduced or increased. portfolioId: " + portfolioId
+					+ ", targetAmount: " + targetAmount + ", rmbAmount: " + rmbAmount);
+		}
+
 		doInTransaction(() -> {
 			Portfolio portfolio = getPortfolio(portfolioId);
 			if (portfolio == null) {
 				throw new PortfolioException("no such portfolio.");
 			}
 
-			if (CommonUtil.dCompare(portfolio.getCashByName(MoneyName.RMB), rmbAmount, 2) < 0) {
-				throw new PortfolioException("No enough money to exchange. portfolioId: " + portfolioId
-						+ ", current RMB: " + portfolio.getCashByName(MoneyName.RMB) + ", required: " + rmbAmount
-						+ ", target: " + target);
-			}
+			checkEnoughCash(portfolio, MoneyName.RMB, rmbAmount);
+			checkEnoughCash(portfolio, target, targetAmount);
 
-			portfolio.addCashByName(MoneyName.RMB, -rmbAmount);
+			portfolio.addCashByName(MoneyName.RMB, rmbAmount);
 			portfolio.addCashByName(target, targetAmount);
 
 			ExchangeMoneyRecord record = new ExchangeMoneyRecord();
@@ -438,6 +440,13 @@ public class JpaPortfolioManager implements PortfolioManager {
 			record.setDate(date);
 			em.persist(record);
 		});
+	}
+
+	private void checkEnoughCash(Portfolio portfolio, MoneyName name, double amount) {
+		if (CommonUtil.dCompare(portfolio.getCashByName(name) + amount, 0, 2) < 0) {
+			throw new PortfolioException("No enough money to exchange. portfolioId: " + portfolio.getId() + ", Money: "
+					+ name + ", current: " + portfolio.getCashByName(name) + ", required: " + amount);
+		}
 	}
 
 	private void doInTransaction(Runnable r) {
