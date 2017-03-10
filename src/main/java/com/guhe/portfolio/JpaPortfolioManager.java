@@ -25,7 +25,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 	private EntityManager em;
 
 	private StockMarket market;
-	
+
 	private MoneyExchanger moneyExchanger;
 
 	public JpaPortfolioManager(EntityManager em) {
@@ -407,10 +407,9 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	@Override
-	public void exchangeMoney(String portfolioId, MoneyName target, double exchangeRate, double targetAmount,
-			Date date) {
-		LOGGER.info("exchange money, portfolioId: " + portfolioId + ", target: " + target + ", exchangeRate: "
-				+ exchangeRate + "targetAmount: " + targetAmount + ", date: " + date);
+	public void exchangeMoney(String portfolioId, MoneyName target, double targetAmount, double rmbAmount, Date date) {
+		LOGGER.info("exchange money, portfolioId: " + portfolioId + ", target: " + target + "targetAmount: "
+				+ targetAmount + ", rmbAmount: " + rmbAmount + ", date: " + date);
 
 		if (target == MoneyName.RMB) {
 			throw new PortfolioException("Can not exchange for same money. portfolioId: " + portfolioId);
@@ -422,21 +421,20 @@ public class JpaPortfolioManager implements PortfolioManager {
 				throw new PortfolioException("no such portfolio.");
 			}
 
-			double requiredAmount = targetAmount * exchangeRate;
-			if (CommonUtil.dCompare(portfolio.getCashByName(MoneyName.RMB), requiredAmount, 2) < 0) {
+			if (CommonUtil.dCompare(portfolio.getCashByName(MoneyName.RMB), rmbAmount, 2) < 0) {
 				throw new PortfolioException("No enough money to exchange. portfolioId: " + portfolioId
-						+ ", current RMB: " + portfolio.getCashByName(MoneyName.RMB) + ", required: " + requiredAmount
+						+ ", current RMB: " + portfolio.getCashByName(MoneyName.RMB) + ", required: " + rmbAmount
 						+ ", target: " + target);
 			}
 
-			portfolio.addCashByName(MoneyName.RMB, -requiredAmount);
+			portfolio.addCashByName(MoneyName.RMB, -rmbAmount);
 			portfolio.addCashByName(target, targetAmount);
 
 			ExchangeMoneyRecord record = new ExchangeMoneyRecord();
 			record.setPortfolio(portfolio);
 			record.setTarget(target);
-			record.setExchangeRate(exchangeRate);
-			record.setAmount(targetAmount);
+			record.setTargetAmount(targetAmount);
+			record.setRmbAmount(rmbAmount);
 			record.setDate(date);
 			em.persist(record);
 		});

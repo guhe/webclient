@@ -24,9 +24,9 @@ public class ExchangeMoneyRecord {
 	@Enumerated(EnumType.STRING)
 	private MoneyName target;
 	
-	private double exchangeRate;
+	private double targetAmount;
 	
-	private double amount;
+	private double rmbAmount;
 	
 	private Date date;
 
@@ -54,20 +54,20 @@ public class ExchangeMoneyRecord {
 		this.target = target;
 	}
 
-	public double getExchangeRate() {
-		return exchangeRate;
+	public double getTargetAmount() {
+		return targetAmount;
 	}
 
-	public void setExchangeRate(double exchangeRate) {
-		this.exchangeRate = exchangeRate;
+	public void setTargetAmount(double targetAmount) {
+		this.targetAmount = targetAmount;
 	}
 
-	public double getAmount() {
-		return amount;
+	public double getRmbAmount() {
+		return rmbAmount;
 	}
 
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public void setRmbAmount(double rmbAmount) {
+		this.rmbAmount = rmbAmount;
 	}
 
 	public Date getDate() {
