@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import com.guhe.market.MoneyExchanger;
 import com.guhe.market.MoneyName;
 import com.guhe.market.StockMarket;
 import com.guhe.portfolio.DailyData;
@@ -38,10 +39,14 @@ public class PortfolioResource {
 	@Inject
 	private PortfolioManager pm;
 
+	@Inject
+	private MoneyExchanger moneyExchanger;
+
 	@GET
 	public List<PortfolioViewData> getPortfolios() {
 		List<Portfolio> portfolios = pm.getPortfolios();
-		return portfolios.stream().map(e -> createPortfolioViewData(new PortfolioCalculator(e, stockMarket)))
+		return portfolios.stream()
+				.map(e -> createPortfolioViewData(e, new PortfolioCalculator(e, stockMarket, moneyExchanger)))
 				.collect(Collectors.toList());
 	}
 
@@ -53,15 +58,15 @@ public class PortfolioResource {
 			return null;
 		}
 
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
-		return createPortfolioViewData(calculator);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket, moneyExchanger);
+		return createPortfolioViewData(portfolio, calculator);
 	}
 
-	private PortfolioViewData createPortfolioViewData(PortfolioCalculator calculator) {
+	private PortfolioViewData createPortfolioViewData(Portfolio portfolio, PortfolioCalculator calculator) {
 		PortfolioViewData viewData = new PortfolioViewData();
-		viewData.setId(calculator.getPortfolio().getId());
-		viewData.setName(calculator.getPortfolio().getName());
-		viewData.setCash(calculator.getPortfolio().getRmbCash());
+		viewData.setId(portfolio.getId());
+		viewData.setName(portfolio.getName());
+		viewData.setCash(calculator.getCash());
 		viewData.setTotalWorth(calculator.getTotalWorth());
 		viewData.setProjectedLiabilities(calculator.getProjectedLiabilities());
 		viewData.setStockNetWorth(calculator.getStockNetWorth());
@@ -83,7 +88,7 @@ public class PortfolioResource {
 			return null;
 		}
 
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket, moneyExchanger);
 		return createHoldingStockVDs(calculator);
 	}
 
@@ -113,7 +118,7 @@ public class PortfolioResource {
 			return null;
 		}
 
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, stockMarket, moneyExchanger);
 		return getHolderVDs(calculator);
 	}
 

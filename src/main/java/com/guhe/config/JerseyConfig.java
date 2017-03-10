@@ -14,8 +14,10 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import com.guhe.market.MoneyExchanger;
 import com.guhe.market.StockMarket;
 import com.guhe.market.TencentStockMarket;
+import com.guhe.market.ZsMoneyExchanger;
 import com.guhe.portfolio.PortfolioManager;
 
 @ApplicationPath("rest")
@@ -28,7 +30,8 @@ public class JerseyConfig extends ResourceConfig {
 
 		register(new AbstractBinder() {
 			@Override
-			protected void configure() { 
+			protected void configure() {
+				bind(ZsMoneyExchanger.class).to(MoneyExchanger.class).in(Singleton.class);
 				bind(TencentStockMarket.class).to(StockMarket.class).in(Singleton.class);
 				bindFactory(EmfFactory.class).to(EntityManagerFactory.class).in(Immediate.class);
 				bindFactory(PortfolioManagerFactory.class).to(PortfolioManager.class).in(RequestScoped.class);

@@ -7,12 +7,15 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.client.ClientBuilder;
 
-public class ZsExchanger implements Exchanger {
+public class ZsMoneyExchanger implements MoneyExchanger {
 	private Map<MoneyName, MoneyPrice> moneyPrices = new HashMap<>();
 
 	@Override
 	public MoneyPrice getMoneyPrice(MoneyName moneyName) {
-		return null;
+		if (moneyPrices.isEmpty()) {
+			loadExchangeRate();
+		}
+		return moneyPrices.get(moneyName);
 	}
 
 	private void loadExchangeRate() {
@@ -22,16 +25,22 @@ public class ZsExchanger implements Exchanger {
 		Matcher m = p.matcher(data);
 
 		int priceIndex = 0;
-		MoneyPrice mp = new MoneyPrice();
-		while (m.find() && priceIndex < 5) {
+		MoneyPrice mp = null;
+		while (m.find() && priceIndex < 4 * 5) {
 			int moneyIndex = priceIndex / 5;
 			int priceType = priceIndex % 5; // 中间价 现汇卖出价 现钞卖出价 现汇买入价 现钞买入价
 			double price = Double.parseDouble(m.group(1));
-			if (priceType == 1) {
-				mp.setSell(price);
+			if (priceType == 2) {
+				mp = new MoneyPrice();
+				mp.setSell(price * 0.01);
 			} else if (priceType == 4) {
-				mp.setBuy(price);
-				moneyPrices.put(MoneyName.values()[moneyIndex], mp);
+				mp.setBuy(price * 0.01);
+				System.out.println("index: " + moneyIndex + ", MoneyPrice: " + mp);
+				if (moneyIndex == 0) { // 港币
+					moneyPrices.put(MoneyName.HKD, mp);
+				} else if (moneyIndex == 3) {
+					moneyPrices.put(MoneyName.USD, mp);
+				}
 			}
 
 			priceIndex++;
@@ -39,7 +48,7 @@ public class ZsExchanger implements Exchanger {
 	}
 
 	public static void main(String[] args) {
-		ZsExchanger calculator = new ZsExchanger();
+		ZsMoneyExchanger calculator = new ZsMoneyExchanger();
 		calculator.loadExchangeRate();
 		System.out.println(calculator.moneyPrices);
 	}

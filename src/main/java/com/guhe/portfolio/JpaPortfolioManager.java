@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import com.guhe.market.MoneyExchanger;
 import com.guhe.market.MoneyName;
 import com.guhe.market.StockMarket;
 import com.guhe.portfolio.PurchaseRedeemRecord.PurchaseOrRedeem;
@@ -24,6 +25,8 @@ public class JpaPortfolioManager implements PortfolioManager {
 	private EntityManager em;
 
 	private StockMarket market;
+	
+	private MoneyExchanger moneyExchanger;
 
 	public JpaPortfolioManager(EntityManager em) {
 		this.em = em;
@@ -31,6 +34,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	public void setMarket(StockMarket market) {
 		this.market = market;
+	}
+
+	public void setMoneyExchanger(MoneyExchanger moneyExchanger) {
+		this.moneyExchanger = moneyExchanger;
 	}
 
 	public EntityManager getEm() {
@@ -388,7 +395,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 		DailyData dd = new DailyData();
 		dd.setPortfolio(portfolio);
 		dd.setDate(day.getTime());
-		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market, day);
+		PortfolioCalculator calculator = new PortfolioCalculator(portfolio, market, moneyExchanger, day);
 		dd.setNetWorth(calculator.getNetWorth());
 		dd.setNetWorthPerUnit(calculator.getNetWorthPerUnit());
 		dd.setProportionOfStock(calculator.getProportionOfStock());

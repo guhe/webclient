@@ -1,5 +1,7 @@
 package com.guhe.portfolio.test;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,6 +16,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import com.guhe.market.MoneyExchanger;
+import com.guhe.market.StockMarket;
 import com.guhe.portfolio.JpaPortfolioManager;
 import com.guhe.util.DerbyUtil;
 
@@ -22,6 +26,10 @@ public class PortfolioTestBase {
 	protected static EntityManagerFactory testEmf;
 
 	protected JpaPortfolioManager pm;
+	
+	protected StockMarket market;
+	
+	protected MoneyExchanger moneyExchanger;
 
 	@BeforeClass
 	public static void beforeAll() throws IOException {
@@ -46,6 +54,12 @@ public class PortfolioTestBase {
 	@Before
 	public void before() {
 		pm = new JpaPortfolioManager(testEmf.createEntityManager());
+		
+		market = mock(StockMarket.class);
+		pm.setMarket(market);
+		
+		moneyExchanger = mock(MoneyExchanger.class);
+		pm.setMoneyExchanger(moneyExchanger);
 	}
 
 	@After

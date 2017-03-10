@@ -3,26 +3,31 @@ package com.guhe.portfolio;
 import java.util.Calendar;
 import java.util.stream.Stream;
 
+import com.guhe.market.MoneyExchanger;
+import com.guhe.market.MoneyName;
 import com.guhe.market.StockData;
 import com.guhe.market.StockMarket;
 
 public class PortfolioCalculator {
 	private Portfolio portfolio;
 	private StockMarket market;
+	private MoneyExchanger moneyExchanger;
 	private Calendar day;
 
-	public PortfolioCalculator(Portfolio portfolio, StockMarket market) {
-		this(portfolio, market, null);
+	public PortfolioCalculator(Portfolio portfolio, StockMarket market, MoneyExchanger exchanger) {
+		this(portfolio, market, exchanger, null);
 	}
 
-	public PortfolioCalculator(Portfolio portfolio, StockMarket market, Calendar day) {
+	public PortfolioCalculator(Portfolio portfolio, StockMarket market, MoneyExchanger moneyExchanger, Calendar day) {
 		this.portfolio = portfolio;
 		this.market = market;
+		this.moneyExchanger = moneyExchanger;
 		this.day = day;
 	}
 
-	public Portfolio getPortfolio() {
-		return portfolio;
+	public double getCash() {
+		return portfolio.getRmbCash() + portfolio.getUsdCash() * moneyExchanger.getMoneyPrice(MoneyName.USD).getBuy()
+				+ portfolio.getHkdCash() * moneyExchanger.getMoneyPrice(MoneyName.HKD).getBuy();
 	}
 
 	public double getNumberOfShares() {
@@ -34,7 +39,7 @@ public class PortfolioCalculator {
 	}
 
 	public double getTotalWorth() {
-		return getStockTotalWorth() + portfolio.getRmbCash();
+		return getStockTotalWorth() + getCash();
 	}
 
 	public double getProjectedLiabilities() {
@@ -95,8 +100,8 @@ public class PortfolioCalculator {
 		public HoldingCalculator(Holding holding) {
 			this.holding = holding;
 			this.data = market.getStockData(holding.getStock().getCode(), day);
-			if(data == null){
-				throw new RuntimeException("no stock data, stock: "+holding.getStock().getCode()+", day: "+day);
+			if (data == null) {
+				throw new RuntimeException("no stock data, stock: " + holding.getStock().getCode() + ", day: " + day);
 			}
 		}
 

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.guhe.market.MoneyExchanger;
+import com.guhe.market.MoneyName;
 import com.guhe.market.StockData;
 import com.guhe.market.StockMarket;
 import com.guhe.portfolio.Holder;
@@ -42,13 +44,17 @@ public class PortfolioResourceTest extends JerseyTest {
 
 	private StockMarket market;
 
+	private MoneyExchanger noneyExchanger;
+
 	private PortfolioManager pm;
 
 	private Portfolio createPortfolio() {
 		Portfolio portfolio = new Portfolio();
 		portfolio.setId("P00000001");
 		portfolio.setName("范昌虎测试组合1");
-		portfolio.setRmbCash(23066);
+		portfolio.setRmbCash(13066);
+		portfolio.setUsdCash(1000);
+		portfolio.setHkdCash(5000);
 		portfolio.setNetWorthPerUnitLastYear(1.0822);
 
 		Stock ping_an_yin_hang = new Stock("000001", "平安银行");
@@ -119,6 +125,10 @@ public class PortfolioResourceTest extends JerseyTest {
 		data2.setPb(2);
 		when(market.getStockData("601318", null)).thenReturn(data2);
 
+		noneyExchanger = mock(MoneyExchanger.class);
+		when(noneyExchanger.getMoneyPrice(MoneyName.HKD)).thenReturn(new MoneyExchanger.MoneyPrice(0.8, 0.85));
+		when(noneyExchanger.getMoneyPrice(MoneyName.USD)).thenReturn(new MoneyExchanger.MoneyPrice(6.0, 6.5));
+
 		pm = mock(PortfolioManager.class);
 		when(pm.getPortfolio("P00000001")).thenReturn(createPortfolio());
 
@@ -128,6 +138,7 @@ public class PortfolioResourceTest extends JerseyTest {
 			protected void configure() {
 				bind(market).to(StockMarket.class);
 				bind(pm).to(PortfolioManager.class);
+				bind(noneyExchanger).to(MoneyExchanger.class);
 			}
 		});
 		return config;

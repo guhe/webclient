@@ -1,9 +1,8 @@
 package com.guhe.portfolio.test;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,8 +17,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.guhe.market.MoneyExchanger;
 import com.guhe.market.StockData;
-import com.guhe.market.StockMarket;
 import com.guhe.portfolio.DailyData;
 import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
@@ -31,8 +30,6 @@ import com.guhe.portfolio.TradeRecord.BuyOrSell;
 import com.guhe.util.CommonUtil;
 
 public class SupplementDailyDataTest extends PortfolioTestBase {
-
-	private StockMarket market;
 
 	Portfolio portfolio;
 
@@ -51,9 +48,6 @@ public class SupplementDailyDataTest extends PortfolioTestBase {
 	@Before
 	public void before() {
 		super.before();
-
-		market = mock(StockMarket.class);
-		pm.setMarket(market);
 
 		portfolio = new Portfolio();
 		portfolio.setId("ID001");
@@ -76,6 +70,8 @@ public class SupplementDailyDataTest extends PortfolioTestBase {
 		portfolio.add(holding);
 
 		pm.savePortfolio(portfolio);
+
+		when(moneyExchanger.getMoneyPrice(any())).thenReturn(new MoneyExchanger.MoneyPrice(0, 0));
 	}
 
 	@After
@@ -97,7 +93,7 @@ public class SupplementDailyDataTest extends PortfolioTestBase {
 		pm.redeem("ID001", "Tiger", 5000, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
 
 		when(market.isOpen(any())).thenReturn(true);
-		
+
 		when(market.getStockData("000001", getDay("2017-01-10"))).thenReturn(new StockData(6, 0, 0));
 		when(market.getStockData("000001", getDay("2017-01-11"))).thenReturn(new StockData(7, 0, 0));
 		when(market.getStockData("000001", getDay("2017-01-12"))).thenReturn(new StockData(8, 0, 0));
