@@ -449,14 +449,14 @@ public class JpaPortfolioManager implements PortfolioManager {
 		}
 	}
 
-	private void doInTransaction(Runnable r) {
+	private void doInTransaction(Runnable r) throws RuntimeException {
 		em.getTransaction().begin();
 		try {
 			r.run();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
-			throw e;
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -46,7 +46,7 @@ public class TencentStockMarket implements StockMarket {
 
 	@Override
 	public boolean isOpen(Calendar day) {
-		return getHistoryStockData("sh000001", day) == null;
+		return getHistoryStockData("sh000001", day) != null;
 	}
 
 	private StockData getHistoryStockData(String stockFullCode, Calendar day) {
