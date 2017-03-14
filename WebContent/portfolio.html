@@ -62,7 +62,12 @@
 						position : "right",
 						ticks : {
 							callback : function(value, index, values) {
-								return value.toPercent();
+								if(Math.abs(values[values.length - 1] - values[0]) >= 0.1){
+									return value.toPercent();
+								}else{
+									return value.toPercent(1);
+								}
+								
 							},
 							labelOffset : 0
 						},
