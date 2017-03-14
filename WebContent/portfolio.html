@@ -106,6 +106,7 @@
 		$.get({
 			url : "rest/Portfolio/" + portfolioId + "/DailyData/NetWorthPerUnit",
 			dataType : 'json',
+			async : false,
 			success : function(result) {
 				var labels = [];
 				var data = [];
@@ -123,39 +124,38 @@
 				}
 			}
 		});
-		$.get({
-			url : "rest/Market/Stock/sh000001",
-			dataType : 'json',
-			success : function(result) {
+
+		function createOnBenchmarkSuccCallback(datasetIndex) {
+			return function(result) {
 				var data = [];
 				if (result[0]) {
-					var first = result[0]["netWorthPerUnit"];
+					var first = null;
 					$.each(result, function(key, row) {
-						data[key] = row["netWorthPerUnit"] / first - 1;
+						var index = $.inArray(row["date"], chart.data.labels);
+						if (index >= 0) {
+							if (first == null) {
+								first = row["netWorthPerUnit"];
+							}
+							data[index] = row["netWorthPerUnit"] / first - 1;
+						}
 					});
 				}
-				chart.data.datasets[1].data = data;
+				chart.data.datasets[datasetIndex].data = data;
 				if (++curve_count == 3) {
 					chart.update();
 				}
 			}
+		}
+
+		$.get({
+			url : "rest/Market/Stock/sh000300",
+			dataType : 'json',
+			success : createOnBenchmarkSuccCallback(1)
 		});
 		$.get({
 			url : "rest/Market/Stock/sz399905",
 			dataType : 'json',
-			success : function(result) {
-				var data = [];
-				if (result[0]) {
-					var first = result[0]["netWorthPerUnit"];
-					$.each(result, function(key, row) {
-						data[key] = row["netWorthPerUnit"] / first - 1;
-					});
-				}
-				chart.data.datasets[2].data = data;
-				if (++curve_count == 3) {
-					chart.update();
-				}
-			}
+			success : createOnBenchmarkSuccCallback(2)
 		});
 	}
 
