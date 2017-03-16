@@ -122,11 +122,11 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	private void updatePortfolioWithBuy(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
-		if (portfolio.getRmbCash() - fee - amount * price < 0) {
+		portfolio.addCashByName(stock.getExchange().getMoneyName(), CommonUtil.dRound(-amount * price - fee, 2));
+
+		if (CommonUtil.dCompare(portfolio.getCashByName(stock.getExchange().getMoneyName()), 0, 2) < 0) {
 			throw new PortfolioException("no enough money to buy.");
 		}
-
-		portfolio.setRmbCash(CommonUtil.dRound(portfolio.getRmbCash() - amount * price - fee, 2));
 
 		Holding holding = portfolio.getHoldings().stream().filter(e -> e.getStock().getCode().equals(stock.getCode()))
 				.findFirst().orElse(null);
@@ -142,7 +142,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 	}
 
 	private void updatePortfolioWithSell(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
-		portfolio.setRmbCash(CommonUtil.dRound(portfolio.getRmbCash() + amount * price - fee, 2));
+		portfolio.addCashByName(stock.getExchange().getMoneyName(), CommonUtil.dRound(amount * price - fee, 2));
 
 		List<Holding> holdings = portfolio.getHoldings();
 		Holding holding = holdings.stream().filter(e -> e.getStock().getCode().equals(stock.getCode())).findFirst()
@@ -449,14 +449,14 @@ public class JpaPortfolioManager implements PortfolioManager {
 		}
 	}
 
-	private void doInTransaction(Runnable r) throws RuntimeException {
+	private void doInTransaction(Runnable r) {
 		em.getTransaction().begin();
 		try {
 			r.run();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
-			throw new RuntimeException(e);
+			throw e;
 		}
 	}
 

@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import com.guhe.market.MoneyName;
 import com.guhe.util.Reflector;
 
 @Entity
@@ -53,16 +54,22 @@ public class Stock {
 	}
 
 	public enum Exchange {
-		ShangHai('6'), ShenZheng('0', '3');
+		ShangHai(MoneyName.RMB, '6'), ShenZheng(MoneyName.RMB, '0', '3'), ShangHai_B(MoneyName.USD,
+				'9'), ShenZheng_B(MoneyName.HKD, '2');
 
+		private MoneyName moneyName;
 		private List<Character> prefixChars;
 
-		private Exchange(Character... firsts) {
+		private Exchange(MoneyName mn, Character... firsts) {
+			moneyName = mn;
 			prefixChars = Arrays.asList(firsts);
-			
 		}
 
-		public static Exchange get(String code) {
+		public MoneyName getMoneyName() {
+			return moneyName;
+		}
+
+		private static Exchange get(String code) {
 			if (code == null || code.length() == 0) {
 				throw new RuntimeException();
 			}
