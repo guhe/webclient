@@ -123,7 +123,15 @@ public class PortfolioCalculator {
 		}
 
 		public double getMarketWorth() {
-			return holding.getAmount() * data.getPrice();
+			return holding.getAmount() * data.getPrice() * getMoneyPrice();
+		}
+
+		private double getMoneyPrice() {
+			if (holding.getStock().getExchange().getMoneyName() == MoneyName.RMB) {
+				return 1;
+			} else {
+				return moneyExchanger.getMoneyPrice(holding.getStock().getExchange().getMoneyName()).getBuy();
+			}
 		}
 
 		public double getEstimatedCommission() {
@@ -131,9 +139,9 @@ public class PortfolioCalculator {
 					|| holding.getStock().getExchange() == Stock.Exchange.ShenZheng) {
 				return Math.max(5, getMarketWorth() * RATE_COMMISSION);
 			} else if (holding.getStock().getExchange() == Stock.Exchange.ShangHai_B) {
-				return Math.max(1, getMarketWorth() * RATE_COMMISSION_B);
+				return Math.max(1 * getMoneyPrice(), getMarketWorth() * RATE_COMMISSION_B);
 			} else if (holding.getStock().getExchange() == Stock.Exchange.ShenZheng_B) {
-				return Math.max(5, getMarketWorth() * RATE_COMMISSION_B);
+				return Math.max(5 * getMoneyPrice(), getMarketWorth() * RATE_COMMISSION_B);
 			} else {
 				throw new RuntimeException("");
 			}

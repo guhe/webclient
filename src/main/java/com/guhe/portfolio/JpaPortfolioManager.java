@@ -302,28 +302,26 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 			Map<Calendar, List<PurchaseRedeemRecord>> prRecords = portfolio.getPurchaseRedeemRecords().stream()
 					.filter(e -> {
-						Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-						day.setTime(e.getDate());
-						CommonUtil.clearToDay(day);
+						Calendar day = date2CalendarDay(e.getDate());
 						return day.after(startDay) && day.before(endDay) || day.equals(endDay);
 					}).collect(Collectors.groupingBy(e -> {
-						Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-						day.setTime(e.getDate());
-						CommonUtil.clearToDay(day);
-						return day;
+						return date2CalendarDay(e.getDate());
 					}));
 
 			Map<Calendar, List<TradeRecord>> tradeRecords = portfolio.getTradeRecords().stream().filter(e -> {
-				Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-				day.setTime(e.getDate());
-				CommonUtil.clearToDay(day);
+				Calendar day = date2CalendarDay(e.getDate());
 				return (day.after(startDay) && day.before(endDay)) || day.equals(endDay);
 			}).collect(Collectors.groupingBy(e -> {
-				Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-				day.setTime(e.getDate());
-				CommonUtil.clearToDay(day);
-				return day;
+				return date2CalendarDay(e.getDate());
 			}));
+
+			Map<Calendar, List<ExchangeMoneyRecord>> emRecords = portfolio.getExchangeMoneyRecords().stream()
+					.filter(e -> {
+						Calendar day = date2CalendarDay(e.getDate());
+						return (day.after(startDay) && day.before(endDay)) || day.equals(endDay);
+					}).collect(Collectors.groupingBy(e -> {
+						return date2CalendarDay(e.getDate());
+					}));
 
 			Portfolio clonedPortfolio = portfolio.clone();
 
@@ -333,10 +331,29 @@ public class JpaPortfolioManager implements PortfolioManager {
 					DailyData dd = calcDailyData(clonedPortfolio, day);
 					em.persist(dd);
 					undoPurchaseRedeem(clonedPortfolio, prRecords.get(day));
+					undoExchangeMoney(clonedPortfolio, emRecords.get(day));
 					undoTrade(clonedPortfolio, tradeRecords.get(day));
 				}
 			}
 		});
+	}
+
+	private void undoExchangeMoney(Portfolio portfolio, List<ExchangeMoneyRecord> emRecords) {
+		if (emRecords == null) {
+			return;
+		}
+
+		emRecords.forEach(emr -> {
+			portfolio.addCashByName(emr.getTarget(), -emr.getTargetAmount());
+			portfolio.addRmbCash(-emr.getRmbAmount());
+		});
+	}
+
+	private Calendar date2CalendarDay(Date date) {
+		Calendar day = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
+		day.setTime(date);
+		CommonUtil.clearToDay(day);
+		return day;
 	}
 
 	private void undoTrade(Portfolio portfolio, List<TradeRecord> tradeRecord) {
@@ -353,10 +370,12 @@ public class JpaPortfolioManager implements PortfolioManager {
 			}
 
 			if (tr.getBuyOrSell() == TradeRecord.BuyOrSell.BUY) {
-				portfolio.addRmbCash(tr.getAmount() * tr.getPrice() + tr.getFee());
+				portfolio.addCashByName(tr.getStock().getExchange().getMoneyName(),
+						tr.getAmount() * tr.getPrice() + tr.getFee());
 				holding.addAmount(-tr.getAmount());
 			} else {
-				portfolio.addRmbCash(tr.getFee() - tr.getAmount() * tr.getPrice());
+				portfolio.addCashByName(tr.getStock().getExchange().getMoneyName(),
+						tr.getFee() - tr.getAmount() * tr.getPrice());
 				holding.addAmount(tr.getAmount());
 			}
 
