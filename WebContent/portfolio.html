@@ -259,6 +259,7 @@
 			url : "rest/Portfolio/" + portfolioId + "/CashDetail",
 			dataType : 'json',
 			success : function(result) {
+				console.log(result);
 				$.each(result, function(key, row_data) {
 					var row = $("<tr/>").appendTo($("#cash_detail tbody"));
 					$("<td/>").html(row_data["moneyName"]).appendTo(row);
@@ -299,6 +300,7 @@
 	$(document).ready(function() {
 		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
 		$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
+		$("#cash_detail caption a").attr("href", "exchange_money.html?id=" + portfolioId);
 
 		//click net worth button
 		$("#net_worth_bt").click(showNetworthChart);
@@ -427,8 +429,8 @@
 					<th>货币名称</th>
 					<th>金额(本币计价)</th>
 					<th>金额(RMB计价)</th>
-					<th>汇率(RMB->HKD)</th>
-					<th>汇率(HKD->RMB)</th>
+					<th>汇率(RMB->其他)</th>
+					<th>汇率(其他->RMB)</th>
 				</tr>
 			</thead>
 			<tbody>

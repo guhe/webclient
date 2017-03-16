@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>汇兑</title>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<script src="js/jquery-3.0.0.js"></script>
+<script src="js/extends.js"></script>
+<script>
+	var portfolioId = $.getUrlVar("id");
+
+	function loadExchangeMoneyRecord() {
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/ExchangeMoney",
+			dataType : 'json',
+			success : function(result) {
+				$("#detail tbody tr").remove();
+
+				result.sort(function(a, b) {
+					if (a["date"] == b["date"]) {
+						return 0
+					}
+					return a["date"] > b["date"] ? 1 : -1;
+				});
+
+				$.each(result, function(key, row_data) {
+					var row = $("<tr/>").appendTo($("#detail tbody"));
+					$("<td/>").html(
+							row_data["targetAmount"] > 0 ? "RMB-->" + row_data["target"] : row_data["target"]
+									+ "-->RMB").appendTo(row); // 操作类型
+					$("<td/>").html(Math.abs(row_data["targetAmount"])).appendTo(row); // 目标金额
+					$("<td/>").html(Math.abs(row_data["rmbAmount"])).appendTo(row); // RMB金额
+					$("<td/>").html((row_data["rate"] * 100).toFixed(2)).appendTo(row); // 参考汇率
+					$("<td/>").html(row_data["date"]).appendTo(row); // 日期
+				});
+			},
+		});
+	}
+
+	function addExchangeMoneyRecord() {
+		var data = {};
+		var opType = $(".inputArea select option:selected").val();
+		data["target"] = opType.substr(1);
+		var flag = opType[0] == '-' ? -1 : 1;
+		data["targetAmount"] = $(".inputArea input[name='targetAmount']").val() *　flag;
+		data["rmbAmount"] = $(".inputArea input[name='rmbAmount']").val()  *　(-flag);
+		data["date"] = $(".inputArea input[name='date']").val();
+
+		$.post({
+			url : "rest/Portfolio/" + portfolioId + "/ExchangeMoney",
+			contentType : "application/json; charset=utf-8",
+			dataType : 'json',
+			data : JSON.stringify(data),
+			async : false,
+			success : function(result) {
+				if (result["rltCode"] == 0) {
+					$("#tradeTip span").text("操作成功。");
+
+					loadExchangeMoneyRecord();
+				} else {
+					$("#tradeTip span").text(result["message"]);
+				}
+			},
+			error : function() {
+				$("#tradeTip span").text("操作失败。");
+			}
+		});
+	}
+
+	$(document).ready(function() {
+		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
+
+		$(".inputArea form").submit(function(event) {
+			event.preventDefault();
+
+			addExchangeMoneyRecord();
+		});
+
+		$.get({
+			url : "rest/Portfolio/" + portfolioId,
+			dataType : 'json',
+			async : false,
+			success : function(result) {
+				$('title').text("汇兑-" + result["name"]);
+			},
+		});
+
+		loadExchangeMoneyRecord();
+	});
+</script>
+</head>
+<body>
+	<div style="height: 50px"></div>
+	<div align="center">
+		<div id="detail" class="detail">
+			<table class="zebra">
+				<caption>
+					<span>汇兑记录</span> <a href="#">返回</a>
+				</caption>
+				<thead>
+					<tr>
+						<th>操作类型</th>
+						<th>目标金额</th>
+						<th>RMB金额</th>
+						<th>参考汇率</th>
+						<th>日期</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div style="height: 20px"></div>
+		<div class="inputArea" align="center">
+			<form>
+				<table>
+					<tr>
+						<td><span>操作类型：</span></td>
+						<td align="center"><select name="type" style="width: 100%;">
+								<option value="+HKD">人民币-->港币</option>
+								<option value="-HKD">港币-->人民币</option>
+								<option value="+USD">人民币-->美元</option>
+								<option value="-USD">美元-->人民币</option>
+						</select></td>
+					</tr>
+					<tr>
+						<td><span>目标金额：</span></td>
+						<td><input type="text" name="targetAmount"></td>
+					</tr>
+					<tr>
+						<td><span>RMB金额：</span></td>
+						<td><input type="text" name="rmbAmount"></td>
+					</tr>
+					<tr>
+						<td><span>日期：</span></td>
+						<td><input type="text" name="date"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center"><input type="submit"
+							value="确定"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<p id="tradeTip">
+			<span></span>
+		</p>
+	</div>
+</body>
+</html>

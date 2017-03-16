@@ -19,6 +19,7 @@ import com.guhe.market.MoneyExchanger;
 import com.guhe.market.MoneyName;
 import com.guhe.market.StockMarket;
 import com.guhe.portfolio.DailyData;
+import com.guhe.portfolio.ExchangeMoneyRecord;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioCalculator;
 import com.guhe.portfolio.PortfolioException;
@@ -266,6 +267,27 @@ public class PortfolioResource {
 			result = new PortfolioResultViewData(-1, e.getMessage());
 		}
 		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("{portfolio}/ExchangeMoney")
+	public List<ExchangeMoneyParam> getExchangeMoneyRecord(@PathParam("portfolio") String portfolioId) {
+		Portfolio portfolio = pm.getPortfolio(portfolioId);
+		if (portfolio == null) {
+			return null;
+		}
+
+		return portfolio.getExchangeMoneyRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+	}
+
+	private ExchangeMoneyParam createViewData(ExchangeMoneyRecord record) {
+		ExchangeMoneyParam vd = new ExchangeMoneyParam();
+		vd.setTarget(record.getTarget().name());
+		vd.setTargetAmount(record.getTargetAmount());
+		vd.setRmbAmount(record.getRmbAmount());
+		vd.setRate(-record.getRmbAmount()/record.getTargetAmount());
+		vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", record.getDate()));
+		return vd;
 	}
 
 	@GET

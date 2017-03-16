@@ -9,6 +9,7 @@ public class ExchangeMoneyParam {
 	private String target;
 	private double targetAmount;
 	private double rmbAmount;
+	private double rate;
 	private String date;
 
 	public String getTarget() {
@@ -33,6 +34,14 @@ public class ExchangeMoneyParam {
 
 	public void setRmbAmount(double rmbAmount) {
 		this.rmbAmount = rmbAmount;
+	}
+
+	public double getRate() {
+		return rate;
+	}
+
+	public void setRate(double rate) {
+		this.rate = rate;
 	}
 
 	public String getDate() {

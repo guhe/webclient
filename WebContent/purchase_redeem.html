@@ -59,12 +59,10 @@
 				if (result["rltCode"] == 0) {
 					$("#tradeTip span").text("操作成功。");
 					
-					loadTradeRecord();
+					loadPurchaseRedeemRecord();
 				} else {
 					$("#tradeTip span").text(result["message"]);
 				}
-				
-				loadPurchaseRedeemRecord();
 			},
 			error : function() {
 				$("#tradeTip span").text("操作失败。");
