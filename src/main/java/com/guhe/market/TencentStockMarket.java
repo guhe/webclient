@@ -99,9 +99,9 @@ public class TencentStockMarket implements StockMarket {
 	}
 
 	private String toStockFullCode(String stockCode) {
-		if (stockCode.charAt(0) == '6') {
+		if (stockCode.charAt(0) == '6' || stockCode.charAt(0) == '9') {
 			return "sh" + stockCode;
-		} else if (stockCode.charAt(0) == '0' || stockCode.charAt(0) == '3') {
+		} else if (stockCode.charAt(0) == '0' || stockCode.charAt(0) == '2' || stockCode.charAt(0) == '3') {
 			return "sz" + stockCode;
 		} else {
 			throw new RuntimeException("unknown stock code : " + stockCode);
