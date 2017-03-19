@@ -24,6 +24,7 @@ import com.guhe.market.MoneyExchanger;
 import com.guhe.market.MoneyName;
 import com.guhe.market.StockData;
 import com.guhe.market.StockMarket;
+import com.guhe.portfolio.ExchangeMoneyRecord;
 import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
 import com.guhe.portfolio.Portfolio;
@@ -107,6 +108,13 @@ public class PortfolioResourceTest extends JerseyTest {
 		prRecord2.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
 		portfolio.add(prRecord2);
 
+		ExchangeMoneyRecord emr = new ExchangeMoneyRecord();
+		emr.setTarget(MoneyName.HKD);
+		emr.setTargetAmount(10000);
+		emr.setRmbAmount(-8800);
+		emr.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
+		portfolio.add(emr);
+		
 		return portfolio;
 	}
 
@@ -399,5 +407,22 @@ public class PortfolioResourceTest extends JerseyTest {
 		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(0));
 		expectObj.set("message", mapper.getNodeFactory().textNode("OK"));
 		assertEquals(expectObj, response.readEntity(ObjectNode.class));
+	}
+	
+	@Test
+	public void test_get_exchange_money_records(){
+		JsonNode actual = target("/Portfolio/P00000001/ExchangeMoney").request().accept(MediaType.APPLICATION_JSON)
+				.get(JsonNode.class);
+
+		ArrayNode expect = mapper.createArrayNode();
+		ObjectNode obj1 = mapper.createObjectNode();
+		obj1.set("target", mapper.getNodeFactory().textNode("HKD"));
+		obj1.set("targetAmount", mapper.getNodeFactory().numberNode(10000.0));
+		obj1.set("rmbAmount", mapper.getNodeFactory().numberNode(-8800.0));
+		obj1.set("rate", mapper.getNodeFactory().numberNode(0.88));
+		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-11"));
+		expect.add(obj1);
+
+		assertEquals(expect, actual);
 	}
 }

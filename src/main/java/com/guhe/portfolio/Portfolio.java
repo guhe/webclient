@@ -150,6 +150,10 @@ public class Portfolio implements Cloneable {
 		return dailyDatas;
 	}
 
+	public void add(ExchangeMoneyRecord emr) {
+		exchangeMoneyRecords.add(emr);
+	}
+	
 	public List<ExchangeMoneyRecord> getExchangeMoneyRecords() {
 		return exchangeMoneyRecords;
 	}
