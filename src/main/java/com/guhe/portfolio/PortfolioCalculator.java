@@ -94,6 +94,7 @@ public class PortfolioCalculator {
 		private static final double RATE_SH_GUOHU = 0.00002;
 		private static final double RATE_COMMISSION = 0.00025;
 		private static final double RATE_COMMISSION_B = 0.0005;
+		private static final double RATE_SETTLEMENT_B = 0.0005;
 
 		private Holding holding;
 		private StockData data;
@@ -149,8 +150,13 @@ public class PortfolioCalculator {
 
 		public double getEstimatedTax() {
 			double rate = RATE_TAX;
-			if (holding.getStock().getExchange() == Stock.Exchange.ShangHai) {
+			if (holding.getStock().getExchange() == Stock.Exchange.ShangHai
+					|| holding.getStock().getExchange() == Stock.Exchange.ShangHai_B) {
 				rate += RATE_SH_GUOHU;
+			}
+			if (holding.getStock().getExchange() == Stock.Exchange.ShangHai_B
+					|| holding.getStock().getExchange() == Stock.Exchange.ShenZheng_B) {
+				rate += RATE_SETTLEMENT_B;
 			}
 
 			return getMarketWorth() * rate;
