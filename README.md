@@ -4,6 +4,7 @@
 
 ### dev
 [![Build Status](https://travis-ci.org/guhe/webclient.svg?branch=dev)](https://travis-ci.org/guhe/webclient)
+[![codecov.io](https://codecov.io/github/guhe/webclient/coverage.svg?branch=dev)](https://codecov.io/github/guhe/webclient)
 
 # webclient
 
