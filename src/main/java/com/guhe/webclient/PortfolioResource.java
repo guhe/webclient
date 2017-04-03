@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -82,6 +83,20 @@ public class PortfolioResource {
 		return viewData;
 	}
 
+	@DELETE
+	@Path("{portfolio}")
+	public Response deletePortfolio(@PathParam("portfolio") String id) {
+		PortfolioResultViewData result;
+		try {
+			pm.deletePortfolio(id);
+			result = new PortfolioResultViewData(0, "OK");
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = new PortfolioResultViewData(-1, e.getMessage());
+		}
+		return Response.ok(result).build();
+	}
+
 	@GET
 	@Path("{portfolio}/HoldingStock")
 	public List<HoldingStockViewData> getHoldingStocks(@PathParam("portfolio") String portfolioId) {
@@ -98,7 +113,7 @@ public class PortfolioResource {
 		return calculator.getHoldingCalculatorStream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
-	public HoldingStockViewData createViewData(PortfolioCalculator.HoldingCalculator calculator) {
+	private HoldingStockViewData createViewData(PortfolioCalculator.HoldingCalculator calculator) {
 		HoldingStockViewData vd = new HoldingStockViewData();
 		vd.setCode(calculator.getHolding().getStock().getCode());
 		vd.setName(calculator.getHolding().getStock().getName());
@@ -128,7 +143,7 @@ public class PortfolioResource {
 		return calculator.getHolderCalculatorStream().map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
-	public PortfolioHolderViewData createViewData(PortfolioCalculator.HolderCalculator calculator) {
+	private PortfolioHolderViewData createViewData(PortfolioCalculator.HolderCalculator calculator) {
 		PortfolioHolderViewData vd = new PortfolioHolderViewData();
 		vd.setName(calculator.getPortfolioHolder().getHolder().getName());
 		vd.setShare(calculator.getPortfolioHolder().getShare());
@@ -285,7 +300,7 @@ public class PortfolioResource {
 		vd.setTarget(record.getTarget().name());
 		vd.setTargetAmount(record.getTargetAmount());
 		vd.setRmbAmount(record.getRmbAmount());
-		vd.setRate(-record.getRmbAmount()/record.getTargetAmount());
+		vd.setRate(-record.getRmbAmount() / record.getTargetAmount());
 		vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", record.getDate()));
 		return vd;
 	}

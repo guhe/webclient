@@ -5,29 +5,55 @@
 <title>股盒</title>
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 <script src="js/jquery-3.0.0.js"></script>
+<script src="js/dialog.js"></script>
 <script>
-	$(document).ready(function() {
-		$("#detail tbody tr").remove();
+	function deletePortfolio(id, name) {
+		if (!confirm("确定要删除组合\"" + name + "\"吗？")) {
+			return;
+		}
 
-		$.get({
-			url : "rest/Portfolio",
-			dataType : 'json',
+		$.ajax({
+			type : "DELETE",
+			url : "rest/Portfolio/" + id,
 			success : function(result) {
-				$.each(result, function(key, row_data) {
-					var href = "portfolio.html?id=" + row_data["id"];
-					var row = $("<tr/>").appendTo($("#detail tbody"));
-					$("<td/>").html("<a href=\""+href+"\">" + row_data["id"] + "</a>").appendTo(row);
-					$("<td/>").html("<a href=\""+href+"\">" + row_data["name"] + "</a>").appendTo(row);
-				});
+				if (result["rltCode"] == 0) {
+					new Dialog("操作成功。").show();
+				} else {
+					new Dialog(result["message"]).show();
+				}
+			},
+			error : function() {
+				new Dialog("操作失败。").show();
 			}
 		});
-	});
+	}
+
+	$(document).ready(
+			function() {
+				$("#detail tbody tr").remove();
+
+				$.get({
+					url : "rest/Portfolio",
+					dataType : 'json',
+					success : function(result) {
+						$.each(result, function(key, row_data) {
+							var href = "portfolio.html?id=" + row_data["id"];
+							var row = $("<tr/>").appendTo($("#detail tbody"));
+							$("<td/>").html("<a href=\""+href+"\">" + row_data["id"] + "</a>").appendTo(row);
+							$("<td/>").html("<a href=\""+href+"\">" + row_data["name"] + "</a>").appendTo(row);
+							$("<td/>").html(
+									"<a href=\"javascript:deletePortfolio('" + row_data["id"] + "', '"
+											+ row_data["name"] + "')\">删除</a>").appendTo(row);
+						});
+					}
+				});
+			});
 </script>
 </head>
 <body>
 	<div style="height: 50px"></div>
 	<div align="center">
-		<div id= "detail" class="detail">
+		<div id="detail" class="detail">
 			<table class="zebra">
 				<caption>
 					<span>组合列表</span>
@@ -36,6 +62,7 @@
 					<tr>
 						<th>编号</th>
 						<th>名称</th>
+						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody>
