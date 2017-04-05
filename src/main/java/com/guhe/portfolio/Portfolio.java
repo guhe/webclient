@@ -47,6 +47,9 @@ public class Portfolio implements Cloneable {
 	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ExchangeMoneyRecord> exchangeMoneyRecords = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ModifyCashRecord> modifyCashRecords = new ArrayList<>();
+
 	public Portfolio() {
 	}
 
@@ -153,11 +156,19 @@ public class Portfolio implements Cloneable {
 	public void add(ExchangeMoneyRecord emr) {
 		exchangeMoneyRecords.add(emr);
 	}
-	
+
 	public List<ExchangeMoneyRecord> getExchangeMoneyRecords() {
 		return exchangeMoneyRecords;
 	}
+	
+	public void add(ModifyCashRecord mcr){
+		modifyCashRecords.add(mcr);
+	}
 
+	public List<ModifyCashRecord> getModifyCashRecords() {
+		return modifyCashRecords;
+	}
+	
 	public double getCashByName(MoneyName name) {
 		if (name == MoneyName.RMB) {
 			return rmbCash;
@@ -165,6 +176,19 @@ public class Portfolio implements Cloneable {
 			return hkdCash;
 		} else if (name == MoneyName.USD) {
 			return usdCash;
+		} else {
+			throw new PortfolioException(
+					"portfolio does not support this money. portfolioId: " + id + ", money name: " + name);
+		}
+	}
+
+	public void setCashByName(MoneyName name, double money) {
+		if (name == MoneyName.RMB) {
+			rmbCash = money;
+		} else if (name == MoneyName.HKD) {
+			hkdCash = money;
+		} else if (name == MoneyName.USD) {
+			usdCash = money;
 		} else {
 			throw new PortfolioException(
 					"portfolio does not support this money. portfolioId: " + id + ", money name: " + name);

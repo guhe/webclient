@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>修改现金金额</title>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<script src="js/jquery-3.0.0.js"></script>
+<script src="js/extends.js"></script>
+<script>
+	var portfolioId = $.getUrlVar("id");
+
+	function loadModifyCashRecord() {
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/ModifyCash",
+			dataType : 'json',
+			success : function(result) {
+				$("#detail tbody tr").remove();
+
+				result.sort(function(a, b) {
+					if (a["date"] == b["date"]) {
+						return 0
+					}
+					return a["date"] > b["date"] ? 1 : -1;
+				});
+
+				$.each(result, function(key, row_data) {
+					var row = $("<tr/>").appendTo($("#detail tbody"));
+					$("<td/>").html(row_data["target"]).appendTo(row);
+					$("<td/>").html(row_data["oldAmount"].toFixed(2)).appendTo(row);
+					$("<td/>").html(row_data["newAmount"].toFixed(2)).appendTo(row);
+					$("<td/>").html((row_data["newAmount"] - row_data["oldAmount"]).toFixed(2)).appendTo(row);
+					$("<td/>").html(row_data["date"]).appendTo(row); // 日期
+				});
+			},
+		});
+	}
+
+	function addExchangeMoneyRecord() {
+		var data = {};
+		data["target"] = $(".inputArea select option:selected").val();
+		data["newAmount"] = $(".inputArea input[name='newAmount']").val() * 1;
+		data["date"] = $(".inputArea input[name='date']").val();
+
+		$.post({
+			url : "rest/Portfolio/" + portfolioId + "/ModifyCash",
+			contentType : "application/json; charset=utf-8",
+			dataType : 'json',
+			data : JSON.stringify(data),
+			async : false,
+			success : function(result) {
+				if (result["rltCode"] == 0) {
+					$("#tradeTip span").text("操作成功。");
+
+					loadExchangeMoneyRecord();
+				} else {
+					$("#tradeTip span").text(result["message"]);
+				}
+			},
+			error : function() {
+				$("#tradeTip span").text("操作失败。");
+			}
+		});
+	}
+
+	var AllCash = {};
+
+	$(document).ready(function() {
+		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
+
+		$(".inputArea form").submit(function(event) {
+			event.preventDefault();
+
+			addExchangeMoneyRecord();
+		});
+
+		$.get({
+			url : "rest/Portfolio/" + portfolioId + "/CashDetail",
+			dataType : 'json',
+			success : function(result) {
+				$.each(result, function(key, row_data) {
+					AllCash[row_data["moneyName"]] = row_data["amount"];
+				});
+
+				var type = $(".inputArea select option:selected").val();
+				$(".inputArea input[name='oldAmount']").val(AllCash[type] == null ? 0 : AllCash[type]);
+			}
+		});
+
+		$.get({
+			url : "rest/Portfolio/" + portfolioId,
+			dataType : 'json',
+			async : false,
+			success : function(result) {
+				$('title').text("修改现金金额-" + result["name"]);
+			},
+		});
+
+		$(".inputArea select").change(function() {
+			var type = $(".inputArea select option:selected").val();
+			$(".inputArea input[name='oldAmount']").val(AllCash[type] == null ? 0 : AllCash[type]);
+		});
+
+		loadModifyCashRecord();
+	});
+</script>
+</head>
+<body>
+	<div style="height: 50px"></div>
+	<div align="center">
+		<div id="detail" class="detail">
+			<table class="zebra">
+				<caption>
+					<span>修改记录</span> <a href="#">返回</a>
+				</caption>
+				<thead>
+					<tr>
+						<th>货币类型</th>
+						<th>修改前金额</th>
+						<th>修改后金额</th>
+						<th>差额</th>
+						<th>日期</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div style="height: 20px"></div>
+		<div class="inputArea" align="center">
+			<form>
+				<table>
+					<tr>
+						<td><span>操作类型：</span></td>
+						<td align="center"><select name="type" style="width: 100%;">
+								<option value="RMB">人民币</option>
+								<option value="HKD">港币</option>
+								<option value="USD">美元</option>
+						</select></td>
+					</tr>
+					<tr>
+						<td><span>修改前金额：</span></td>
+						<td><input type="text" name="oldAmount" disabled="disabled"></td>
+					</tr>
+					<tr>
+						<td><span>修改后金额：</span></td>
+						<td><input type="text" name="newAmount"></td>
+					</tr>
+					<tr>
+						<td><span>日期：</span></td>
+						<td><input type="text" name="date"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center"><input type="submit"
+							value="确定"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<p id="tradeTip">
+			<span></span>
+		</p>
+	</div>
+</body>
+</html>

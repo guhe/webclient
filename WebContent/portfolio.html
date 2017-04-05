@@ -300,7 +300,8 @@
 	$(document).ready(function() {
 		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
 		$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
-		$("#cash_detail caption a").attr("href", "exchange_money.html?id=" + portfolioId);
+		$("#cash_detail caption a").eq(0).attr("href", "exchange_money.html?id=" + portfolioId);
+		$("#cash_detail caption a").eq(1).attr("href", "modify_cash.html?id=" + portfolioId);
 
 		//click net worth button
 		$("#net_worth_bt").click(showNetworthChart);
@@ -422,7 +423,7 @@
 	<div id="cash_detail" class="detail">
 		<table class="zebra">
 			<caption>
-				<span>现金明细</span> <a href="#">兑换</a>
+				<span>现金明细</span> <a href="#">兑换</a> <a href="#">修改</a>
 			</caption>
 			<thead>
 				<tr>

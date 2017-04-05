@@ -116,7 +116,6 @@ public class ExchangeMoneyTest extends PortfolioTestBase {
 		assertEquals(target, record.getTarget());
 		assertEquals(targetAmount, record.getTargetAmount(), 0.01);
 		assertEquals(rmbAmount, record.getRmbAmount(), 0.01);
-		assertEquals(target, record.getTarget());
-		CommonUtil.parseDate("yyyy-MM-dd", date);
+		assertEquals(CommonUtil.parseDate("yyyy-MM-dd", date), record.getDate());
 	}
 }

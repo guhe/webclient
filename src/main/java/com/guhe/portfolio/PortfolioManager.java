@@ -31,4 +31,6 @@ public interface PortfolioManager {
 	void supplementDailyData(String portfolioId, Date endDate);
 
 	void exchangeMoney(String portfolioId, MoneyName target, double targetAmount, double rmbAmount, Date date);
+	
+	void modifyCash(String portfolioId, MoneyName target, double amount, Date date);
 }

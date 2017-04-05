@@ -359,4 +359,33 @@ public class PortfolioResource {
 			cashDetails.add(cashDetail);
 		}
 	}
+
+	@POST
+	@Path("{portfolio}/ModifyCash")
+	public Response modifyCash(@PathParam("portfolio") String portfolioId, ModifyCashViewData param) {
+		PortfolioResultViewData result;
+		try {
+			Date date = CommonUtil.parseDate("yyyy-MM-dd", param.getDate());
+			pm.modifyCash(portfolioId, MoneyName.valueOf(param.getTarget()), param.getNewAmount(), date);
+			result = new PortfolioResultViewData(0, "OK");
+		} catch (Exception e) {
+			LOGGER.warning("Failed to modify cash, portfolioId: " + portfolioId + ", param: " + param + ", reason: "
+					+ e.getMessage());
+			result = new PortfolioResultViewData(-1, e.getMessage());
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("{portfolio}/ModifyCash")
+	public List<ModifyCashViewData> getModifyCashRecords(@PathParam("portfolio") String portfolioId) {
+		return pm.getPortfolio(portfolioId).getModifyCashRecords().stream().map(e -> {
+			ModifyCashViewData vd = new ModifyCashViewData();
+			vd.setTarget(e.getTarget().name());
+			vd.setOldAmount(e.getOldAmount());
+			vd.setNewAmount(e.getNewAmount());
+			vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", e.getDate()));
+			return vd;
+		}).collect(Collectors.toList());
+	}
 }

@@ -27,6 +27,7 @@ import com.guhe.market.StockMarket;
 import com.guhe.portfolio.ExchangeMoneyRecord;
 import com.guhe.portfolio.Holder;
 import com.guhe.portfolio.Holding;
+import com.guhe.portfolio.ModifyCashRecord;
 import com.guhe.portfolio.Portfolio;
 import com.guhe.portfolio.PortfolioException;
 import com.guhe.portfolio.PortfolioHolder;
@@ -114,6 +115,13 @@ public class PortfolioResourceTest extends JerseyTest {
 		emr.setRmbAmount(-8800);
 		emr.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
 		portfolio.add(emr);
+		
+		ModifyCashRecord mcr = new ModifyCashRecord();
+		mcr.setTarget(MoneyName.RMB);
+		mcr.setOldAmount(13000);
+		mcr.setNewAmount(13066);
+		mcr.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
+		portfolio.add(mcr);
 
 		return portfolio;
 	}
@@ -454,6 +462,42 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj3.set("sellPrice", mapper.getNodeFactory().numberNode(6.5));
 		obj3.set("rmbAmount", mapper.getNodeFactory().numberNode(6000.0));
 		expect.add(obj3);
+		
+		assertEquals(expect, actual);
+	}
+
+	@Test
+	public void test_modify_cash_succ() {
+		ObjectNode reqMsg = mapper.createObjectNode();
+		reqMsg.set("target", mapper.getNodeFactory().textNode("HKD"));
+		reqMsg.set("newAmount", mapper.getNodeFactory().numberNode(8000.0));
+		reqMsg.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		Entity<String> entity = Entity.json(reqMsg.toString());
+		Response response = target("/Portfolio/P00000001/ModifyCash").request().accept(MediaType.APPLICATION_JSON)
+				.post(entity);
+
+		verify(pm).modifyCash("P00000001", MoneyName.HKD, 8000.0, CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"));
+
+		assertEquals(200, response.getStatus());
+
+		ObjectNode expectObj = mapper.createObjectNode();
+		expectObj.set("rltCode", mapper.getNodeFactory().numberNode(0));
+		expectObj.set("message", mapper.getNodeFactory().textNode("OK"));
+		assertEquals(expectObj, response.readEntity(ObjectNode.class));
+	}
+
+	@Test
+	public void test_get_modify_cash_records(){
+		JsonNode actual = target("/Portfolio/P00000001/ModifyCash").request().accept(MediaType.APPLICATION_JSON)
+				.get(JsonNode.class);
+		
+		ArrayNode expect = mapper.createArrayNode();
+		ObjectNode obj1 = mapper.createObjectNode();
+		obj1.set("target", mapper.getNodeFactory().textNode("RMB"));
+		obj1.set("oldAmount", mapper.getNodeFactory().numberNode(13000.0));
+		obj1.set("newAmount", mapper.getNodeFactory().numberNode(13066.0));
+		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-11"));
+		expect.add(obj1);
 		
 		assertEquals(expect, actual);
 	}

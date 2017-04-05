@@ -323,10 +323,18 @@ public class JpaPortfolioManager implements PortfolioManager {
 						return date2CalendarDay(e.getDate());
 					}));
 
+			Map<Calendar, List<ModifyCashRecord>> mcRecords = portfolio.getModifyCashRecords().stream().filter(e -> {
+				Calendar day = date2CalendarDay(e.getDate());
+				return (day.after(startDay) && day.before(endDay)) || day.equals(endDay);
+			}).collect(Collectors.groupingBy(e -> {
+				return date2CalendarDay(e.getDate());
+			}));
+
 			Portfolio clonedPortfolio = portfolio.clone();
 
 			for (Calendar day = endDay; day.after(startDay) || day.equals(startDay); day.add(Calendar.DAY_OF_MONTH,
 					-1)) {
+				undoModifyCash(clonedPortfolio, mcRecords.get(day));
 				if (market.isOpen(day)) {
 					DailyData dd = calcDailyData(clonedPortfolio, day);
 					em.persist(dd);
@@ -335,6 +343,16 @@ public class JpaPortfolioManager implements PortfolioManager {
 					undoTrade(clonedPortfolio, tradeRecords.get(day));
 				}
 			}
+		});
+	}
+
+	private void undoModifyCash(Portfolio portfolio, List<ModifyCashRecord> mcRecords) {
+		if (mcRecords == null) {
+			return;
+		}
+
+		mcRecords.forEach(e -> {
+			portfolio.addCashByName(e.getTarget(), e.getOldAmount() - e.getNewAmount());
 		});
 	}
 
@@ -466,6 +484,33 @@ public class JpaPortfolioManager implements PortfolioManager {
 			throw new PortfolioException("No enough money to exchange. portfolioId: " + portfolio.getId() + ", Money: "
 					+ name + ", current: " + portfolio.getCashByName(name) + ", required: " + amount);
 		}
+	}
+
+	@Override
+	public void modifyCash(String portfolioId, MoneyName target, double amount, Date date) {
+		LOGGER.info("modify cash, portfolioId: " + portfolioId + ", target: " + target + "amount: " + amount
+				+ ", date: " + date);
+
+		if (amount < 0) {
+			throw new PortfolioException("amount can not be less than 0.");
+		}
+
+		doInTransaction(() -> {
+			Portfolio portfolio = getPortfolio(portfolioId);
+			if (portfolio == null) {
+				throw new PortfolioException("no such portfolio.");
+			}
+
+			ModifyCashRecord record = new ModifyCashRecord();
+			record.setPortfolio(portfolio);
+			record.setTarget(target);
+			record.setNewAmount(amount);
+			record.setOldAmount(portfolio.getCashByName(target));
+			record.setDate(date);
+			em.persist(record);
+
+			portfolio.setCashByName(target, amount);
+		});
 	}
 
 	private void doInTransaction(Runnable r) {
