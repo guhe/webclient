@@ -27,7 +27,9 @@ public class JerseyConfig extends ResourceConfig {
 		packages("com.guhe.webclient");
 
 		register(ImmediateFeature.class);
-
+		
+		register(CacheControlFeature.class);
+		
 		register(new AbstractBinder() {
 			@Override
 			protected void configure() {
