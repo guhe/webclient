@@ -34,6 +34,9 @@ class CacheControlFeature implements DynamicFeature {
 		@Override
 		public void filter(ContainerRequestContext reqContext, ContainerResponseContext rspContext) {
 			rspContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, headerValue);
+			if (this == NO_CACHE_FILTER) {
+				rspContext.getHeaders().putSingle(HttpHeaders.EXPIRES, 0);
+			}
 		}
 
 	}
