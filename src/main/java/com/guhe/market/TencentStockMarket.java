@@ -64,7 +64,7 @@ public class TencentStockMarket implements StockMarket {
 			lltms.put(stockFullCode, lltm);
 		}
 		long now = System.currentTimeMillis();
-		if (Math.abs(now - lltm.current) > 10 * 1000) {
+		if (Math.abs(now - lltm.his) > 60 * 60 * 1000) {
 			hisCache.remove(stockFullCode);
 		}
 
@@ -76,7 +76,7 @@ public class TencentStockMarket implements StockMarket {
 			String url = toUrl(stockFullCode, false);
 			String data = ClientBuilder.newClient().target(url).request().get(String.class);
 			parseHisData(data, stockFullCode, stockDatas);
-			lltm.current = now;
+			lltm.his = now;
 
 			LOGGER.info("Loaded a stock data, stock : " + stockFullCode + ", data : " + stockDatas);
 		}
@@ -105,7 +105,7 @@ public class TencentStockMarket implements StockMarket {
 			lltms.put(stockFullCode, lltm);
 		}
 		long now = System.currentTimeMillis();
-		if (Math.abs(now - lltm.current) > 60 * 60 * 1000) {
+		if (Math.abs(now - lltm.current) > 30 * 1000) {
 			cache.remove(stockFullCode);
 		}
 

@@ -14,7 +14,7 @@ public class ZsMoneyExchanger implements MoneyExchanger {
 	@Override
 	public synchronized MoneyPrice getMoneyPrice(MoneyName moneyName) {
 		long now = System.currentTimeMillis();
-		if(Math.abs(now - lastLoadTimeMillis) > 10 * 1000){
+		if (Math.abs(now - lastLoadTimeMillis) > 5 * 60 * 1000) {
 			moneyPrices.clear();
 		}
 		if (moneyPrices.isEmpty()) {
