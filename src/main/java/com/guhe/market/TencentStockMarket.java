@@ -17,6 +17,7 @@ import com.guhe.util.CommonUtil;
 public class TencentStockMarket implements StockMarket {
 	private static final Logger LOGGER = Logger.getLogger(TencentStockMarket.class.getName());
 
+	private Map<String, LastLoadTimeMillis> lltms = new HashMap<>();
 	private Map<String, StockData> cache = new HashMap<>();
 	private Map<String, Map<String, StockData>> hisCache = new HashMap<>();
 
@@ -57,6 +58,16 @@ public class TencentStockMarket implements StockMarket {
 	}
 
 	private void tryLoadStockDatas(String stockFullCode) {
+		LastLoadTimeMillis lltm = lltms.get(stockFullCode);
+		if (lltm == null) {
+			lltm = new LastLoadTimeMillis();
+			lltms.put(stockFullCode, lltm);
+		}
+		long now = System.currentTimeMillis();
+		if (Math.abs(now - lltm.current) > 10 * 1000) {
+			hisCache.remove(stockFullCode);
+		}
+
 		Map<String, StockData> stockDatas = hisCache.get(stockFullCode);
 		if (stockDatas == null) {
 			stockDatas = new HashMap<>();
@@ -65,6 +76,9 @@ public class TencentStockMarket implements StockMarket {
 			String url = toUrl(stockFullCode, false);
 			String data = ClientBuilder.newClient().target(url).request().get(String.class);
 			parseHisData(data, stockFullCode, stockDatas);
+			lltm.current = now;
+
+			LOGGER.info("Loaded a stock data, stock : " + stockFullCode + ", data : " + stockDatas);
 		}
 	}
 
@@ -85,12 +99,23 @@ public class TencentStockMarket implements StockMarket {
 	}
 
 	private StockData getCurrentStockData(String stockFullCode) {
+		LastLoadTimeMillis lltm = lltms.get(stockFullCode);
+		if (lltm == null) {
+			lltm = new LastLoadTimeMillis();
+			lltms.put(stockFullCode, lltm);
+		}
+		long now = System.currentTimeMillis();
+		if (Math.abs(now - lltm.current) > 60 * 60 * 1000) {
+			cache.remove(stockFullCode);
+		}
+
 		if (!cache.containsKey(stockFullCode)) {
 			String url = toUrl(stockFullCode, true);
 
 			String data = ClientBuilder.newClient().target(url).request().get(String.class);
 			StockData sd = buildStockData(data, stockFullCode);
 			cache.put(stockFullCode, sd);
+			lltm.current = now;
 
 			LOGGER.info("Loaded a stock data, stock : " + stockFullCode + ", data : " + sd);
 		}
@@ -111,7 +136,7 @@ public class TencentStockMarket implements StockMarket {
 	private String toUrl(String stockFullCode, boolean onlyCurrent) {
 		int days = 1;
 		if (!onlyCurrent) {
-			days = 180;
+			days = 90;
 		}
 		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,{1},";
 		return MessageFormat.format(urlPattern, stockFullCode, days);
@@ -133,3 +158,8 @@ public class TencentStockMarket implements StockMarket {
 	}
 }
 
+class LastLoadTimeMillis {
+	long current;
+	long his;
+
+}

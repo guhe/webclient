@@ -8,12 +8,18 @@ import java.util.regex.Pattern;
 import javax.ws.rs.client.ClientBuilder;
 
 public class ZsMoneyExchanger implements MoneyExchanger {
+	private long lastLoadTimeMillis = 0;
 	private Map<MoneyName, MoneyPrice> moneyPrices = new HashMap<>();
 
 	@Override
 	public synchronized MoneyPrice getMoneyPrice(MoneyName moneyName) {
+		long now = System.currentTimeMillis();
+		if(Math.abs(now - lastLoadTimeMillis) > 10 * 1000){
+			moneyPrices.clear();
+		}
 		if (moneyPrices.isEmpty()) {
 			loadExchangeRate();
+			lastLoadTimeMillis = now;
 		}
 		return moneyPrices.get(moneyName);
 	}
