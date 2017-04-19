@@ -136,7 +136,7 @@ public class TencentStockMarket implements StockMarket {
 	private String toUrl(String stockFullCode, boolean onlyCurrent) {
 		int days = 1;
 		if (!onlyCurrent) {
-			days = 90;
+			days = 180;
 		}
 		String urlPattern = "http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={0},day,,,{1},";
 		return MessageFormat.format(urlPattern, stockFullCode, days);
