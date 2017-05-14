@@ -64,12 +64,12 @@
 						position : "right",
 						ticks : {
 							callback : function(value, index, values) {
-								if(Math.abs(values[values.length - 1] - values[0]) >= 0.1){
+								if (Math.abs(values[values.length - 1] - values[0]) >= 0.1) {
 									return value.toPercent();
-								}else{
+								} else {
 									return value.toPercent(1);
 								}
-								
+
 							},
 							labelOffset : 0
 						},
@@ -177,13 +177,30 @@
 					return b["proportion"] - a["proportion"];
 				});
 				$.each(result, function(key, row_data) {
+					var tradeRecords = $("<table/>");
+					tradeRecords.attr("class", "inner-table");
+					var trRow = $("<tr/>");
+					trRow.appendTo(tradeRecords);
+					trRow.css("color", "red");
+					$("<td/>").html("买").appendTo(trRow);
+					$("<td/>").html("100").appendTo(trRow);
+					$("<td/>").html("5.52").appendTo(trRow);
+					
+					trRow = $("<tr/>");
+					trRow.appendTo(tradeRecords);
+					trRow.css("color", "green");
+					$("<td/>").html("卖").appendTo(trRow);
+					$("<td/>").html("1000").appendTo(trRow);
+					$("<td/>").html("15.52").appendTo(trRow);
+
 					var row = $("<tr/>").appendTo($("#stock_detail tbody"));
 					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
 					$("<td/>").html(row_data["amount"]).appendTo(row); // 数量
 					$("<td/>").html(row_data["curPrice"].toFixed(2)).appendTo(row); // 价格
 					$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
-					$("<td/>").html(row_data["estimatedCommission"].toFixed(2)).appendTo(row); //预计手续费
-					$("<td/>").html(row_data["estimatedTax"].toFixed(2)).appendTo(row); //预计税费
+					$("<td/>").html((row_data["estimatedCommission"] + row_data["estimatedTax"]).toFixed(2)).appendTo(
+							row); //预计负债
+					$("<td/>").css("padding", "0px").html(tradeRecords).appendTo(row);
 					$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
 					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
 				});
@@ -393,8 +410,8 @@
 					<th>数量</th>
 					<th>现价</th>
 					<th>市值</th>
-					<th>预计手续费</th>
-					<th>预计税费</th>
+					<th>预计负债</th>
+					<th>近期成交</th>
 					<th>净值</th>
 					<th>占比</th>
 				</tr>

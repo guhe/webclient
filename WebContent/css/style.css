@@ -58,7 +58,7 @@ html, body {
 	font-weight: normal;
 }
 
-.zebra tbody tr:nth-child(even) {
+.zebra tbody>tr:nth-child(even) {
 	background: #3c3c3c;
 	color: #fff;
 }
@@ -87,6 +87,25 @@ html, body {
 	border-style: solid;
 	border-width: 1px;
 }
+
+/* ---------- trade record -------- */
+.inner-table {
+	width: 100%;
+	border-width: 0;
+	border-style: none;
+}
+
+.inner-table td {
+	border-width: 0;
+	text-align: left;
+	padding: 1px;
+}
+
+.inner-table tr {
+	background: inherit;
+	color: inherit;
+}
+
 
 /* ---------- index.html ---------- */
 .gmt {
