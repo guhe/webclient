@@ -176,22 +176,24 @@
 				result.sort(function(a, b) {
 					return b["proportion"] - a["proportion"];
 				});
+				
 				$.each(result, function(key, row_data) {
 					var tradeRecords = $("<table/>");
 					tradeRecords.attr("class", "inner-table");
-					var trRow = $("<tr/>");
-					trRow.appendTo(tradeRecords);
-					trRow.css("color", "red");
-					$("<td/>").html("买").appendTo(trRow);
-					$("<td/>").html("100").appendTo(trRow);
-					$("<td/>").html("5.52").appendTo(trRow);
-					
-					trRow = $("<tr/>");
-					trRow.appendTo(tradeRecords);
-					trRow.css("color", "green");
-					$("<td/>").html("卖").appendTo(trRow);
-					$("<td/>").html("1000").appendTo(trRow);
-					$("<td/>").html("15.52").appendTo(trRow);
+					row_data.tradeRecords.sort(function(a, b){
+						if (a["date"] == b["date"]) {
+							return 0;
+						}
+						return a["date"] > b["date"] ? 1 : -1;
+					});
+					$.each(row_data.tradeRecords, function(key, tr) {
+						var trRow = $("<tr/>");
+						trRow.appendTo(tradeRecords);
+						trRow.css("color", tr.buyOrSell == "BUY" ? "red" : "green");
+						$("<td/>").html(tr.buyOrSell == "BUY" ? "买" : "卖").appendTo(trRow);
+						$("<td/>").html(tr.amount).appendTo(trRow);
+						$("<td/>").html(tr.price).appendTo(trRow);
+					});
 
 					var row = $("<tr/>").appendTo($("#stock_detail tbody"));
 					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
@@ -278,7 +280,6 @@
 			url : "rest/Portfolio/" + portfolioId + "/CashDetail",
 			dataType : 'json',
 			success : function(result) {
-				console.log(result);
 				$.each(result, function(key, row_data) {
 					var row = $("<tr/>").appendTo($("#cash_detail tbody"));
 					$("<td/>").html(row_data["moneyName"]).appendTo(row);
