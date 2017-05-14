@@ -1,6 +1,8 @@
 package com.guhe.portfolio;
 
 import java.util.Calendar;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.guhe.market.MoneyExchanger;
@@ -168,6 +170,12 @@ public class PortfolioCalculator {
 
 		public double getProportion() {
 			return getNetWorth() / PortfolioCalculator.this.getNetWorth();
+		}
+
+		public List<TradeRecord> getTradeRecords() {
+			return holding.getPortfolio().getTradeRecords().stream()
+					.filter(e -> e.getStock().getCode().equals(holding.getStock().getCode()))
+					.collect(Collectors.toList());
 		}
 	}
 

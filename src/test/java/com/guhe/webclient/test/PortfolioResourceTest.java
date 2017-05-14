@@ -60,16 +60,22 @@ public class PortfolioResourceTest extends JerseyTest {
 		portfolio.setNetWorthPerUnitLastYear(1.0822);
 
 		Stock ping_an_yin_hang = new Stock("000001", "平安银行");
-		portfolio.add(new Holding(ping_an_yin_hang, 5800));
+		Holding holding1 = new Holding(ping_an_yin_hang, 5800);
+		holding1.setPortfolio(portfolio);
+		portfolio.add(holding1);
 		Stock zhong_guo_ping_an = new Stock("601318", "中国平安");
-		portfolio.add(new Holding(zhong_guo_ping_an, 3600));
+		Holding holding2 = new Holding(zhong_guo_ping_an, 3600);
+		holding2.setPortfolio(portfolio);
+		portfolio.add(holding2);
 
 		PortfolioHolder holder1 = new PortfolioHolder();
+		holder1.setPortfolio(portfolio);
 		holder1.setHolder(new Holder("Tiger"));
 		holder1.setShare(70000.0);
 		holder1.setTotalInvestment(50000);
 		portfolio.add(holder1);
 		PortfolioHolder holder2 = new PortfolioHolder();
+		holder2.setPortfolio(portfolio);
 		holder2.setHolder(new Holder("Angel"));
 		holder2.setShare(80000.0);
 		holder2.setTotalInvestment(50000);
@@ -115,7 +121,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		emr.setRmbAmount(-8800);
 		emr.setDate(CommonUtil.parseDate("yyyy-MM-dd", "2016-08-11"));
 		portfolio.add(emr);
-		
+
 		ModifyCashRecord mcr = new ModifyCashRecord();
 		mcr.setTarget(MoneyName.RMB);
 		mcr.setOldAmount(13000);
@@ -199,6 +205,17 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj1.set("estimatedTax", mapper.getNodeFactory().numberNode(51.504));
 		obj1.set("netWorth", mapper.getNodeFactory().numberNode(51439.62));
 		obj1.set("proportion", mapper.getNodeFactory().numberNode(0.271364));
+		ArrayNode trs = mapper.createArrayNode();
+		ObjectNode tr = mapper.createObjectNode();
+		tr.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
+		tr.set("stockCode", mapper.getNodeFactory().textNode("000001"));
+		tr.set("stockName", mapper.getNodeFactory().textNode("平安银行"));
+		tr.set("amount", mapper.getNodeFactory().numberNode(500));
+		tr.set("price", mapper.getNodeFactory().numberNode(8.65));
+		tr.set("fee", mapper.getNodeFactory().numberNode(5.0));
+		tr.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		trs.add(tr);
+		obj1.set("tradeRecords", trs);
 		expect.add(obj1);
 
 		ObjectNode obj2 = mapper.createObjectNode();
@@ -211,6 +228,17 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj2.set("estimatedTax", mapper.getNodeFactory().numberNode(117.504));
 		obj2.set("netWorth", mapper.getNodeFactory().numberNode(115053.696));
 		obj2.set("proportion", mapper.getNodeFactory().numberNode(0.606954));
+		trs = mapper.createArrayNode();
+		tr = mapper.createObjectNode();
+		tr.set("buyOrSell", mapper.getNodeFactory().textNode("SELL"));
+		tr.set("stockCode", mapper.getNodeFactory().textNode("601318"));
+		tr.set("stockName", mapper.getNodeFactory().textNode("中国平安"));
+		tr.set("amount", mapper.getNodeFactory().numberNode(300));
+		tr.set("price", mapper.getNodeFactory().numberNode(38.88));
+		tr.set("fee", mapper.getNodeFactory().numberNode(10.5));
+		tr.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
+		trs.add(tr);
+		obj2.set("tradeRecords", trs);
 		expect.add(obj2);
 
 		assertEquals(expect, actual);
@@ -434,12 +462,12 @@ public class PortfolioResourceTest extends JerseyTest {
 
 		assertEquals(expect, actual);
 	}
-	
+
 	@Test
 	public void test_get_cash_detail() {
 		JsonNode actual = target("/Portfolio/P00000001/CashDetail").request().accept(MediaType.APPLICATION_JSON)
 				.get(JsonNode.class);
-		
+
 		ArrayNode expect = mapper.createArrayNode();
 		ObjectNode obj1 = mapper.createObjectNode();
 		obj1.set("moneyName", mapper.getNodeFactory().textNode("RMB"));
@@ -462,7 +490,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj3.set("sellPrice", mapper.getNodeFactory().numberNode(6.5));
 		obj3.set("rmbAmount", mapper.getNodeFactory().numberNode(6000.0));
 		expect.add(obj3);
-		
+
 		assertEquals(expect, actual);
 	}
 
@@ -487,10 +515,10 @@ public class PortfolioResourceTest extends JerseyTest {
 	}
 
 	@Test
-	public void test_get_modify_cash_records(){
+	public void test_get_modify_cash_records() {
 		JsonNode actual = target("/Portfolio/P00000001/ModifyCash").request().accept(MediaType.APPLICATION_JSON)
 				.get(JsonNode.class);
-		
+
 		ArrayNode expect = mapper.createArrayNode();
 		ObjectNode obj1 = mapper.createObjectNode();
 		obj1.set("target", mapper.getNodeFactory().textNode("RMB"));
@@ -498,7 +526,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj1.set("newAmount", mapper.getNodeFactory().numberNode(13066.0));
 		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-11"));
 		expect.add(obj1);
-		
+
 		assertEquals(expect, actual);
 	}
 }

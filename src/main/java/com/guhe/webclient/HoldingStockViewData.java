@@ -1,5 +1,7 @@
 package com.guhe.webclient;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "holdingStock")
@@ -13,6 +15,7 @@ class HoldingStockViewData {
 	private double estimatedTax;
 	private double netWorth;
 	private double proportion;
+	private List<TradeRecordViewData> tradeRecords;
 
 	public String getName() {
 		return name;
@@ -84,5 +87,13 @@ class HoldingStockViewData {
 
 	public void setProportion(Double proportion) {
 		this.proportion = proportion;
+	}
+
+	public List<TradeRecordViewData> getTradeRecords() {
+		return tradeRecords;
+	}
+
+	public void setTradeRecords(List<TradeRecordViewData> tradeRecords) {
+		this.tradeRecords = tradeRecords;
 	}
 }
