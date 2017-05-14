@@ -124,8 +124,9 @@ public class PortfolioResource {
 		vd.setEstimatedTax(calculator.getEstimatedTax());
 		vd.setNetWorth(calculator.getNetWorth());
 		vd.setProportion(calculator.getProportion());
-		vd.setTradeRecords(calculator.getTradeRecords().stream().limit(2).map(e -> createViewData(e))
-				.collect(Collectors.toList()));
+		vd.setTradeRecords(calculator.getTradeRecords().stream().sorted((e1, e2) -> {
+			return -e1.getDate().compareTo(e2.getDate());
+		}).limit(2).map(e -> createViewData(e)).collect(Collectors.toList()));
 
 		return vd;
 	}
