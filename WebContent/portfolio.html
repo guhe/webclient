@@ -176,11 +176,11 @@
 				result.sort(function(a, b) {
 					return b["proportion"] - a["proportion"];
 				});
-				
+
 				$.each(result, function(key, row_data) {
 					var tradeRecords = $("<table/>");
 					tradeRecords.attr("class", "inner-table");
-					row_data.tradeRecords.sort(function(a, b){
+					row_data.tradeRecords.sort(function(a, b) {
 						if (a["date"] == b["date"]) {
 							return 0;
 						}
@@ -318,10 +318,32 @@
 	}
 
 	$(document).ready(function() {
-		$("#stock_detail caption a").attr("href", "trade.html?id=" + portfolioId);
-		$("#holder_detail caption a").attr("href", "purchase_redeem.html?id=" + portfolioId);
-		$("#cash_detail caption a").eq(0).attr("href", "exchange_money.html?id=" + portfolioId);
-		$("#cash_detail caption a").eq(1).attr("href", "modify_cash.html?id=" + portfolioId);
+		var priv = $.getUrlVar("priv");
+		if (priv == "admin") {
+			$("#stock_detail caption a").show();
+			$("#holder_detail caption a").show();
+			$("#cash_detail caption a").eq(0).show();
+			$("#cash_detail caption a").eq(1).show();
+
+			$("#supplement_bt").show();
+		} else {
+			$("#stock_detail caption a").hide();
+			$("#holder_detail caption a").hide();
+			$("#cash_detail caption a").eq(0).hide();
+			$("#cash_detail caption a").eq(1).hide();
+
+			$("#supplement_bt").hide();
+		}
+
+		var urlParams = "id=" + portfolioId;
+		if (priv != null) {
+			urlParams += "&priv=" + priv;
+		}
+
+		$("#stock_detail caption a").attr("href", "trade.html?" + urlParams);
+		$("#holder_detail caption a").attr("href", "purchase_redeem.html?" + urlParams);
+		$("#cash_detail caption a").eq(0).attr("href", "exchange_money.html?" + urlParams);
+		$("#cash_detail caption a").eq(1).attr("href", "modify_cash.html?" + urlParams);
 
 		//click net worth button
 		$("#net_worth_bt").click(showNetworthChart);
@@ -392,7 +414,8 @@
 		<button id="cash_bt" type="button" class="button black">现金管理</button>
 		<button type="button" class="button black">0</button>
 		<button type="button" class="button black">0</button>
-		<button id="supplement_bt" type="button" class="button black">补录历史净值</button>
+		<button id="supplement_bt" type="button" class="button black"
+			style="display: none">补录历史净值</button>
 		<button type="button" class="button black">0</button>
 	</div>
 

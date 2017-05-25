@@ -70,7 +70,13 @@
 	}
 
 	$(document).ready(function() {
-		$("#detail caption a").attr("href", "portfolio.html?id=" + portfolioId);
+		var priv = $.getUrlVar("priv");
+		var urlParams = "id=" + portfolioId;
+		if (priv != null) {
+			urlParams += "&priv=" + priv;
+		}
+		
+		$("#detail caption a").attr("href", "portfolio.html?" + urlParams);
 
 		$(".inputArea form").submit(function(event) {
 			event.preventDefault();
