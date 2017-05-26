@@ -53,8 +53,18 @@ public class TencentStockMarket implements StockMarket {
 	private StockData getHistoryStockData(String stockFullCode, Calendar day) {
 		tryLoadStockDatas(stockFullCode);
 
-		String dayStr = CommonUtil.formatDate("yyyy-MM-dd", day.getTime());
-		return hisCache.get(stockFullCode).get(dayStr);
+		StockData sd = null;
+		day = (Calendar) day.clone();
+		do {
+			String dayStr = CommonUtil.formatDate("yyyy-MM-dd", day.getTime());
+			sd = hisCache.get(stockFullCode).get(dayStr);
+			if (sd == null) {
+				LOGGER.info("no stock data for "+stockFullCode+" at "+dayStr+", try yesterday.");
+				day.add(Calendar.DAY_OF_YEAR, -1);
+			}
+		} while (sd == null);
+
+		return sd;
 	}
 
 	private void tryLoadStockDatas(String stockFullCode) {
