@@ -103,7 +103,15 @@ public class PortfolioCalculator {
 
 		public HoldingCalculator(Holding holding) {
 			this.holding = holding;
-			this.data = market.getStockData(holding.getStock().getCode(), day);
+			
+			data = market.getStockData(holding.getStock().getCode(), day);
+			if (data == null && day != null) {
+				Calendar yesterday = (Calendar) day.clone();
+				do {
+					yesterday.add(Calendar.DAY_OF_YEAR, -1);
+					data = market.getStockData(holding.getStock().getCode(), yesterday);
+				} while (data == null);
+			}
 			if (data == null) {
 				throw new RuntimeException("no stock data, stock: " + holding.getStock().getCode() + ", day: " + day);
 			}
