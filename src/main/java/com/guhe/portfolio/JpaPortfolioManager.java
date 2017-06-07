@@ -334,14 +334,14 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 			for (Calendar day = endDay; day.after(startDay) || day.equals(startDay); day.add(Calendar.DAY_OF_MONTH,
 					-1)) {
-				undoModifyCash(clonedPortfolio, mcRecords.get(day));
 				if (market.isOpen(day)) {
 					DailyData dd = calcDailyData(clonedPortfolio, day);
 					em.persist(dd);
-					undoPurchaseRedeem(clonedPortfolio, prRecords.get(day));
-					undoExchangeMoney(clonedPortfolio, emRecords.get(day));
-					undoTrade(clonedPortfolio, tradeRecords.get(day));
 				}
+				undoModifyCash(clonedPortfolio, mcRecords.get(day));
+				undoPurchaseRedeem(clonedPortfolio, prRecords.get(day));
+				undoExchangeMoney(clonedPortfolio, emRecords.get(day));
+				undoTrade(clonedPortfolio, tradeRecords.get(day));
 			}
 		});
 	}
