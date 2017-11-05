@@ -246,28 +246,19 @@ public class PortfolioResourceTest extends JerseyTest {
 
 	@Test
 	public void test_get_trade_record_by_portfolio_id() {
-		JsonNode actual = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
+		JsonNode actual = target("/Portfolio/P00000001/Trade").queryParam("start", "2016-12-01").request().accept(MediaType.APPLICATION_JSON)
 				.get(JsonNode.class);
 
 		ArrayNode expect = mapper.createArrayNode();
-		ObjectNode obj1 = mapper.createObjectNode();
-		obj1.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
-		obj1.set("stockCode", mapper.getNodeFactory().textNode("000001"));
-		obj1.set("stockName", mapper.getNodeFactory().textNode("平安银行"));
-		obj1.set("amount", mapper.getNodeFactory().numberNode(500));
-		obj1.set("price", mapper.getNodeFactory().numberNode(8.65));
-		obj1.set("fee", mapper.getNodeFactory().numberNode(5.0));
-		obj1.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
-		expect.add(obj1);
-		ObjectNode obj2 = mapper.createObjectNode();
-		obj2.set("buyOrSell", mapper.getNodeFactory().textNode("SELL"));
-		obj2.set("stockCode", mapper.getNodeFactory().textNode("601318"));
-		obj2.set("stockName", mapper.getNodeFactory().textNode("中国平安"));
-		obj2.set("amount", mapper.getNodeFactory().numberNode(300));
-		obj2.set("price", mapper.getNodeFactory().numberNode(38.88));
-		obj2.set("fee", mapper.getNodeFactory().numberNode(10.5));
-		obj2.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
-		expect.add(obj2);
+		ObjectNode obj = mapper.createObjectNode();
+		obj.set("buyOrSell", mapper.getNodeFactory().textNode("SELL"));
+		obj.set("stockCode", mapper.getNodeFactory().textNode("601318"));
+		obj.set("stockName", mapper.getNodeFactory().textNode("中国平安"));
+		obj.set("amount", mapper.getNodeFactory().numberNode(300));
+		obj.set("price", mapper.getNodeFactory().numberNode(38.88));
+		obj.set("fee", mapper.getNodeFactory().numberNode(10.5));
+		obj.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
+		expect.add(obj);
 
 		assertEquals(expect, actual);
 	}

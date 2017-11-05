@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -14,6 +15,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.guhe.market.MoneyExchanger;
@@ -160,16 +162,19 @@ public class PortfolioResource {
 
 	@GET
 	@Path("{portfolio}/Trade")
-	public List<TradeRecordViewData> getTradeRecords(@PathParam("portfolio") String portfolioId) {
+	public List<TradeRecordViewData> getTradeRecords(@PathParam("portfolio") String portfolioId, @QueryParam("start") String start) {
 		Portfolio portfolio = pm.getPortfolio(portfolioId);
 		if (portfolio == null) {
 			return null;
 		}
 
-		Calendar startDay = Calendar.getInstance();
-		CommonUtil.clearToDay(startDay);
-		startDay.add(Calendar.MONTH, -6);
-		return portfolio.getTradeRecords().stream().filter(e->e.getDate().after(startDay.getTime())).map(e -> createViewData(e)).collect(Collectors.toList());
+		Stream<TradeRecord> trStream = portfolio.getTradeRecords().stream();
+		if(start != null) {
+			Date startTime = CommonUtil.parseDate("yyyy-MM-dd", start);
+			trStream = trStream.filter(e->e.getDate().after(startTime));
+		}
+		
+		return trStream.map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
 	private TradeRecordViewData createViewData(TradeRecord record) {
