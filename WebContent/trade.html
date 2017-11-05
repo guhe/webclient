@@ -12,8 +12,14 @@
 	var portfolioId = $.getUrlVar("id");
 
 	function loadTradeRecord() {
+		var date = new Date();
+		var month = date.getMonth() + 1 - 6; // 6 months ago
+		month = month <= 9 ? ("0" + month) : month;
+		var day = date.getDate();
+		day = day <= 9 ? ("0" + day) : day;
+		var todayStr = date.getFullYear() + "-" + month + "-" + day;
 		$.get({
-			url : "rest/Portfolio/" + portfolioId + "/Trade",
+			url : "rest/Portfolio/" + portfolioId + "/Trade?start="+todayStr,
 			dataType : 'json',
 			success : function(result) {
 				$("#detail tbody tr").remove();
@@ -23,29 +29,36 @@
 					}
 					return a["date"] > b["date"] ? 1 : -1;
 				});
-				$.each(result, function(key, row_data) {
-					var isBuy = row_data["buyOrSell"] == "BUY";
-					var row = $("<tr/>").appendTo($("#detail tbody"));
-					$("<td/>").html(isBuy ? "买入" : "卖出").appendTo(row);
-					$("<td/>").html(row_data["stockName"] + row_data["stockCode"]).appendTo(row);
-					$("<td/>").html(row_data["amount"]).appendTo(row);
-					$("<td/>").html(row_data["price"].toFixed(2)).appendTo(row);
-					$("<td/>").html(row_data["fee"].toFixed(2)).appendTo(row);
-					$("<td/>").html(row_data["date"]).appendTo(row);
+				$.each(result,
+						function(key, row_data) {
+							var isBuy = row_data["buyOrSell"] == "BUY";
+							var row = $("<tr/>").appendTo($("#detail tbody"));
+							$("<td/>").html(isBuy ? "买入" : "卖出").appendTo(row);
+							$("<td/>").html(
+									row_data["stockName"]
+											+ row_data["stockCode"]).appendTo(
+									row);
+							$("<td/>").html(row_data["amount"]).appendTo(row);
+							$("<td/>").html(row_data["price"].toFixed(2))
+									.appendTo(row);
+							$("<td/>").html(row_data["fee"].toFixed(2))
+									.appendTo(row);
+							$("<td/>").html(row_data["date"]).appendTo(row);
 
-					if (isBuy) {
-						row.css("background", "#800");
-					} else {
-						row.css("background", "#080");
-					}
-				});
+							if (isBuy) {
+								row.css("background", "#800");
+							} else {
+								row.css("background", "#080");
+							}
+						});
 			},
 		});
 	}
 
 	function addTradeRecord() {
 		var data = {};
-		data["buyOrSell"] = $(".inputArea input[name='buyOrSell']:checked").val();
+		data["buyOrSell"] = $(".inputArea input[name='buyOrSell']:checked")
+				.val();
 		data["stockCode"] = $(".inputArea input[name='stockCode']").val();
 		data["amount"] = $(".inputArea input[name='amount']").val() * 1;
 		data["price"] = $(".inputArea input[name='price']").val() * 1;
@@ -79,7 +92,7 @@
 		if (priv != null) {
 			urlParams += "&priv=" + priv;
 		}
-		
+
 		$("#detail caption a").attr("href", "portfolio.html?" + urlParams);
 
 		$.get({
