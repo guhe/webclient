@@ -166,7 +166,10 @@ public class PortfolioResource {
 			return null;
 		}
 
-		return portfolio.getTradeRecords().stream().map(e -> createViewData(e)).collect(Collectors.toList());
+		Calendar startDay = Calendar.getInstance();
+		CommonUtil.clearToDay(startDay);
+		startDay.add(Calendar.MONTH, -6);
+		return portfolio.getTradeRecords().stream().filter(e->e.getDate().after(startDay.getTime())).map(e -> createViewData(e)).collect(Collectors.toList());
 	}
 
 	private TradeRecordViewData createViewData(TradeRecord record) {
