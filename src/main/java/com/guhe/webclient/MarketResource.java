@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 import com.guhe.market.StockMarket;
 
@@ -32,5 +33,18 @@ public class MarketResource {
 			dailyNWPU.setNetWorthPerUnit(e.getValue().getPrice());
 			return dailyNWPU;
 		}).collect(Collectors.toList());
+	}
+
+	@GET
+	@Path("Stock/{stockCode}/totalTradeFee")
+	public Double getTotalTradeFee(@PathParam("stockCode") String stockCode, @QueryParam("bos") String buyOrSell,
+			@QueryParam("count") int count, @QueryParam("price") double price) {
+		if (buyOrSell.equals("BUY")) {
+			return stockMarket.getTotalBuyFee(stockCode, count, price);
+		} else if (buyOrSell.equals("SELL")) {
+			return stockMarket.getTotalSellFee(stockCode, count, price);
+		} else {
+			throw new IllegalArgumentException("Value 'bos' must be 'BUY' or 'SELL'.");
+		}
 	}
 }

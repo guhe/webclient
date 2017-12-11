@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.guhe.market.Exchange;
 import com.guhe.market.MoneyExchanger;
 import com.guhe.market.MoneyName;
 import com.guhe.market.StockData;
@@ -146,12 +147,12 @@ public class PortfolioCalculator {
 		}
 
 		public double getEstimatedCommission() {
-			if (holding.getStock().getExchange() == Stock.Exchange.ShangHai
-					|| holding.getStock().getExchange() == Stock.Exchange.ShenZheng) {
+			if (holding.getStock().getExchange() == Exchange.ShangHai
+					|| holding.getStock().getExchange() == Exchange.ShenZheng) {
 				return Math.max(5, getMarketWorth() * RATE_COMMISSION);
-			} else if (holding.getStock().getExchange() == Stock.Exchange.ShangHai_B) {
+			} else if (holding.getStock().getExchange() == Exchange.ShangHai_B) {
 				return Math.max(1 * getMoneyPrice(), getMarketWorth() * RATE_COMMISSION_B);
-			} else if (holding.getStock().getExchange() == Stock.Exchange.ShenZheng_B) {
+			} else if (holding.getStock().getExchange() == Exchange.ShenZheng_B) {
 				return Math.max(5 * getMoneyPrice(), getMarketWorth() * RATE_COMMISSION_B);
 			} else {
 				throw new RuntimeException("");
@@ -160,12 +161,12 @@ public class PortfolioCalculator {
 
 		public double getEstimatedTax() {
 			double rate = RATE_TAX;
-			if (holding.getStock().getExchange() == Stock.Exchange.ShangHai
-					|| holding.getStock().getExchange() == Stock.Exchange.ShangHai_B) {
+			if (holding.getStock().getExchange() == Exchange.ShangHai
+					|| holding.getStock().getExchange() == Exchange.ShangHai_B) {
 				rate += RATE_SH_GUOHU;
 			}
-			if (holding.getStock().getExchange() == Stock.Exchange.ShangHai_B
-					|| holding.getStock().getExchange() == Stock.Exchange.ShenZheng_B) {
+			if (holding.getStock().getExchange() == Exchange.ShangHai_B
+					|| holding.getStock().getExchange() == Exchange.ShenZheng_B) {
 				rate += RATE_SETTLEMENT_B;
 			}
 

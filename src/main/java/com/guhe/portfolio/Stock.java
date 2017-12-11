@@ -1,13 +1,10 @@
 package com.guhe.portfolio;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import com.guhe.market.MoneyName;
+import com.guhe.market.Exchange;
 import com.guhe.util.Reflector;
 
 @Entity
@@ -32,7 +29,7 @@ public class Stock {
 	}
 
 	public Exchange getExchange() {
-		return Exchange.get(code);
+		return Exchange.instance(code);
 	}
 
 	public String getCode() {
@@ -51,34 +48,5 @@ public class Stock {
 	@Override
 	public boolean equals(Object obj) {
 		return Reflector.isAllFieldsEquals(obj, this);
-	}
-
-	public enum Exchange {
-		ShangHai(MoneyName.RMB, '6'), ShenZheng(MoneyName.RMB, '0', '3'), ShangHai_B(MoneyName.USD,
-				'9'), ShenZheng_B(MoneyName.HKD, '2');
-
-		private MoneyName moneyName;
-		private List<Character> prefixChars;
-
-		private Exchange(MoneyName mn, Character... firsts) {
-			moneyName = mn;
-			prefixChars = Arrays.asList(firsts);
-		}
-
-		public MoneyName getMoneyName() {
-			return moneyName;
-		}
-
-		private static Exchange get(String code) {
-			if (code == null || code.length() == 0) {
-				throw new RuntimeException();
-			}
-			for (Exchange ex : values()) {
-				if (ex.prefixChars.contains(code.charAt(0))) {
-					return ex;
-				}
-			}
-			throw new RuntimeException();
-		}
 	}
 }

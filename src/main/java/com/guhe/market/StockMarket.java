@@ -13,4 +13,8 @@ public interface StockMarket {
 	boolean isOpen(Calendar day);
 	
 	Map<String, StockData> getDailyStockData(String stockFullCode, Calendar from, Calendar to);
+
+	double getTotalBuyFee(String stockCode, int count, double price);
+
+	double getTotalSellFee(String stockCode, int count, double price);
 }

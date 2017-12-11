@@ -156,6 +156,20 @@ public class TencentStockMarket implements StockMarket {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public double getTotalBuyFee(String stockCode, int count, double price) {
+		Exchange ex = Exchange.instance(stockCode);
+		double amount = count * price;
+		return ex.getBrokerage(amount) + ex.getSettlementFee(amount) + ex.getTransferFee(amount);
+	}
+
+	@Override
+	public double getTotalSellFee(String stockCode, int count, double price) {
+		Exchange ex = Exchange.instance(stockCode);
+		double amount = count * price;
+		return ex.getBrokerage(amount) + ex.getSettlementFee(amount) + ex.getTransferFee(amount) + ex.getTax(amount);
+	}
 }
 
 class LastLoadTimeMillis {
