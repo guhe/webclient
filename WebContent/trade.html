@@ -109,6 +109,28 @@
 
 			addTradeRecord();
 		});
+		
+		var feeFunc =  function(event) {
+			var buyOrSell = $(".inputArea input[name='buyOrSell']:checked").val();
+			var stockCode = $(".inputArea input[name='stockCode']").val();
+			var amount = $(".inputArea input[name='amount']").val() * 1;
+			var price = $(".inputArea input[name='price']").val() * 1;
+			$.get({
+				url : "rest/Market/Stock/"+stockCode+"/totalTradeFee",
+				dataType : 'json',
+				data: {bos:buyOrSell, count:amount, price: price},
+				async : true,
+				success : function(result) {
+					console.log(result);
+					$(".inputArea input[name='fee']").val(result.toFixed(2));
+				},
+			});
+		}
+		
+		$(".inputArea input[name='buyOrSell']").click(feeFunc);
+		$(".inputArea input[name='stockCode']").change(feeFunc);
+		$(".inputArea input[name='amount']").change(feeFunc);
+		$(".inputArea input[name='price']").change(feeFunc);
 
 		loadTradeRecord();
 	});
