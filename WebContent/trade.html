@@ -121,7 +121,6 @@
 				data: {bos:buyOrSell, count:amount, price: price},
 				async : true,
 				success : function(result) {
-					console.log(result);
 					$(".inputArea input[name='fee']").val(result.toFixed(2));
 				},
 			});
