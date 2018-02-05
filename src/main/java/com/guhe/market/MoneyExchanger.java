@@ -1,7 +1,10 @@
 package com.guhe.market;
 
+import org.jvnet.hk2.annotations.Contract;
+
 import com.guhe.util.Reflector;
 
+@Contract
 public interface MoneyExchanger {
 	
 	MoneyPrice getMoneyPrice(MoneyName moneyName);
