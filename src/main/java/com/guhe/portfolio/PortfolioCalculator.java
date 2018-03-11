@@ -16,6 +16,8 @@ public class PortfolioCalculator {
 	private StockMarket market;
 	private MoneyExchanger moneyExchanger;
 	private Calendar day;
+	
+	public static final double GRID_SIZE = 0.08;
 
 	public PortfolioCalculator(Portfolio portfolio, StockMarket market, MoneyExchanger exchanger) {
 		this(portfolio, market, exchanger, null);

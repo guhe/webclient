@@ -16,6 +16,8 @@ class HoldingStockViewData {
 	private double netWorth;
 	private double proportion;
 	private List<TradeRecordViewData> tradeRecords;
+	private double nextBuyPrice;
+	private double nextSellPrice;
 
 	public String getName() {
 		return name;
@@ -95,5 +97,21 @@ class HoldingStockViewData {
 
 	public void setTradeRecords(List<TradeRecordViewData> tradeRecords) {
 		this.tradeRecords = tradeRecords;
+	}
+
+	public Double getNextBuyPrice() {
+		return nextBuyPrice;
+	}
+
+	public void setNextBuyPrice(Double nextBuyPrice) {
+		this.nextBuyPrice = nextBuyPrice;
+	}
+
+	public Double getNextSellPrice() {
+		return nextSellPrice;
+	}
+
+	public void setNextSellPrice(Double nextSellPrice) {
+		this.nextSellPrice = nextSellPrice;
 	}
 }

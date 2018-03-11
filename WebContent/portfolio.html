@@ -194,6 +194,19 @@
 						$("<td/>").html(tr.amount).appendTo(trRow);
 						$("<td/>").html(tr.price).appendTo(trRow);
 					});
+					
+					var gridTable = $("<table/>");
+					gridTable.attr("class", "inner-table");
+					var buyGridTr = $("<tr/>");
+					buyGridTr.appendTo(gridTable);
+					buyGridTr.css("color",  "red");
+					$("<td/>").html("买").appendTo(buyGridTr);
+					$("<td/>").html(row_data["nextBuyPrice"].toFixed(2)).appendTo(buyGridTr);
+					var sellGridTr = $("<tr/>");
+					sellGridTr.appendTo(gridTable);
+					sellGridTr.css("color",  "green");
+					$("<td/>").html("卖").appendTo(sellGridTr);
+					$("<td/>").html(row_data["nextSellPrice"].toFixed(2)).appendTo(sellGridTr);
 
 					var row = $("<tr/>").appendTo($("#stock_detail tbody"));
 					$("<td/>").html(row_data["name"] + row_data["code"]).appendTo(row); // 股票代码
@@ -202,8 +215,8 @@
 					$("<td/>").html(row_data["marketWorth"].toFixed(0)).appendTo(row); // 市值
 					$("<td/>").html((row_data["estimatedCommission"] + row_data["estimatedTax"]).toFixed(2)).appendTo(
 							row); //预计负债
-					$("<td/>").css("padding", "0px").html(tradeRecords).appendTo(row);
-					$("<td/>").html(row_data["netWorth"].toFixed(0)).appendTo(row); //净值
+					$("<td/>").css("padding", "0px").html(tradeRecords).appendTo(row); // 交易记录
+					$("<td/>").css("padding", "0px").html(gridTable).appendTo(row); //净值
 					$("<td/>").html(row_data["proportion"].toPercent(1)).appendTo(row); //占比
 				});
 			}
@@ -436,7 +449,7 @@
 					<th>市值</th>
 					<th>预计负债</th>
 					<th>近期成交</th>
-					<th>净值</th>
+					<th>网格</th>
 					<th>占比</th>
 				</tr>
 			</thead>

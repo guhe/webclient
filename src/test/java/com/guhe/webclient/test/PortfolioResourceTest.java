@@ -216,6 +216,8 @@ public class PortfolioResourceTest extends JerseyTest {
 		tr.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
 		trs.add(tr);
 		obj1.set("tradeRecords", trs);
+		obj1.set("nextBuyPrice", mapper.getNodeFactory().numberNode(7.958));
+		obj1.set("nextSellPrice", mapper.getNodeFactory().numberNode(9.342));
 		expect.add(obj1);
 
 		ObjectNode obj2 = mapper.createObjectNode();
@@ -239,6 +241,8 @@ public class PortfolioResourceTest extends JerseyTest {
 		tr.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
 		trs.add(tr);
 		obj2.set("tradeRecords", trs);
+		obj2.set("nextBuyPrice", mapper.getNodeFactory().numberNode(35.7696));
+		obj2.set("nextSellPrice", mapper.getNodeFactory().numberNode(41.9904));
 		expect.add(obj2);
 
 		assertEquals(expect, actual);

@@ -127,8 +127,17 @@ public class PortfolioResource {
 		vd.setNetWorth(calculator.getNetWorth());
 		vd.setProportion(calculator.getProportion());
 		vd.setTradeRecords(calculator.getTradeRecords().stream().sorted((e1, e2) -> {
-			return -e1.getDate().compareTo(e2.getDate());
+			int rt = e2.getDate().compareTo(e1.getDate());
+			if(rt != 0) {
+				return rt;
+			}
+			return e2.getId() - e1.getId();
 		}).limit(2).map(e -> createViewData(e)).collect(Collectors.toList()));
+		if(!vd.getTradeRecords().isEmpty()) {
+			double lastTradePrice = vd.getTradeRecords().get(0).getPrice();
+			vd.setNextBuyPrice(lastTradePrice * (1 - PortfolioCalculator.GRID_SIZE));
+			vd.setNextSellPrice(lastTradePrice * (1 + PortfolioCalculator.GRID_SIZE));
+		}
 
 		return vd;
 	}
