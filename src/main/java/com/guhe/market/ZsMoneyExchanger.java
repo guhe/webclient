@@ -34,12 +34,12 @@ public class ZsMoneyExchanger implements MoneyExchanger {
 		MoneyPrice mp = null;
 		while (m.find() && priceIndex < 4 * 5) {
 			int moneyIndex = priceIndex / 5;
-			int priceType = priceIndex % 5; // 中间价 现汇卖出价 现钞卖出价 现汇买入价 现钞买入价
+			int priceType = priceIndex % 5; // 现汇卖出价 现钞卖出价 现汇买入价 现钞买入价
 			double price = Double.parseDouble(m.group(1));
-			if (priceType == 2) {
+			if (priceType == 1) {
 				mp = new MoneyPrice();
 				mp.setSell(price * 0.01);
-			} else if (priceType == 4) {
+			} else if (priceType == 3) {
 				mp.setBuy(price * 0.01);
 				System.out.println("index: " + moneyIndex + ", MoneyPrice: " + mp);
 				if (moneyIndex == 0) { // 港币
