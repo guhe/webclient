@@ -32,6 +32,8 @@ public class TradeRecord {
 	private double fee;
 
 	private Date date;
+	
+	private String note;
 
 	public int getId() {
 		return id;
@@ -95,6 +97,14 @@ public class TradeRecord {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	public enum BuyOrSell {

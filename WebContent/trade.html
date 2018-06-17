@@ -44,6 +44,7 @@
 							$("<td/>").html(row_data["fee"].toFixed(2))
 									.appendTo(row);
 							$("<td/>").html(row_data["date"]).appendTo(row);
+							$("<td/>").html(row_data["note"]).appendTo(row);
 
 							if (isBuy) {
 								row.css("background", "#800");
@@ -64,6 +65,7 @@
 		data["price"] = $(".inputArea input[name='price']").val() * 1;
 		data["fee"] = $(".inputArea input[name='fee']").val() * 1;
 		data["date"] = $(".inputArea input[name='date']").val();
+		data["note"] = $(".inputArea input[name='note']").val();
 
 		$.post({
 			url : "rest/Portfolio/" + portfolioId + "/Trade",
@@ -151,6 +153,7 @@
 						<th>成交价格</th>
 						<th>交易费用</th>
 						<th>成交日期</th>
+						<th>备注</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -186,6 +189,10 @@
 					<tr>
 						<td><span>交易日期：</span></td>
 						<td><input type="text" name="date"></td>
+					</tr>
+					<tr>
+						<td><span>备注：</span></td>
+						<td><input type="text" name="note"></td>
 					</tr>
 					<tr>
 						<td colspan="2" align="center"><input type="submit"

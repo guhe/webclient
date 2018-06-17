@@ -13,6 +13,7 @@ class TradeRecordViewData {
 	private double price;
 	private double fee;
 	private String date;
+	private String note;
 
 	public String getBuyOrSell() {
 		return buyOrSell;
@@ -68,6 +69,14 @@ class TradeRecordViewData {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	@Override

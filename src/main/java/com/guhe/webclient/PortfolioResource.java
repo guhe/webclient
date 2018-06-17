@@ -195,6 +195,7 @@ public class PortfolioResource {
 		vd.setPrice(record.getPrice());
 		vd.setFee(record.getFee());
 		vd.setDate(CommonUtil.formatDate("yyyy-MM-dd", record.getDate()));
+		vd.setNote(record.getNote());
 		return vd;
 	}
 
@@ -206,7 +207,7 @@ public class PortfolioResource {
 			BuyOrSell buyOrSell = BuyOrSell.valueOf(viewData.getBuyOrSell());
 			Date date = CommonUtil.parseDate("yyyy-MM-dd", viewData.getDate());
 			pm.trade(portfolioId, viewData.getStockCode(), buyOrSell, viewData.getPrice(), viewData.getAmount(),
-					viewData.getFee(), date);
+					viewData.getFee(), date, viewData.getNote());
 			result = new PortfolioResultViewData(0, "OK");
 		} catch (PortfolioException e) {
 			LOGGER.warning("Failed to trade, portfolioId: " + portfolioId + ", trade: " + viewData + ", reason: "

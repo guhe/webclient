@@ -88,7 +88,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	@Override
 	public void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee,
-			Date date) {
+			Date date, String note) {
 		LOGGER.info("trade: portfolioId:" + portfolioId + ", stockCode:" + stockCode + ", buyOrSell:" + buyOrSell
 				+ ", price:" + price + ", amount:" + amount + ", fee:" + fee + ", date:"
 				+ CommonUtil.formatDate("yyyy-MM-dd", date));
@@ -117,6 +117,7 @@ public class JpaPortfolioManager implements PortfolioManager {
 			tradeRecord.setPrice(CommonUtil.dRound(price, 2));
 			tradeRecord.setFee(CommonUtil.dRound(fee, 2));
 			tradeRecord.setStock(getStockByCode(stockCode));
+			tradeRecord.setNote(note);
 			em.persist(tradeRecord);
 		});
 	}

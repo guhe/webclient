@@ -88,6 +88,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		record1.setPrice(8.65);
 		record1.setFee(5.0);
 		record1.setStock(ping_an_yin_hang);
+		record1.setNote("111");
 		portfolio.add(record1);
 		TradeRecord record2 = new TradeRecord();
 		record2.setBuyOrSell(TradeRecord.BuyOrSell.SELL);
@@ -96,6 +97,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		record2.setPrice(38.88);
 		record2.setFee(10.5);
 		record2.setStock(zhong_guo_ping_an);
+		record2.setNote("222");
 		portfolio.add(record2);
 
 		PurchaseRedeemRecord prRecord1 = new PurchaseRedeemRecord();
@@ -214,6 +216,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		tr.set("price", mapper.getNodeFactory().numberNode(8.65));
 		tr.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		tr.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		tr.set("note", mapper.getNodeFactory().textNode("111"));
 		trs.add(tr);
 		obj1.set("tradeRecords", trs);
 		obj1.set("nextBuyPrice", mapper.getNodeFactory().numberNode(7.958));
@@ -239,6 +242,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		tr.set("price", mapper.getNodeFactory().numberNode(38.88));
 		tr.set("fee", mapper.getNodeFactory().numberNode(10.5));
 		tr.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
+		tr.set("note", mapper.getNodeFactory().textNode("222"));
 		trs.add(tr);
 		obj2.set("tradeRecords", trs);
 		obj2.set("nextBuyPrice", mapper.getNodeFactory().numberNode(35.7696));
@@ -262,6 +266,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj.set("price", mapper.getNodeFactory().numberNode(38.88));
 		obj.set("fee", mapper.getNodeFactory().numberNode(10.5));
 		obj.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
+		obj.set("note", mapper.getNodeFactory().textNode("222"));
 		expect.add(obj);
 
 		assertEquals(expect, actual);
@@ -276,6 +281,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		tradeObj.set("price", mapper.getNodeFactory().numberNode(8.65));
 		tradeObj.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		tradeObj.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		tradeObj.set("note", mapper.getNodeFactory().textNode("111"));
 
 		Entity<String> entity = Entity.json(tradeObj.toString());
 
@@ -283,7 +289,7 @@ public class PortfolioResourceTest extends JerseyTest {
 				.post(entity);
 
 		verify(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65, 500, 5.0,
-				CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"));
+				CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"), "111");
 
 		assertEquals(200, response.getStatus());
 
@@ -296,7 +302,7 @@ public class PortfolioResourceTest extends JerseyTest {
 	@Test
 	public void test_post_trade_and_fail() {
 		doThrow(new PortfolioException("mock expection")).when(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65,
-				500, 5.0, CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"));
+				500, 5.0, CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"), "111");
 
 		ObjectNode tradeObj = mapper.createObjectNode();
 		tradeObj.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));
@@ -305,6 +311,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		tradeObj.set("price", mapper.getNodeFactory().numberNode(8.65));
 		tradeObj.set("fee", mapper.getNodeFactory().numberNode(5.0));
 		tradeObj.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
+		tradeObj.set("note", mapper.getNodeFactory().textNode("111"));
 		Entity<String> entity = Entity.json(tradeObj.toString());
 		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
 				.post(entity);
