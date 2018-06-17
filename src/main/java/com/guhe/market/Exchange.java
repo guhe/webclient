@@ -6,10 +6,11 @@ import java.util.List;
 public enum Exchange {
 
 	ShangHai(MoneyName.RMB, '6'), ShenZheng(MoneyName.RMB, '0', '3'), ShangHai_B(MoneyName.USD,
-			'9'), ShenZheng_B(MoneyName.HKD, '2');
+			'9'), ShenZheng_B(MoneyName.HKD, '2'), HuShen_CB(MoneyName.RMB, '1');
 
 	private static final double RATE_BROKERAGE_A = 0.00025;
 	private static final double RATE_BROKERAGE_B = 0.0005;
+	private static final double RATE_BROKERAGE_CB = 0.00005;
 	private static final double RATE_SETTLEMENT_B = 0.0005;
 	private static final double RATE_TRANSFER = 0.00002;
 	private static final double RATE_TAX = 0.001;
@@ -33,6 +34,8 @@ public enum Exchange {
 			return Math.max(1, amount * RATE_BROKERAGE_B);
 		} else if (this == Exchange.ShenZheng_B) {
 			return Math.max(5, amount * RATE_BROKERAGE_B);
+		}  else if (this == Exchange.HuShen_CB) {
+			return RATE_BROKERAGE_CB * amount;
 		} else {
 			throw new RuntimeException("");
 		}
@@ -53,6 +56,9 @@ public enum Exchange {
 	}
 	
 	public double getTax(double amount) {
+		if (this == Exchange.HuShen_CB) {
+			return 0;
+		}
 		return amount * RATE_TAX;
 	}
 
