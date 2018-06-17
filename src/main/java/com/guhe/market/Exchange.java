@@ -37,7 +37,7 @@ public enum Exchange {
 		}  else if (this == Exchange.HuShen_CB) {
 			return RATE_BROKERAGE_CB * amount;
 		} else {
-			throw new RuntimeException("");
+			return 0;
 		}
 	}
 

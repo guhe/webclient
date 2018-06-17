@@ -95,12 +95,6 @@ public class PortfolioCalculator {
 	}
 
 	public class HoldingCalculator {
-		private static final double RATE_TAX = 0.001;
-		private static final double RATE_SH_GUOHU = 0.00002;
-		private static final double RATE_COMMISSION = 0.00025;
-		private static final double RATE_COMMISSION_B = 0.0005;
-		private static final double RATE_SETTLEMENT_B = 0.0005;
-
 		private Holding holding;
 		private StockData data;
 
@@ -149,30 +143,13 @@ public class PortfolioCalculator {
 		}
 
 		public double getEstimatedCommission() {
-			if (holding.getStock().getExchange() == Exchange.ShangHai
-					|| holding.getStock().getExchange() == Exchange.ShenZheng) {
-				return Math.max(5, getMarketWorth() * RATE_COMMISSION);
-			} else if (holding.getStock().getExchange() == Exchange.ShangHai_B) {
-				return Math.max(1 * getMoneyPrice(), getMarketWorth() * RATE_COMMISSION_B);
-			} else if (holding.getStock().getExchange() == Exchange.ShenZheng_B) {
-				return Math.max(5 * getMoneyPrice(), getMarketWorth() * RATE_COMMISSION_B);
-			} else {
-				throw new RuntimeException("");
-			}
+			return holding.getStock().getExchange().getBrokerage(getMarketWorth());
 		}
 
 		public double getEstimatedTax() {
-			double rate = RATE_TAX;
-			if (holding.getStock().getExchange() == Exchange.ShangHai
-					|| holding.getStock().getExchange() == Exchange.ShangHai_B) {
-				rate += RATE_SH_GUOHU;
-			}
-			if (holding.getStock().getExchange() == Exchange.ShangHai_B
-					|| holding.getStock().getExchange() == Exchange.ShenZheng_B) {
-				rate += RATE_SETTLEMENT_B;
-			}
-
-			return getMarketWorth() * rate;
+			Exchange ex = holding.getStock().getExchange();
+			double amount = getMarketWorth();
+			return ex.getTax(amount) + ex.getTransferFee(amount)+ex.getSettlementFee(amount);
 		}
 
 		public double getNetWorth() {
