@@ -336,8 +336,10 @@ public class PortfolioResource {
 		}
 
 		Calendar startDay = (Calendar) endDay.clone();
-		startDay.add(Calendar.MONTH, -6);
-
+		startDay.set(Calendar.MONTH, Calendar.JANUARY);
+		startDay.set(Calendar.DAY_OF_MONTH, 1);
+		startDay.add(Calendar.DAY_OF_MONTH, -3);
+		
 		List<DailyData> dailyDatas = pm.getDailyData(portfolioId, startDay.getTime(), endDay.getTime());
 		return dailyDatas.stream().map(e -> {
 			DailyNWPUViewData vd = new DailyNWPUViewData();
