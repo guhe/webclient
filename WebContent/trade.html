@@ -43,6 +43,8 @@
 									.appendTo(row);
 							$("<td/>").html(row_data["fee"].toFixed(2))
 									.appendTo(row);
+							$("<td/>").html(row_data["exRate"].toFixed(6))
+									.appendTo(row);
 							$("<td/>").html(row_data["date"]).appendTo(row);
 							$("<td/>").html(row_data["note"]).appendTo(row);
 
@@ -64,6 +66,7 @@
 		data["amount"] = $(".inputArea input[name='amount']").val() * 1;
 		data["price"] = $(".inputArea input[name='price']").val() * 1;
 		data["fee"] = $(".inputArea input[name='fee']").val() * 1;
+		data["exRate"] = $(".inputArea input[name='exRate']").val() * 1;
 		data["date"] = $(".inputArea input[name='date']").val();
 		data["note"] = $(".inputArea input[name='note']").val();
 
@@ -152,6 +155,7 @@
 						<th>成交数量</th>
 						<th>成交价格</th>
 						<th>交易费用</th>
+						<th>交易汇率</th>
 						<th>成交日期</th>
 						<th>备注</th>
 					</tr>
@@ -185,6 +189,10 @@
 					<tr>
 						<td><span>交易费用：</span></td>
 						<td><input type="text" name="fee"></td>
+					</tr>
+					<tr>
+						<td><span>交易汇率：</span></td>
+						<td><input type="text" name="exRate" value="1.0"></td>
 					</tr>
 					<tr>
 						<td><span>交易日期：</span></td>

@@ -83,13 +83,13 @@ public class SupplementDailyDataTest extends PortfolioTestBase {
 
 	@Test
 	public void save_get_remove_portfolio() {
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"), "");
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"), "");
 		pm.purchase("ID001", "Tiger", 10100, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-10"));
 
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 8, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"), "");
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 8, 500, 50, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"), "");
 		pm.redeem("ID001", "Tiger", 10000, 1.0, 200, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-11"));
 
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"), "");
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 5, 500, 50, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"), "");
 		pm.redeem("ID001", "Tiger", 5000, 1.0, 100, CommonUtil.parseDate("yyyy-MM-dd", "2017-01-13"));
 
 		when(market.isOpen(any())).thenReturn(true);

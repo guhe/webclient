@@ -19,8 +19,8 @@ public interface PortfolioManager {
 
 	void deletePortfolio(String id);
 
-	void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee,
-			Date date, String note);
+	void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee, 
+			double exRate, Date date, String note);
 
 	void purchase(String portfolioId, String holderName, double money, double netWorth, double fee, Date date);
 
@@ -33,4 +33,5 @@ public interface PortfolioManager {
 	void exchangeMoney(String portfolioId, MoneyName target, double targetAmount, double rmbAmount, Date date);
 	
 	void modifyCash(String portfolioId, MoneyName target, double amount, Date date);
+
 }

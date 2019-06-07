@@ -12,6 +12,7 @@ class TradeRecordViewData {
 	private long amount;
 	private double price;
 	private double fee;
+	private double exRate = 1.0;
 	private String date;
 	private String note;
 
@@ -61,6 +62,14 @@ class TradeRecordViewData {
 
 	public void setFee(Double fee) {
 		this.fee = fee;
+	}
+
+	public double getExRate() {
+		return exRate;
+	}
+
+	public void setExRate(double exRate) {
+		this.exRate = exRate;
 	}
 
 	public String getDate() {

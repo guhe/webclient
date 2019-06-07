@@ -124,7 +124,9 @@ public class TencentStockMarket implements StockMarket {
 	}
 
 	private String toStockFullCode(String stockCode) {
-		if (stockCode.charAt(0) == '6' || stockCode.charAt(0) == '9' || stockCode.startsWith("11")) {
+		if(stockCode.length() == 5) {
+			return "hk" + stockCode;
+		} else if (stockCode.charAt(0) == '6' || stockCode.charAt(0) == '9' || stockCode.startsWith("11")) {
 			return "sh" + stockCode;
 		} else if (stockCode.charAt(0) == '0' || stockCode.charAt(0) == '2' || stockCode.charAt(0) == '3' || stockCode.startsWith("12")) {
 			return "sz" + stockCode;

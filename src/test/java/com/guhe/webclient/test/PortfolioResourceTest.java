@@ -215,6 +215,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		tr.set("amount", mapper.getNodeFactory().numberNode(500));
 		tr.set("price", mapper.getNodeFactory().numberNode(8.65));
 		tr.set("fee", mapper.getNodeFactory().numberNode(5.0));
+		tr.set("exRate", mapper.getNodeFactory().numberNode(1.0));
 		tr.set("date", mapper.getNodeFactory().textNode("2016-08-10"));
 		tr.set("note", mapper.getNodeFactory().textNode("111"));
 		trs.add(tr);
@@ -241,6 +242,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		tr.set("amount", mapper.getNodeFactory().numberNode(300));
 		tr.set("price", mapper.getNodeFactory().numberNode(38.88));
 		tr.set("fee", mapper.getNodeFactory().numberNode(10.5));
+		tr.set("exRate", mapper.getNodeFactory().numberNode(1.0));
 		tr.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
 		tr.set("note", mapper.getNodeFactory().textNode("222"));
 		trs.add(tr);
@@ -254,8 +256,8 @@ public class PortfolioResourceTest extends JerseyTest {
 
 	@Test
 	public void test_get_trade_record_by_portfolio_id() {
-		JsonNode actual = target("/Portfolio/P00000001/Trade").queryParam("start", "2016-12-01").request().accept(MediaType.APPLICATION_JSON)
-				.get(JsonNode.class);
+		JsonNode actual = target("/Portfolio/P00000001/Trade").queryParam("start", "2016-12-01").request()
+				.accept(MediaType.APPLICATION_JSON).get(JsonNode.class);
 
 		ArrayNode expect = mapper.createArrayNode();
 		ObjectNode obj = mapper.createObjectNode();
@@ -265,6 +267,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		obj.set("amount", mapper.getNodeFactory().numberNode(300));
 		obj.set("price", mapper.getNodeFactory().numberNode(38.88));
 		obj.set("fee", mapper.getNodeFactory().numberNode(10.5));
+		obj.set("exRate", mapper.getNodeFactory().numberNode(1.0));
 		obj.set("date", mapper.getNodeFactory().textNode("2016-12-22"));
 		obj.set("note", mapper.getNodeFactory().textNode("222"));
 		expect.add(obj);
@@ -288,7 +291,7 @@ public class PortfolioResourceTest extends JerseyTest {
 		Response response = target("/Portfolio/P00000001/Trade").request().accept(MediaType.APPLICATION_JSON)
 				.post(entity);
 
-		verify(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65, 500, 5.0,
+		verify(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65, 500, 5.0, 1.0,
 				CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"), "111");
 
 		assertEquals(200, response.getStatus());
@@ -302,7 +305,7 @@ public class PortfolioResourceTest extends JerseyTest {
 	@Test
 	public void test_post_trade_and_fail() {
 		doThrow(new PortfolioException("mock expection")).when(pm).trade("P00000001", "000001", BuyOrSell.BUY, 8.65,
-				500, 5.0, CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"), "111");
+				500, 5.0, 1.0, CommonUtil.parseDate("yyy-MM-dd", "2016-08-10"), "111");
 
 		ObjectNode tradeObj = mapper.createObjectNode();
 		tradeObj.set("buyOrSell", mapper.getNodeFactory().textNode("BUY"));

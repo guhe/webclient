@@ -68,7 +68,8 @@ public class TradeTest extends PortfolioTestBase {
 	@Test
 	public void test_trade_buy_sell() {
 		// buy 400
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 5.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"), "111");
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 400, 5.0, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"),
+				"111");
 
 		portfolio = pm.getPortfolio("ID001");
 		assertEquals(8895.4, portfolio.getRmbCash(), 0.000001);
@@ -78,7 +79,8 @@ public class TradeTest extends PortfolioTestBase {
 		assertThat(holdings.get(0), "ID001", "000001", 400);
 
 		// sell 300
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-15"), "222");
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 300, 8.3, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-15"),
+				"222");
 
 		portfolio = pm.getPortfolio("ID001");
 		assertEquals(11887.1, portfolio.getRmbCash(), 0.000001);
@@ -86,13 +88,14 @@ public class TradeTest extends PortfolioTestBase {
 		holdings = portfolio.getHoldings();
 		assertEquals(1, holdings.size());
 		assertThat(holdings.get(0), "ID001", "000001", 100);
-		
+
 		// sell 100
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 100, 6.5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-16"), "333");
-		
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 10, 100, 6.5, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-16"),
+				"333");
+
 		portfolio = pm.getPortfolio("ID001");
 		assertEquals(12880.6, portfolio.getRmbCash(), 0.000001);
-		
+
 		holdings = portfolio.getHoldings();
 		assertEquals(0, holdings.size());
 
@@ -105,22 +108,26 @@ public class TradeTest extends PortfolioTestBase {
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_nonexistent_portfolio() {
-		pm.trade("ID002", "000001", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"), "");
+		pm.trade("ID002", "000001", BuyOrSell.BUY, 8.5, 400, 5, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"),
+				"");
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_nonexistent_stock() {
-		pm.trade("ID001", "000002", BuyOrSell.BUY, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"), "");
+		pm.trade("ID001", "000002", BuyOrSell.BUY, 8.5, 400, 5, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"),
+				"");
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_no_enough_money_to_buy() {
-		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 4000, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"), "");
+		pm.trade("ID001", "000001", BuyOrSell.BUY, 8.5, 4000, 5, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"),
+				"");
 	}
 
 	@Test(expected = PortfolioException.class)
 	public void test_trade_with_no_such_holding_to_sell() {
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"), "");
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"),
+				"");
 	}
 
 	@Test(expected = PortfolioException.class)
@@ -133,7 +140,8 @@ public class TradeTest extends PortfolioTestBase {
 		pm.getEm().persist(holding);
 		pm.getEm().getTransaction().commit();
 
-		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"), "");
+		pm.trade("ID001", "000001", BuyOrSell.SELL, 8.5, 400, 5, 1.0, CommonUtil.parseDate("yyyy-MM-dd", "2016-12-14"),
+				"");
 	}
 
 	private void assertThat(Holding holding, String protfolioId, String stockCode, int amount) {

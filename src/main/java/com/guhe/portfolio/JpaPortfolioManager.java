@@ -88,9 +88,9 @@ public class JpaPortfolioManager implements PortfolioManager {
 
 	@Override
 	public void trade(String portfolioId, String stockCode, BuyOrSell buyOrSell, double price, long amount, double fee,
-			Date date, String note) {
+			double exRate, Date date, String note) {
 		LOGGER.info("trade: portfolioId:" + portfolioId + ", stockCode:" + stockCode + ", buyOrSell:" + buyOrSell
-				+ ", price:" + price + ", amount:" + amount + ", fee:" + fee + ", date:"
+				+ ", price:" + price + ", amount:" + amount + ", fee:" + fee + ", exRate:" + exRate + ", date:"
 				+ CommonUtil.formatDate("yyyy-MM-dd", date));
 		doInTransaction(() -> {
 			Portfolio portfolio = getPortfolio(portfolioId);
@@ -104,9 +104,9 @@ public class JpaPortfolioManager implements PortfolioManager {
 			}
 
 			if (buyOrSell == BuyOrSell.BUY) {
-				updatePortfolioWithBuy(portfolio, stock, price, amount, fee);
+				updatePortfolioWithBuy(portfolio, stock, price, amount, fee, exRate);
 			} else {
-				updatePortfolioWithSell(portfolio, stock, price, amount, fee);
+				updatePortfolioWithSell(portfolio, stock, price, amount, fee, exRate);
 			}
 
 			TradeRecord tradeRecord = new TradeRecord();
@@ -116,16 +116,19 @@ public class JpaPortfolioManager implements PortfolioManager {
 			tradeRecord.setPortfolio(portfolio);
 			tradeRecord.setPrice(CommonUtil.dRound(price, 2));
 			tradeRecord.setFee(CommonUtil.dRound(fee, 2));
+			tradeRecord.setExRate(exRate);
 			tradeRecord.setStock(getStockByCode(stockCode));
 			tradeRecord.setNote(note);
 			em.persist(tradeRecord);
 		});
 	}
 
-	private void updatePortfolioWithBuy(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
-		portfolio.addCashByName(stock.getExchange().getMoneyName(), CommonUtil.dRound(-amount * price - fee, 2));
+	private void updatePortfolioWithBuy(Portfolio portfolio, Stock stock, double price, long amount, double fee,
+			double exRate) {
+		portfolio.addCashByName(stock.getExchange().getTradeMoneyName(),
+				CommonUtil.dRound((-amount * price - fee) * exRate, 2));
 
-		if (CommonUtil.dCompare(portfolio.getCashByName(stock.getExchange().getMoneyName()), 0, 2) < 0) {
+		if (CommonUtil.dCompare(portfolio.getCashByName(stock.getExchange().getTradeMoneyName()), 0, 2) < 0) {
 			throw new PortfolioException("no enough money to buy.");
 		}
 
@@ -142,8 +145,10 @@ public class JpaPortfolioManager implements PortfolioManager {
 		}
 	}
 
-	private void updatePortfolioWithSell(Portfolio portfolio, Stock stock, double price, long amount, double fee) {
-		portfolio.addCashByName(stock.getExchange().getMoneyName(), CommonUtil.dRound(amount * price - fee, 2));
+	private void updatePortfolioWithSell(Portfolio portfolio, Stock stock, double price, long amount, double fee,
+			double exRate) {
+		portfolio.addCashByName(stock.getExchange().getTradeMoneyName(),
+				CommonUtil.dRound((amount * price - fee) * exRate, 2));
 
 		List<Holding> holdings = portfolio.getHoldings();
 		Holding holding = holdings.stream().filter(e -> e.getStock().getCode().equals(stock.getCode())).findFirst()
@@ -389,12 +394,12 @@ public class JpaPortfolioManager implements PortfolioManager {
 			}
 
 			if (tr.getBuyOrSell() == TradeRecord.BuyOrSell.BUY) {
-				portfolio.addCashByName(tr.getStock().getExchange().getMoneyName(),
-						tr.getAmount() * tr.getPrice() + tr.getFee());
+				portfolio.addCashByName(tr.getStock().getExchange().getTradeMoneyName(),
+						(tr.getAmount() * tr.getPrice() + tr.getFee()) * tr.getExRate());
 				holding.addAmount(-tr.getAmount());
 			} else {
-				portfolio.addCashByName(tr.getStock().getExchange().getMoneyName(),
-						tr.getFee() - tr.getAmount() * tr.getPrice());
+				portfolio.addCashByName(tr.getStock().getExchange().getTradeMoneyName(),
+						(tr.getFee() - tr.getAmount() * tr.getPrice()) * tr.getExRate());
 				holding.addAmount(tr.getAmount());
 			}
 

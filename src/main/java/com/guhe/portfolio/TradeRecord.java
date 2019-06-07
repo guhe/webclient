@@ -2,6 +2,7 @@ package com.guhe.portfolio;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,11 +29,14 @@ public class TradeRecord {
 	private long amount;
 
 	private double price;
-	
+
 	private double fee;
 
+	@Column(name = "EXRATE", columnDefinition = "double default 1.0")
+	private double exRate = 1.0;
+
 	private Date date;
-	
+
 	private String note;
 
 	public int getId() {
@@ -89,6 +93,14 @@ public class TradeRecord {
 
 	public void setFee(double fee) {
 		this.fee = fee;
+	}
+
+	public double getExRate() {
+		return exRate;
+	}
+
+	public void setExRate(double exRate) {
+		this.exRate = exRate;
 	}
 
 	public Date getDate() {
