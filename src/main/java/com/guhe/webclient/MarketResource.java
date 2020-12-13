@@ -23,7 +23,7 @@ public class MarketResource {
 	@Path("Stock/{stockCode}")
 	public List<DailyNWPUViewData> getDailyNWPU(@PathParam("stockCode") String stockFullCode) {
 		Calendar from = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
-		from.set(2018, 11, 28);
+		from.set(2019, 11, 28);
 		Calendar to = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 		return stockMarket.getDailyStockData(stockFullCode, from, to).entrySet().stream().sorted((e1, e2) -> {
 			return e1.getKey().compareTo(e2.getKey());
